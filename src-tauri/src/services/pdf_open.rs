@@ -20,6 +20,7 @@ pub struct PdfOpenOffer {
 struct Pending {
     offer: PdfOpenOffer,
     path: PathBuf,
+    connector: Option<super::zotero_connector::model::OpenGrant>,
 }
 #[derive(Default)]
 pub struct PdfOpenRequests {
@@ -111,9 +112,58 @@ impl PdfOpenRequests {
                     title,
                 },
                 path,
+                connector: None,
             });
         }
         Ok(pending.len())
+    }
+    pub fn enqueue_connector(
+        &self,
+        path: PathBuf,
+        context: super::zotero_connector::model::OpenContext,
+        cancel: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    ) -> Result<String> {
+        let mut pending = self
+            .pending
+            .lock()
+            .map_err(|_| StorageError::Invalid("PDF请求队列锁异常。"))?;
+        if let Some(value) = pending.iter_mut().find(|v| v.path == path) {
+            value.connector = Some((context, cancel));
+            return Ok(value.offer.id.clone());
+        }
+        if pending.len() >= 16 {
+            return Err(StorageError::Invalid("PDF请求队列已满，请先处理或取消。"));
+        }
+        let id = ephemeral();
+        let title = path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .chars()
+            .filter(|c| !c.is_control())
+            .take(160)
+            .collect();
+        pending.push_back(Pending {
+            offer: PdfOpenOffer {
+                id: id.clone(),
+                title,
+            },
+            path,
+            connector: Some((context, cancel)),
+        });
+        Ok(id)
+    }
+    pub fn cancel_connection(&self, connection: &str) -> Result<()> {
+        let mut values = self
+            .pending
+            .lock()
+            .map_err(|_| StorageError::Invalid("PDF请求队列锁异常。"))?;
+        values.retain(|v| {
+            v.connector
+                .as_ref()
+                .is_none_or(|(c, _)| c.connection_id != connection)
+        });
+        Ok(())
     }
     pub fn list(&self) -> Result<Vec<PdfOpenOffer>> {
         Ok(self
@@ -125,6 +175,12 @@ impl PdfOpenRequests {
             .collect())
     }
     pub fn take(&self, id: &str) -> Result<PathBuf> {
+        self.take_with_context(id).map(|v| v.0)
+    }
+    pub fn take_with_context(
+        &self,
+        id: &str,
+    ) -> Result<(PathBuf, Option<super::zotero_connector::model::OpenGrant>)> {
         let mut pending = self
             .pending
             .lock()
@@ -133,7 +189,8 @@ impl PdfOpenRequests {
             .iter()
             .position(|item| item.offer.id == id)
             .ok_or(StorageError::NotFound)?;
-        Ok(pending.remove(index).ok_or(StorageError::NotFound)?.path)
+        let value = pending.remove(index).ok_or(StorageError::NotFound)?;
+        Ok((value.path, value.connector))
     }
     pub fn dismiss(&self, id: &str) -> Result<()> {
         self.take(id).map(|_| ())

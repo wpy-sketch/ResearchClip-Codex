@@ -71,8 +71,8 @@ pub async fn open_pdf_document(
             let (record, source) = if let Some(id) = document_id {
                 (library.with(|s| s.pdf_record(&id))?, None)
             } else {
-                let path = if let Some(id) = request_id {
-                    service.requests.take(&id).map_err(error)?
+                let (path, connector) = if let Some(id) = request_id {
+                    service.requests.take_with_context(&id).map_err(error)?
                 } else {
                     let Some(selected) = app
                         .dialog()
@@ -84,10 +84,14 @@ pub async fn open_pdf_document(
                     else {
                         return Ok(None);
                     };
-                    selected
-                        .into_path()
-                        .map_err(|_| error(StorageError::Invalid("请选择本地PDF。")))?
+                    (
+                        selected
+                            .into_path()
+                            .map_err(|_| error(StorageError::Invalid("请选择本地PDF。")))?,
+                        None,
+                    )
                 };
+                service.attach_connector(&token, connector).map_err(error)?;
                 job.check().map_err(error)?;
                 let title = path
                     .file_name()

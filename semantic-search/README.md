@@ -9,6 +9,6 @@
 
 首版仅CPU、2个ONNX推理线程、单任务，最多2000张，结果前60项。查询和索引都可取消。删除索引仅删除派生向量，不删原图、笔记、OCR、文档或模型。重建逐项替换，中途取消保留已完成数据。
 
-模型组合固定为OpenAI CLIP ViT-B/32的Xenova量化ONNX图像编码器（MIT来源模型）与Sentence Transformers官方对齐的多语言文本编码器及投影（Apache-2.0）；这是同一对齐嵌入空间，不能替换成其他CLIP、中文CLIP或Qwen向量。量化转换与版本、预处理和投影共同定义 `clip-b32-multilingual-int8-v1`。来源、许可证与实测限制见上方评估文档。
+模型组合固定为OpenAI CLIP ViT-B/32的Xenova量化ONNX图像编码器与Sentence Transformers官方对齐的多语言文本编码器及投影（文本仓库声明Apache-2.0）。Step 2复核未找到锁定视觉ONNX仓库的独立权重许可证，不能把上游代码MIT当作权重分发核准；因此新组件中心禁用该模型的一键分发，既有手动研究流程保留；这是同一对齐嵌入空间，不能替换成其他CLIP、中文CLIP或Qwen向量。量化转换与版本、预处理和投影共同定义 `clip-b32-multilingual-int8-v1`。来源、许可证与实测限制见上方评估文档。
 
 本目录的worker是应用内置固定代码；WebView不能指定脚本、模型地址、执行命令或任意输入文件路径。CLI单元测试使用隔离临时目录，不应对用户资料库运行实验脚本。

@@ -2,7 +2,7 @@
 
 ## 功能与模块
 
-素材库“普通搜索 / 图文语义 · 实验”切换；自然语言查询独立于标题、笔记、标签、OCR全文。`features/semantic` → main窗口限定的5个IPC命令 → `EmbeddingService` 单个有界后台任务 → 固定Python/ONNX worker → schema11派生索引。复用现有 `LibraryService`、截图读取、缩略图、知识卡片、主题、原生目录选择器和公式OCR运行时；没有新增npm/Cargo/Python依赖，没有云端向量库或上传。
+素材库“普通搜索 / 图文语义 · 实验”切换；自然语言查询独立于标题、笔记、标签、OCR全文。`features/semantic` → main窗口限定的5个IPC命令 → `EmbeddingService` 单个有界后台任务 → 固定Python/ONNX worker → schema11派生索引。复用现有 `LibraryService`、截图读取、缩略图、知识卡片、主题、原生目录选择器和公式OCR运行时；原A13实现当时没有新增npm/Cargo/Python依赖，没有云端向量库或上传。Step 2另外验证了随主程序运行时的CPU原型，新增Rust依赖及许可限制见[本轮报告](qa/STEP2_REPORT.md)；视觉权重许可未核实，新的托管安装保持禁用。
 
 用户主动开启/更新索引；启动或重启不会自动下载或扫描。下载另需明确确认，离线导入不联网。索引/查询/导入/下载互斥、可取消、失败显示原因并保留已提交记录；重试更新跳过相同原图。普通搜索不依赖模型。新截图需手动更新索引。
 
@@ -13,7 +13,7 @@
 | 图像编码器 | `Xenova/clip-vit-base-patch32`，固定提交 `d15189d7028b43f1d3e65039190477f6af591c2a`，`vision_model_quantized.onnx`，89,117,001字节；转换自OpenAI CLIP ViT-B/32 |
 | 文本编码器 | `sentence-transformers/clip-ViT-B-32-multilingual-v1`，固定提交 `58edf8cada9e398793dca955574a48cbb7f18be2`，官方 `model_quint8_avx2.onnx`，135,377,779字节；mean pooling后通过同提交 `2_Dense` 的768→512投影 |
 | 配对依据 | 官方文本模型卡明确要求原版CLIP ViT-B/32图像编码器，蒸馏对齐其空间；支持包括zh-cn/zh-tw的50多种语言。不是将两个独立CLIP的向量混用 |
-| 许可证 | [OpenAI代码及权重MIT](https://github.com/openai/CLIP#license)；[MIT正文](https://github.com/openai/CLIP/blob/main/LICENSE)。[Xenova转换来源](https://huggingface.co/Xenova/clip-vit-base-patch32)未单独标新的许可证，按上游MIT保留来源；[官方文本模型卡](https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1)标Apache-2.0。应用不捆绑/改写权重，下载固定公开文件，离线分发须附原许可 |
+| 许可证 | 2026-10-28复核：OpenAI CLIP代码LICENSE为MIT，但模型卡未独立声明权重许可；锁定Xenova转换仓库也未独立声明视觉权重分发许可，不能由代码许可推定权重许可。[视觉模型卡](https://huggingface.co/Xenova/clip-vit-base-patch32)；[文本模型卡](https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1)明确Apache-2.0。新组件中心阻止该语义权重的一键安装，原有手动研究路径保留；不得称为已审核可分发模型包。 |
 | 推理与API | [ONNX Runtime Python](https://onnxruntime.ai/docs/api/python/api_summary.html) `InferenceSession` / `SessionOptions`，已在安装版本1.31.0验证实际输入输出；tokenizers0.23.3本地JSON加载；无trust_remote_code、pickle、Torch或远程模型Hub调用 |
 | 预处理 | RGB、短边224、bicubic中心裁剪、CLIP固定均值方差；文本上限128token、attention-mask mean pooling、无偏置线性投影、L2归一化512维 |
 | 文件/内存 | 八份文件合计228,030,489字节；首次Windows CPU探针峰值工作集301,867,008字节。运行时和解码另占空间，不是模型文件大小即内存上限 |

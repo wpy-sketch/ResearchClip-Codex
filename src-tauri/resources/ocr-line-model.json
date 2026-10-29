@@ -1,0 +1,20 @@
+{
+  "revision": "1cfba2e90fc938db55889873735088de210cc173",
+  "files": [
+    {
+      "path": "rec.onnx",
+      "url": "https://huggingface.co/SWHL/RapidOCR/resolve/1cfba2e90fc938db55889873735088de210cc173/PP-OCRv4/ch_PP-OCRv4_rec_infer.onnx",
+      "size": 10857958,
+      "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b"
+    },
+    {
+      "path": "characters.txt",
+      "url": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/v2.7.3/ppocr/utils/ppocr_keys_v1.txt",
+      "size": 26249,
+      "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7"
+    }
+  ],
+  "source": "https://huggingface.co/SWHL/RapidOCR",
+  "license": "Apache-2.0",
+  "licenseUrl": "https://huggingface.co/SWHL/RapidOCR/blob/main/README.md"
+}

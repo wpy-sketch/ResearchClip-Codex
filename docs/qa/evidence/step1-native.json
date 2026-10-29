@@ -1,0 +1,22 @@
+{
+  "mode": "Windows Tauri debug/custom-protocol, real WebView2/Rust IPC, isolated local data",
+  "checks": [
+    "actual isolated SQLite schema21 initialized without a new Step1 migration",
+    "actual embedded frontend renders 46 definitions and all six package classes",
+    "external installation remains UNKNOWN and auto updater is explicitly unimplemented before checking",
+    "catalog controls original clipper service and confirms real native enabled/disabled state",
+    "catalog controls original opt-in Connector service without pairing or touching Zotero",
+    "class filtering and stable feature ID search work",
+    "native WebView contained at 480/760/1440 widths and CSS scale75–200%; not physical Windows DPI acceptance",
+    "settings integration preserves Markdown draft and close confirmation; no empty Markdown panel remains"
+  ],
+  "errors": [],
+  "unverified": [
+    "Physical DPI/HDR/mixed monitors",
+    "Actual browser extension and native host installation",
+    "Actual Zotero XPI/library/API/write permissions",
+    "External WebDAV provider and downloaded model execution"
+  ],
+  "settingsSchema": 1,
+  "result": "PASS"
+}

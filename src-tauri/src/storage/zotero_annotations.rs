@@ -3,8 +3,8 @@ use super::{
     Storage, StorageError,
     library::{check_id, now},
 };
-use crate::services::zotero_annotations::{AnnotationReadCache, AnnotationSource};
-use rusqlite::{OptionalExtension, TransactionBehavior, params};
+use crate::services::zotero_annotations::{AnnotationReadCache, AnnotationSource, MAX_CACHE_BYTES};
+use rusqlite::{OptionalExtension, params};
 type Result<T> = std::result::Result<T, StorageError>;
 impl Storage {
     pub fn annotation_source(&self, document_id: &str, source: &AnnotationSource) -> Result<()> {
@@ -34,7 +34,7 @@ impl Storage {
         let record = self.pdf_record(document_id)?;
         let json:Option<String>=self.connection.query_row("SELECT snapshot_json FROM zotero_annotation_cache WHERE document_id=?1 AND instance_id=?2 AND library_type=?3 AND library_id=?4 AND attachment_key=?5 AND content_hash=?6",params![document_id,source.instance_id,source.library_type,source.library_id,source.attachment_key,record.content_hash],|r|r.get(0)).optional()?;
         json.map(|json| {
-            if json.len() > 8 * 1024 * 1024 {
+            if json.len() > MAX_CACHE_BYTES {
                 return Err(StorageError::Invalid("批注缓存超出预算，未删除原缓存。"));
             }
             let cache: AnnotationReadCache = serde_json::from_str(&json)
@@ -64,17 +64,15 @@ impl Storage {
         }
         let json = serde_json::to_string(cache)
             .map_err(|_| StorageError::Invalid("批注快照序列化失败。"))?;
-        if json.len() > 8 * 1024 * 1024 {
-            return Err(StorageError::Invalid("批注快照超过8MiB，旧缓存保留。"));
+        if json.len() > MAX_CACHE_BYTES {
+            return Err(StorageError::Invalid("批注快照超过64MiB，旧缓存保留。"));
         }
         let s = &cache.source;
-        let tx = self
-            .connection
-            .transaction_with_behavior(TransactionBehavior::Immediate)?;
+        let tx = self.connection.savepoint()?;
         let(total,old):(u64,u64)=tx.query_row("SELECT coalesce(sum(length(cast(snapshot_json AS BLOB))),0),coalesce(sum(CASE WHEN document_id=?1 AND instance_id=?2 AND library_type=?3 AND library_id=?4 AND attachment_key=?5 AND content_hash=?6 THEN length(cast(snapshot_json AS BLOB)) ELSE 0 END),0) FROM zotero_annotation_cache",params![document_id,s.instance_id,s.library_type,s.library_id,s.attachment_key,cache.pdf_content_hash],|r|Ok((r.get(0)?,r.get(1)?)))?;
-        if total - old + json.len() as u64 > 64 * 1024 * 1024 {
+        if total - old + json.len() as u64 > 256 * 1024 * 1024 {
             return Err(StorageError::Invalid(
-                "只读批注缓存达到64MiB上限，旧缓存保留。",
+                "只读批注缓存达到256MiB上限，旧缓存保留。",
             ));
         }
         let previous:Option<i64>=tx.query_row("SELECT fetched_at FROM zotero_annotation_cache WHERE document_id=?1 AND instance_id=?2 AND library_type=?3 AND library_id=?4 AND attachment_key=?5 AND content_hash=?6",params![document_id,s.instance_id,s.library_type,s.library_id,s.attachment_key,cache.pdf_content_hash],|r|r.get(0)).optional()?;
@@ -248,7 +246,7 @@ pub(crate) mod tests {
             Err(StorageError::Conflict)
         ));
         let mut oversized = original.clone();
-        oversized.annotations = (0..130)
+        oversized.annotations = (0..1024)
             .map(|i| {
                 let mut a = original.annotations[0].clone();
                 a.identity.annotation_key = format!("N{i:07}");
@@ -297,5 +295,94 @@ pub(crate) mod tests {
             )
             .unwrap();
         assert_eq!(retained, json);
+    }
+    #[test]
+    fn migration21_preserves_old_snapshot_exactly_and_failed_ddl_rolls_back_with_verified_backup() {
+        for fail in [false, true] {
+            let t = tempfile::tempdir().unwrap();
+            let path = t.path().join("owned-upgrade");
+            let mut s = Storage::open(path.clone()).unwrap();
+            let p = s.register_pdf("保留来源", &"a".repeat(64), 12).unwrap();
+            let source = bind(&mut s, &p.document_id, &p.content_hash, "user", 42);
+            s.save_annotation_cache(&p.document_id, &cache(&source, &p.content_hash))
+                .unwrap();
+            let exact: String = s
+                .connection
+                .query_row(
+                    "SELECT snapshot_json FROM zotero_annotation_cache",
+                    [],
+                    |r| r.get(0),
+                )
+                .unwrap();
+            // Reconstruct only this owned fixture's actual schema20 cache constraint.
+            s.connection
+                .execute_batch("ALTER TABLE zotero_annotation_cache RENAME TO owned_new_cache")
+                .unwrap();
+            s.connection
+                .execute_batch(include_str!(
+                    "../../migrations/019_zotero_annotation_cache.sql"
+                ))
+                .unwrap();
+            s.connection.execute_batch("INSERT INTO zotero_annotation_cache SELECT * FROM owned_new_cache;DROP TABLE owned_new_cache;PRAGMA user_version=20;").unwrap();
+            if fail {
+                s.connection
+                    .execute_batch("CREATE TABLE zotero_annotation_cache_v21(owned_fault TEXT)")
+                    .unwrap();
+            }
+            drop(s);
+            let opened = Storage::open(path.clone());
+            if fail {
+                assert!(opened.is_err());
+                let c = rusqlite::Connection::open(path.join("researchclip.sqlite3")).unwrap();
+                let v: u32 = c
+                    .pragma_query_value(None, "user_version", |r| r.get(0))
+                    .unwrap();
+                assert_eq!(v, 20);
+                let after: String = c
+                    .query_row(
+                        "SELECT snapshot_json FROM zotero_annotation_cache",
+                        [],
+                        |r| r.get(0),
+                    )
+                    .unwrap();
+                assert_eq!(after, exact);
+            } else {
+                let s = opened.unwrap();
+                assert_eq!(s.status().unwrap().schema_version, 21);
+                let after: String = s
+                    .connection
+                    .query_row(
+                        "SELECT snapshot_json FROM zotero_annotation_cache",
+                        [],
+                        |r| r.get(0),
+                    )
+                    .unwrap();
+                assert_eq!(after, exact);
+                assert_eq!(
+                    s.pdf_record(&p.document_id).unwrap().content_hash,
+                    p.content_hash
+                );
+            }
+            let backups: Vec<_> = std::fs::read_dir(path.join("backups"))
+                .unwrap()
+                .map(|e| e.unwrap().path())
+                .filter(|p| {
+                    p.file_name()
+                        .unwrap()
+                        .to_string_lossy()
+                        .starts_with("schema-20-")
+                })
+                .collect();
+            assert_eq!(backups.len(), 1);
+            let c = rusqlite::Connection::open(&backups[0]).unwrap();
+            let before: String = c
+                .query_row(
+                    "SELECT snapshot_json FROM zotero_annotation_cache",
+                    [],
+                    |r| r.get(0),
+                )
+                .unwrap();
+            assert_eq!(before, exact);
+        }
     }
 }

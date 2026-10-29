@@ -1,10 +1,11 @@
 export const MAX_OCR_TEXT_BYTES=1024*1024;
 export interface OcrRegion {x:number;y:number;width:number;height:number}
-export interface OcrStatus {languages:{tag:string;name:string}[];maxDimension:number}
+export interface OcrStatus {languages:{tag:string;name:string}[];maxDimension:number;systemError?:string|null}
 export interface OcrResult {text:string;language:string;widthPx:number;heightPx:number}
 export function validateText(text:string){if(text.includes('\0')||new TextEncoder().encode(text).length>MAX_OCR_TEXT_BYTES)throw new Error('识别文字超过 1 MiB 或包含无效字符。');}
 export function parseStatus(value:unknown):OcrStatus{
   const v=value as OcrStatus;
+  if(v?.systemError!==undefined&&v.systemError!==null&&typeof v.systemError!=='string')throw Error('OCR系统诊断无效。');
   if(!v||!Number.isInteger(v.maxDimension)||v.maxDimension<=0||!Array.isArray(v.languages)||v.languages.length>200||v.languages.some(l=>!l||typeof l.tag!=='string'||!/^[a-z0-9-]{1,64}$/i.test(l.tag)||typeof l.name!=='string'||l.name.length>200))throw new Error('OCR 环境响应无效。');
   return v;
 }

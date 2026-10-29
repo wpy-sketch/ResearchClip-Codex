@@ -11,9 +11,9 @@ use crate::services::{
     },
     zotero_write_model::{AnnotationWriteInput, new_foreign_annotation_key},
 };
-use rusqlite::{OptionalExtension, TransactionBehavior, params};
+use rusqlite::{OptionalExtension, params};
 type Result<T> = std::result::Result<T, StorageError>;
-const BUDGET: i64 = 64 * 1024 * 1024;
+const BUDGET: i64 = 256 * 1024 * 1024;
 fn invalid(_: impl std::fmt::Display) -> StorageError {
     StorageError::Invalid("批注同步记录损坏或未来格式，未重置数据。")
 }
@@ -32,7 +32,7 @@ impl Storage {
     ) -> Result<AnnotationSyncSnapshot> {
         self.annotation_source(document_id, source)?;
         let record = self.pdf_record(document_id)?;
-        let mut query=self.connection.prepare("SELECT id,revision,status,entry_json FROM zotero_annotation_sync WHERE document_id=?1 AND instance_id=?2 AND library_type=?3 AND library_id=?4 AND item_key=?5 AND attachment_key=?6 AND content_hash=?7 ORDER BY id LIMIT 1001")?;
+        let mut query=self.connection.prepare("SELECT id,revision,status,entry_json FROM zotero_annotation_sync WHERE document_id=?1 AND instance_id=?2 AND library_type=?3 AND library_id=?4 AND item_key=?5 AND attachment_key=?6 AND content_hash=?7 ORDER BY id LIMIT 100001")?;
         let rows = query.query_map(
             params![
                 document_id,
@@ -71,9 +71,9 @@ impl Storage {
             }
             entries.push(e);
         }
-        if entries.len() > 1000 {
+        if entries.len() > 100000 {
             return Err(StorageError::Invalid(
-                "当前来源超过1000条同步记录，未丢弃记录。",
+                "当前来源超过100000条同步记录，未丢弃记录。",
             ));
         }
         let raw:Option<String>=self.connection.query_row("SELECT scope_json FROM zotero_annotation_sync_scopes WHERE document_id=?1 AND instance_id=?2 AND library_type=?3 AND library_id=?4 AND item_key=?5 AND attachment_key=?6 AND content_hash=?7",params![document_id,source.instance_id,source.library_type,source.library_id,source.item_key,source.attachment_key,record.content_hash],|r|r.get(0)).optional()?;
@@ -158,9 +158,7 @@ impl Storage {
         let history_id = self.new_id()?;
         let status = state_text(entry.status)?;
         let timestamp = now()?;
-        let tx = self
-            .connection
-            .transaction_with_behavior(TransactionBehavior::Immediate)?;
+        let tx = self.connection.savepoint()?;
         let current: Option<i64> = tx
             .query_row(
                 "SELECT revision FROM zotero_annotation_sync WHERE id=?1",
@@ -179,14 +177,14 @@ impl Storage {
         let old_len = existing.as_ref().map_or(0, |e| e.1.len() as i64);
         if bytes - old_len + json.len() as i64 > BUDGET {
             return Err(StorageError::Invalid(
-                "批注待处理队列达到64MiB保护预算，旧记录和当前输入须保留。",
+                "批注待处理队列达到256MiB保护预算，旧记录和当前输入须保留。",
             ));
         }
         if archive && let Some((version, old)) = &existing {
             let history_bytes:i64=tx.query_row("SELECT coalesce(sum(length(cast(snapshot_json AS BLOB))),0) FROM zotero_annotation_sync_revisions",[],|r|r.get(0))?;
             if history_bytes + old.len() as i64 > BUDGET {
                 return Err(StorageError::Invalid(
-                    "批注处理修订达到64MiB保护预算，未删除任何历史。",
+                    "批注处理修订达到256MiB保护预算，未删除任何历史。",
                 ));
             }
             let parent:Option<String>=tx.query_row("SELECT revision_id FROM zotero_annotation_sync_revisions WHERE change_id=?1 ORDER BY version_number DESC LIMIT 1",[&entry.id],|r|r.get(0)).optional()?;
@@ -237,9 +235,9 @@ impl Storage {
             }
             e.clone()
         } else {
-            if snapshot.entries.len() >= 1000 {
+            if snapshot.entries.len() >= 100000 {
                 return Err(StorageError::Invalid(
-                    "当前来源同步记录达到1000条，未删除旧记录。",
+                    "当前来源同步记录达到100000条，未删除旧记录。",
                 ));
             }
             let remote = if let Some(key) = key {
@@ -322,6 +320,31 @@ impl Storage {
         }
         self.save_annotation_sync_entry(entry, expected, preserve_failure)
     }
+    /// Publish the readonly snapshot and its comparisons together; failures preserve both.
+    pub fn commit_annotation_read(
+        &mut self,
+        document_id: &str,
+        cache: &AnnotationReadCache,
+    ) -> Result<AnnotationSyncSnapshot> {
+        self.connection.execute_batch("BEGIN IMMEDIATE")?;
+        let result = (|| {
+            self.save_annotation_cache(document_id, cache)?;
+            self.observe_annotation_sync(document_id, cache)
+        })();
+        match result {
+            Ok(snapshot) => {
+                if let Err(e) = self.connection.execute_batch("COMMIT") {
+                    self.connection.execute_batch("ROLLBACK")?;
+                    return Err(e.into());
+                }
+                Ok(snapshot)
+            }
+            Err(e) => {
+                self.connection.execute_batch("ROLLBACK")?;
+                Err(e)
+            }
+        }
+    }
     pub fn observe_annotation_sync(
         &mut self,
         document_id: &str,
@@ -334,23 +357,24 @@ impl Storage {
         }
         let snapshot = self.annotation_sync_snapshot(document_id, &cache.source)?;
         let timestamp = now()?;
-        let mut existing = snapshot.entries;
+        // One indexed comparison and one transaction; no per-row full-table budget scans.
+        let mut existing: std::collections::BTreeMap<_, _> = snapshot
+            .entries
+            .into_iter()
+            .map(|e| (e.annotation_key.clone(), e))
+            .collect();
+        let mut changes = Vec::new();
         for remote in &cache.annotations {
-            if let Some(e) = existing
-                .iter_mut()
-                .find(|e| e.annotation_key == remote.identity.annotation_key)
-            {
+            if let Some(mut e) = existing.remove(&remote.identity.annotation_key) {
                 let previous = e.clone();
                 e.observe(Some(remote.clone()), false, timestamp);
                 let mut comparable = e.clone();
                 comparable.updated_at = previous.updated_at;
                 if comparable != previous {
-                    let saved =
-                        self.save_annotation_sync_entry(e.clone(), previous.revision, true)?;
-                    *e = saved;
+                    changes.push((e, Some(previous)));
                 }
             } else {
-                let e = AnnotationSyncEntry {
+                let mut e = AnnotationSyncEntry {
                     format_version: 1,
                     id: self.new_id()?,
                     document_id: document_id.into(),
@@ -369,26 +393,20 @@ impl Storage {
                     last_synced_at: None,
                     updated_at: timestamp,
                 };
-                let mut e = e;
                 if !e.writable_type() {
                     e.status = AnnotationSyncState::ReadOnly;
                 }
-                self.save_annotation_sync_entry(e, 0, false)?;
+                changes.push((e, None));
             }
         }
         if !cache.truncated {
-            for mut e in existing.into_iter().filter(|e| {
-                e.remote.is_some()
-                    && !cache
-                        .annotations
-                        .iter()
-                        .any(|a| a.identity.annotation_key == e.annotation_key)
-            }) {
-                let rev = e.revision;
+            for mut e in existing.into_values().filter(|e| e.remote.is_some()) {
+                let previous = e.clone();
                 e.observe(None, false, timestamp);
-                self.save_annotation_sync_entry(e, rev, true)?;
+                changes.push((e, Some(previous)));
             }
         }
+        self.apply_annotation_sync_changes(changes, timestamp)?;
         let mut scope = snapshot.scope;
         scope.last_refreshed_at = Some(cache.fetched_at);
         scope.message = if cache.truncated {
@@ -399,6 +417,84 @@ impl Storage {
         .into();
         self.save_annotation_sync_scope(document_id, &cache.source, &scope)?;
         self.annotation_sync_snapshot(document_id, &cache.source)
+    }
+    fn apply_annotation_sync_changes(
+        &mut self,
+        changes: Vec<(AnnotationSyncEntry, Option<AnnotationSyncEntry>)>,
+        timestamp: i64,
+    ) -> Result<()> {
+        let mut prepared = Vec::with_capacity(changes.len());
+        let mut byte_delta = 0i64;
+        let mut history_delta = 0i64;
+        for (mut e, previous) in changes {
+            let expected = previous.as_ref().map_or(0, |p| p.revision);
+            e.revision = expected.checked_add(1).ok_or(StorageError::Conflict)?;
+            e.validate().map_err(invalid)?;
+            let json = serde_json::to_string(&e).map_err(invalid)?;
+            if json.len() > 1024 * 1024 {
+                return Err(invalid("entry budget"));
+            }
+            let old = previous
+                .as_ref()
+                .map(serde_json::to_string)
+                .transpose()
+                .map_err(invalid)?;
+            byte_delta += json.len() as i64 - old.as_ref().map_or(0, |s| s.len() as i64);
+            history_delta += old.as_ref().map_or(0, |s| s.len() as i64);
+            let history_id = self.new_id()?;
+            let status = state_text(e.status)?;
+            prepared.push((e, expected, json, old, history_id, status));
+        }
+        let tx = self.connection.savepoint()?;
+        let bytes: i64 = tx.query_row(
+            "SELECT coalesce(sum(length(cast(entry_json AS BLOB))),0) FROM zotero_annotation_sync",
+            [],
+            |r| r.get(0),
+        )?;
+        let history_bytes:i64 = tx.query_row("SELECT coalesce(sum(length(cast(snapshot_json AS BLOB))),0) FROM zotero_annotation_sync_revisions", [], |r|r.get(0))?;
+        if bytes + byte_delta > BUDGET || history_bytes + history_delta > BUDGET {
+            return Err(StorageError::Invalid(
+                "批注同步或修订达到256MiB预算，原记录保留。",
+            ));
+        }
+        for (e, expected, json, old, history_id, status) in prepared {
+            let current: Option<i64> = tx
+                .query_row(
+                    "SELECT revision FROM zotero_annotation_sync WHERE id=?1",
+                    [&e.id],
+                    |r| r.get(0),
+                )
+                .optional()?;
+            if current.unwrap_or(0) != expected {
+                return Err(StorageError::Conflict);
+            }
+            if let Some(old) = old {
+                let parent:Option<String>=tx.query_row("SELECT revision_id FROM zotero_annotation_sync_revisions WHERE change_id=?1 ORDER BY version_number DESC LIMIT 1",[&e.id],|r|r.get(0)).optional()?;
+                tx.execute("INSERT INTO zotero_annotation_sync_revisions(revision_id,change_id,version_number,parent_revision_id,created_at,description,snapshot_json) VALUES(?1,?2,?3,?4,?5,'保留远端比较前的完整状态',?6)",params![history_id,e.id,expected,parent,timestamp,old])?;
+            }
+            tx.execute("INSERT INTO zotero_annotation_sync(id,document_id,instance_id,library_type,library_id,item_key,attachment_key,content_hash,annotation_key,revision,status,entry_json) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12) ON CONFLICT(id) DO UPDATE SET revision=excluded.revision,status=excluded.status,entry_json=excluded.entry_json",params![e.id,e.document_id,e.source.instance_id,e.source.library_type,e.source.library_id,e.source.item_key,e.source.attachment_key,e.pdf_content_hash,e.annotation_key,e.revision,status,json])?;
+        }
+        tx.commit()?;
+        Ok(())
+    }
+    pub fn accept_annotation_read(
+        &mut self,
+        document_id: &str,
+        source: &AnnotationSource,
+    ) -> Result<()> {
+        let snapshot = self.annotation_sync_snapshot(document_id, source)?;
+        let timestamp = now()?;
+        let changes = snapshot
+            .entries
+            .into_iter()
+            .filter(|e| e.local.is_none() && e.status == AnnotationSyncState::RemoteChanged)
+            .map(|mut e| {
+                let previous = e.clone();
+                e.accept_remote(timestamp, "已接受最近读取的远端变化，未向Zotero写入。");
+                (e, Some(previous))
+            })
+            .collect();
+        self.apply_annotation_sync_changes(changes, timestamp)
     }
     pub fn annotation_sync_history(
         &self,

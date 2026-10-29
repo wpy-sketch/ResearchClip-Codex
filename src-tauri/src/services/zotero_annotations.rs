@@ -43,6 +43,14 @@ pub struct AnnotationPosition {
     pub page_index: u32,
     pub rects: Vec<[f64; 4]>,
     pub next_page_rects: Vec<[f64; 4]>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub paths: Vec<Vec<f64>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub width: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub font_size: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rotation: Option<f64>,
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -59,6 +67,49 @@ pub struct ZoteroAnnotation {
     pub position: Option<AnnotationPosition>,
     pub unsupported_reason: Option<String>,
 }
+/// JSON serializers/parsers can differ by a few representable f64 values.
+/// This is not a pixel/point tolerance: actual geometric edits remain conflicts.
+pub(crate) fn positions_equivalent(
+    a: &Option<AnnotationPosition>,
+    b: &Option<AnnotationPosition>,
+) -> bool {
+    fn scalar(a: f64, b: f64) -> bool {
+        if !a.is_finite() || !b.is_finite() {
+            return false;
+        }
+        if a == b {
+            return true;
+        }
+        let order = |x: f64| {
+            let bits = x.to_bits();
+            if bits >> 63 == 0 {
+                bits | (1 << 63)
+            } else {
+                !bits
+            }
+        };
+        (a - b).abs() <= 1e-8 && order(a).abs_diff(order(b)) <= 4
+    }
+    fn rectangles(a: &[[f64; 4]], b: &[[f64; 4]]) -> bool {
+        a.len() == b.len()
+            && a.iter()
+                .zip(b)
+                .all(|(a, b)| a.iter().zip(b).all(|(a, b)| scalar(*a, *b)))
+    }
+    match (a, b) {
+        (None, None) => true,
+        (Some(a), Some(b)) => {
+            a.page_index == b.page_index
+                && rectangles(&a.rects, &b.rects)
+                && rectangles(&a.next_page_rects, &b.next_page_rects)
+                && a.paths == b.paths
+                && a.width == b.width
+                && a.font_size == b.font_size
+                && a.rotation == b.rotation
+        }
+        _ => false,
+    }
+}
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct AnnotationReadCache {
@@ -71,9 +122,26 @@ pub struct AnnotationReadCache {
     pub annotations: Vec<ZoteroAnnotation>,
     pub truncated: bool,
 }
+pub const MAX_ANNOTATIONS: usize = 30_000;
+pub const MAX_CACHE_BYTES: usize = 64 * 1024 * 1024;
 pub const SOURCE_MISMATCH: &str = "ZOTERO_ANNOTATION_SOURCE_MISMATCH";
 pub fn supported(kind: &str) -> bool {
-    matches!(kind, "highlight" | "underline" | "note" | "text" | "image")
+    matches!(
+        kind,
+        "highlight" | "underline" | "note" | "text" | "image" | "ink"
+    )
+}
+fn valid_paths(paths: &[Vec<f64>]) -> bool {
+    paths.len() <= 256
+        && paths.iter().map(Vec::len).sum::<usize>() <= 16000
+        && paths.iter().all(|p| {
+            !p.is_empty()
+                && p.len() % 2 == 0
+                && p.iter().all(|n| n.is_finite() && n.abs() <= 1_000_000.0)
+        })
+}
+fn positive(value: Option<f64>) -> bool {
+    value.is_none_or(|n| n.is_finite() && n > 0.0 && n <= 1000.0)
 }
 fn safe_text(value: &Value, key: &str, max: usize) -> Result<String, String> {
     let text = value.get(key).and_then(Value::as_str).unwrap_or("");
@@ -128,8 +196,54 @@ pub fn parse_position(value: &Value) -> Result<AnnotationPosition, String> {
         .and_then(Value::as_u64)
         .filter(|n| *n < 2000)
         .ok_or("批注页码超出支持范围。")? as u32;
-    let rects = rectangles(p.get("rects"))?;
+    let mut rects = rectangles(p.get("rects"))?;
     let next_page_rects = rectangles(p.get("nextPageRects"))?;
+    let paths: Vec<Vec<f64>> = match p.get("paths") {
+        Some(value) => serde_json::from_value(value.clone()).map_err(|_| "ink笔迹数组无效。")?,
+        None => vec![],
+    };
+    let width = p
+        .get("width")
+        .map(|v| v.as_f64().ok_or("ink宽度无效。"))
+        .transpose()?;
+    let font_size = p
+        .get("fontSize")
+        .map(|v| v.as_f64().ok_or("批注字号无效。"))
+        .transpose()?;
+    let rotation = p
+        .get("rotation")
+        .map(|v| v.as_f64().ok_or("批注旋转无效。"))
+        .transpose()?;
+    if !valid_paths(&paths)
+        || !positive(width)
+        || !positive(font_size)
+        || rotation.is_some_and(|n| !n.is_finite() || n.abs() > 360.0)
+    {
+        return Err("批注笔迹、字号或旋转超过预算。".into());
+    }
+    if !paths.is_empty() {
+        let margin = width.ok_or("ink笔迹缺少线宽。")? / 2.0;
+        let mut bounds = [
+            f64::INFINITY,
+            f64::INFINITY,
+            f64::NEG_INFINITY,
+            f64::NEG_INFINITY,
+        ];
+        for path in &paths {
+            for pair in path.as_chunks::<2>().0 {
+                bounds[0] = bounds[0].min(pair[0]);
+                bounds[1] = bounds[1].min(pair[1]);
+                bounds[2] = bounds[2].max(pair[0]);
+                bounds[3] = bounds[3].max(pair[1]);
+            }
+        }
+        rects = vec![[
+            bounds[0] - margin,
+            bounds[1] - margin,
+            bounds[2] + margin,
+            bounds[3] + margin,
+        ]];
+    }
     if rects.is_empty() {
         return Err("本版不支持此批注几何。".into());
     }
@@ -140,6 +254,10 @@ pub fn parse_position(value: &Value) -> Result<AnnotationPosition, String> {
         page_index,
         rects,
         next_page_rects,
+        paths,
+        width,
+        font_size,
+        rotation,
     })
 }
 pub fn parse_annotation(
@@ -189,7 +307,8 @@ pub fn parse_annotation(
         )
     } else {
         match parse_position(data.get("annotationPosition").unwrap_or(&Value::Null)) {
-            Ok(p) => (Some(p), None),
+            Ok(p) if (kind == "ink") == !p.paths.is_empty() => (Some(p), None),
+            Ok(_) => (None, Some("批注类型与几何结构不匹配。".into())),
             Err(e) => (None, Some(e)),
         }
     };
@@ -227,7 +346,7 @@ impl AnnotationReadCache {
                 .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
             || self.fetched_at <= 0
             || self.fetched_at > 9_007_199_254_740_991
-            || self.annotations.len() > 1000
+            || self.annotations.len() > MAX_ANNOTATIONS
             || self.product_version.as_ref().is_some_and(|v| v.len() > 64)
             || self
                 .library_version
@@ -262,6 +381,13 @@ impl AnnotationReadCache {
                     || p.rects.len() > 200
                     || p.next_page_rects.len() > 200
                     || p.page_index >= 1999 && !p.next_page_rects.is_empty()
+                    || !valid_paths(&p.paths)
+                    || !positive(p.width)
+                    || !positive(p.font_size)
+                    || p.rotation
+                        .is_some_and(|n| !n.is_finite() || n.abs() > 360.0)
+                    || (a.annotation_type == "ink") != !p.paths.is_empty()
+                    || !p.paths.is_empty() && p.width.is_none()
                 {
                     return Err("批注缓存位置无效。".into());
                 }
@@ -283,6 +409,45 @@ impl AnnotationReadCache {
 mod tests {
     use super::*;
     use serde_json::json;
+    #[test]
+    fn geometry_comparison_allows_only_bounded_json_roundtrip_ulps_not_page_or_shape_edits() {
+        let a = AnnotationPosition {
+            page_index: 0,
+            rects: vec![[
+                70.01731738035265,
+                721.7404138501048,
+                242.22159974220722,
+                750.4560616347375,
+            ]],
+            next_page_rects: vec![],
+            paths: vec![],
+            width: None,
+            font_size: None,
+            rotation: None,
+        };
+        let mut b = a.clone();
+        b.rects[0][2] = 242.2215997422072;
+        assert!(positions_equivalent(&Some(a.clone()), &Some(b.clone())));
+        b.rects[0][2] = f64::from_bits(a.rects[0][2].to_bits() + 4);
+        assert!(positions_equivalent(&Some(a.clone()), &Some(b.clone())));
+        b.rects[0][2] = f64::from_bits(a.rects[0][2].to_bits() + 5);
+        assert!(!positions_equivalent(&Some(a.clone()), &Some(b.clone())));
+        b = a.clone();
+        b.rects[0][2] += 0.000001;
+        assert!(!positions_equivalent(&Some(a.clone()), &Some(b.clone())));
+        b = a.clone();
+        b.page_index = 1;
+        assert!(!positions_equivalent(&Some(a.clone()), &Some(b)));
+        b = a.clone();
+        b.rects.push(a.rects[0]);
+        assert!(!positions_equivalent(&Some(a.clone()), &Some(b)));
+        b = a.clone();
+        b.rotation = Some(0.0);
+        assert!(!positions_equivalent(&Some(a.clone()), &Some(b)));
+        b = a.clone();
+        b.rects[0][0] = f64::NAN;
+        assert!(!positions_equivalent(&Some(a), &Some(b)));
+    }
     fn source() -> AnnotationSource {
         AnnotationSource {
             instance_id: "a".repeat(32),
@@ -330,14 +495,16 @@ mod tests {
         );
     }
     #[test]
-    fn unsupported_ink_is_zotero_data_and_invalid_positions_remain_explicit_unrenderable_items() {
+    fn ink_keeps_zotero_identity_and_vector_geometry_and_invalid_positions_remain_explicit() {
         let mut raw = item("ink");
         raw["data"]["annotationPosition"] =
             json!("{\"pageIndex\":0,\"paths\":[[1,2,3,4]],\"width\":2}");
         let a = parse_annotation(&raw, &source()).unwrap();
         assert_eq!(a.annotation_type, "ink");
-        assert!(a.position.is_none());
-        assert!(a.unsupported_reason.unwrap().contains("Zotero ink"));
+        let position = a.position.unwrap();
+        assert_eq!(position.paths, vec![vec![1.0, 2.0, 3.0, 4.0]]);
+        assert_eq!(position.rects, vec![[0.0, 1.0, 4.0, 5.0]]);
+        assert!(a.unsupported_reason.is_none());
         for value in [
             json!("not-json"),
             json!("{\"pageIndex\":2000,\"rects\":[[0,0,1,1]]}"),

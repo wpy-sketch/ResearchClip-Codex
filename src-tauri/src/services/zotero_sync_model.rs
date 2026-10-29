@@ -5,7 +5,7 @@ use super::{
         ZoteroAnnotationIdentity,
     },
     zotero_local::valid_item_key,
-    zotero_write_model::{AnnotationWriteInput, WRITE_TYPES},
+    zotero_write_model::{AnnotationWriteInput, WRITE_TYPES, normalized_annotation_text},
 };
 use serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -165,14 +165,18 @@ impl AnnotationSyncEntry {
                 version: 0,
                 annotation_type: annotation_type.clone(),
                 color: color.to_lowercase(),
-                text: text.clone(),
-                comment: comment.clone(),
+                text: normalized_annotation_text(text),
+                comment: normalized_annotation_text(comment),
                 page_label: (geometry.page_index + 1).to_string(),
                 modified_at: None,
                 position: Some(AnnotationPosition {
                     page_index: geometry.page_index,
                     rects: geometry.raw_rectangles()?,
                     next_page_rects: vec![],
+                    paths: vec![],
+                    width: None,
+                    font_size: (annotation_type == "text").then_some(12.0),
+                    rotation: (annotation_type == "text").then_some(0.0),
                 }),
                 unsupported_reason: None,
             })),
@@ -189,8 +193,8 @@ impl AnnotationSyncEntry {
                         return Err("不能用同步改变批注类型。");
                     }
                     a.color = color.to_lowercase();
-                    a.text = text.clone();
-                    a.comment = comment.clone();
+                    a.text = normalized_annotation_text(text);
+                    a.comment = normalized_annotation_text(comment);
                 }
                 a.map(Some)
             }
@@ -205,7 +209,7 @@ impl AnnotationSyncEntry {
                     && a.color == b.color
                     && a.text == b.text
                     && a.comment == b.comment
-                    && a.position == b.position
+                    && super::zotero_annotations::positions_equivalent(&a.position, &b.position)
             }
             _ => false,
         }

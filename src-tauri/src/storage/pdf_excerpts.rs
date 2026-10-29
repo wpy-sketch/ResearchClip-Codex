@@ -185,18 +185,18 @@ mod tests {
     fn future_database_version_refuses_writes_without_reset() {
         let (tmp, s, _, _) = fixture();
         s.connection
-            .pragma_update(None, "user_version", 21)
+            .pragma_update(None, "user_version", 22)
             .unwrap();
         drop(s);
         assert!(matches!(
             Storage::open(tmp.path().into()),
-            Err(StorageError::NewerSchema(21))
+            Err(StorageError::NewerSchema(22))
         ));
         let c = Connection::open(tmp.path().join("researchclip.sqlite3")).unwrap();
         assert_eq!(
             c.pragma_query_value(None, "user_version", |r| r.get::<_, u32>(0))
                 .unwrap(),
-            21
+            22
         );
     }
 }

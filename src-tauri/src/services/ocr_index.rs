@@ -80,12 +80,35 @@ impl OcrIndexService {
         ids: Vec<String>,
         language: String,
     ) -> Result<IndexProgress, CommandError> {
+        self.begin_with_packages(library, ids, language, None)
+    }
+    pub fn begin_with_packages(
+        self: &Arc<Self>,
+        library: Arc<LibraryService>,
+        ids: Vec<String>,
+        language: String,
+        packages: Option<Arc<super::packages::PackageManager>>,
+    ) -> Result<IndexProgress, CommandError> {
         if ids.len() > 5000 {
             return Err(failure("每批最多5000张图片。"));
         }
-        let languages = super::ocr::OcrService::status().map_err(|e| failure(&e.message))?;
-        if !languages.languages.iter().any(|l| l.tag == language) {
-            return Err(failure("请选择本机已安装的OCR语言。"));
+        let package_language = language == "researchclip-ocr-line"
+            && packages
+                .as_ref()
+                .and_then(|p| p.snapshot().ok())
+                .is_some_and(|s| {
+                    s.registry.installed.iter().any(|e| {
+                        e.package.id == "model.ocr-line" && e.enabled && e.readiness == "READY"
+                    })
+                });
+        if !package_language {
+            if language == "researchclip-ocr-line" {
+                return Err(failure("ONNX行模型尚未就绪，请先安装或启用。"));
+            }
+            let languages = super::ocr::OcrService::status().map_err(|e| failure(&e.message))?;
+            if !languages.languages.iter().any(|l| l.tag == language) {
+                return Err(failure("请选择本机已安装的OCR语言。"));
+            }
         }
         let mut s = self
             .state
@@ -145,11 +168,30 @@ impl OcrIndexService {
                         .expect("fixed OCR options");
                         let mut packet = (options.len() as u32).to_le_bytes().to_vec();
                         packet.extend(options);
-                        packet.extend(png);
-                        let recognized =
+                        packet.extend(&png);
+                        let recognized = if package_language {
+                            packages
+                                .as_ref()
+                                .ok_or_else(|| {
+                                    crate::capture::CaptureError::new(
+                                        crate::capture::ErrorCode::CaptureFailed,
+                                        "ONNX组件不可用。",
+                                    )
+                                })
+                                .and_then(|p| {
+                                    p.recognize(&png).map_err(|e| {
+                                        crate::capture::CaptureError::new(
+                                            crate::capture::ErrorCode::CaptureFailed,
+                                            &e,
+                                        )
+                                    })
+                                })
+                        } else {
                             super::ocr::OcrService::recognize_controlled(&packet, || {
                                 service.status().is_ok_and(|s| s.phase == "cancelling")
-                            });
+                            })
+                            .map(|r| r.text)
+                        };
                         let cancelled = service.status().is_ok_and(|s| s.phase == "cancelling");
                         let saved = library.with(|s| {
                             s.finish_ocr(
@@ -158,7 +200,7 @@ impl OcrIndexService {
                                 if cancelled {
                                     Err("识别已取消，已有文本保留。")
                                 } else {
-                                    recognized.as_ref().map(|r| r.text.as_str()).map_err(
+                                    recognized.as_ref().map(|r| r.as_str()).map_err(
                                         |_| "本地OCR失败，请检查语言、图片尺寸或稍后重试。",
                                     )
                                 },

@@ -3,7 +3,8 @@ use super::*;
 use crate::services::{
     zotero_annotations::{AnnotationSource, ZoteroAnnotation, parse_annotation},
     zotero_write_model::{
-        AnnotationWriteCapabilities, AnnotationWriteInput, WRITE_TYPES, tested_write_version,
+        AnnotationWriteCapabilities, AnnotationWriteInput, WRITE_TYPES, normalized_annotation_text,
+        tested_write_version,
     },
 };
 type WriteResult<T> = std::result::Result<T, ZoteroWriteError>;
@@ -83,7 +84,7 @@ impl ZoteroClient {
             .annotation_context(source, original, cancel, Instant::now())
             .map_err(read_failure)?;
         let supported = tested_write_version(health.product_version.as_deref());
-        Ok(AnnotationWriteCapabilities { product_version: health.product_version, supported_types: if supported { WRITE_TYPES.iter().map(|s| (*s).into()).collect() } else { vec![] }, authorized: false, remembered: false, message: if supported { "已核实此客户端的高亮、下划线和普通文字便签接口；写入仍需当前来源授权，权限由Zotero最终检查。" } else { "此客户端版本未完成写入验证，所有写入类型禁用；仍可只读查看。" }.into() })
+        Ok(AnnotationWriteCapabilities { product_version: health.product_version, supported_types: if supported { WRITE_TYPES.iter().map(|s| (*s).into()).collect() } else { vec![] }, authorized: false, remembered: false, message: if supported { "已识别此客户端的五类非ink标准批注接口；写入需当前来源授权与复读验证。真实Zotero验收状态见发布报告，云同步由Zotero自身设置管理。" } else { "此客户端版本未完成写入验证，所有写入类型禁用；仍可只读查看。" }.into() })
     }
     pub fn authorize_annotation_writes(
         &self,
@@ -422,12 +423,17 @@ impl ZoteroClient {
                 if key.is_empty() {
                     return Err(fail("ZOTERO_WRITE_CONFLICT", "新批注键冲突，请重新创建。"));
                 }
+                let text = normalized_annotation_text(text);
+                let comment = normalized_annotation_text(comment);
                 let raw = geometry
                     .raw_rectangles()
                     .map_err(|message| fail("ZOTERO_WRITE_INVALID", message))?;
                 let mut data = json!({"key":key,"version":0,"itemType":"annotation","parentItem":source.attachment_key,"annotationType":annotation_type,"annotationColor":color.to_lowercase(),"annotationComment":comment,"annotationPageLabel":(geometry.page_index+1).to_string(),"annotationSortIndex":format!("{:05}|000000|00000",geometry.page_index),"annotationPosition":serde_json::to_string(&json!({"pageIndex":geometry.page_index,"rects":raw})).map_err(|_|fail("ZOTERO_WRITE_INVALID", "坐标无法编码。"))?});
-                if annotation_type != "note" {
+                if matches!(annotation_type.as_str(), "highlight" | "underline") {
                     data["annotationText"] = json!(text);
+                }
+                if annotation_type == "text" {
+                    data["annotationPosition"]=serde_json::Value::String(serde_json::to_string(&json!({"pageIndex":geometry.page_index,"rects":raw,"fontSize":12,"rotation":0})).map_err(|_|fail("ZOTERO_WRITE_INVALID","自由文本坐标无法编码。"))?);
                 }
                 let expected=parse_annotation(&json!({"key":key,"version":0,"library":{"type":source.library_type,"id":source.library_id},"data":data}),source).map_err(read_failure)?;
                 Ok(WriteIntent {
@@ -460,11 +466,11 @@ impl ZoteroClient {
                     return Err(fail("ZOTERO_WRITE_INVALID", "不允许通过更新改变批注类型。"));
                 }
                 old.color = color.to_lowercase();
-                old.text = text.clone();
-                old.comment = comment.clone();
-                let mut body = json!({"annotationColor":old.color,"annotationComment":comment});
-                if annotation_type != "note" {
-                    body["annotationText"] = json!(text);
+                old.text = normalized_annotation_text(text);
+                old.comment = normalized_annotation_text(comment);
+                let mut body = json!({"annotationColor":old.color,"annotationComment":old.comment});
+                if matches!(annotation_type.as_str(), "highlight" | "underline") {
+                    body["annotationText"] = json!(old.text);
                 }
                 Ok(WriteIntent {
                     source: source.clone(),
@@ -667,7 +673,10 @@ impl ZoteroClient {
                     && actual.color == expected.color
                     && actual.text == expected.text
                     && actual.comment == expected.comment
-                    && actual.position == expected.position
+                    && crate::services::zotero_annotations::positions_equivalent(
+                        &actual.position,
+                        &expected.position,
+                    )
                 {
                     Ok(ZoteroWriteOutcome {
                         verified: true,

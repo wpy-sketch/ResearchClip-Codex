@@ -1,3 +1,5 @@
+> **v5.0.0 草稿准备，尚未公开发布**：工作台内嵌网页浏览器、当前PDF30,000条Zotero标准批注、六类原生显示、Connector与可调布局。按用户要求本轮上传源码及Release草稿，保留独立Windows验收。使用内置固定组件清单与手动升级，无需Catalog/Updater密钥；不再开发IDE。见[最终验收](docs/qa/FINAL_RELEASE_REPORT.md)、[浏览器与功能审查](docs/qa/BROWSER_WORKSPACE_500.md)和[候选说明](docs/release/RELEASE_NOTES.md)。
+
 > **v4.2.7 · Zotero标准批注双向同步**：本地持久待处理、六种同步状态、条件写入、三方冲突比较与独立处理历史。自动刷新只读且默认关闭。指南33章。[本版说明](docs/RELEASE-NOTES-4.2.7.md) · [实际验收](docs/qa/RELEASE-4.2.7.md)。
 
 > **v4.1.9 · 原生工作区PDF阅读器**：本地只读PDF标签、连续单双页、缩放旋转、目录缩略图、文字复制和全文搜索，保存阅读位置并与Markdown并排；SQLite15。见[本版说明](docs/RELEASE-NOTES-4.1.9.md)、[Step10验收](docs/qa/PDF_READER_STEP10.md)与[发布检查](docs/qa/RELEASE-4.1.9.md)。
@@ -11,7 +13,7 @@
 
 # 使用Codex进行构建
 
-面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v4.2.7 Windows；发布与验收状态见本版记录**。
+面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v5.0.0 Windows；实际origin为ResearchClip-Codex，历史ResearchClip仓库的发布回执保留为历史记录。当前仓库的实际Tag、Release和下载结果以最终报告为准**。
 
 [v4.2.0正式回执](docs/qa/PUBLICATION-4.2.0.md) · [v4.2.0变更](docs/RELEASE-NOTES-4.2.0.md) · [Step11验收](docs/qa/ZOTERO_PDF_STEP11.md) · [GitHub发布版本](https://github.com/wpy-sketch/ResearchClip/releases/latest) · [v4.1.9正式回执](docs/qa/PUBLICATION-4.1.9.md) · [v4.1.8正式回执](docs/qa/PUBLICATION-4.1.8.md) · [v4.1.8发布检查](docs/qa/RELEASE-4.1.8.md) · [v4.1.7正式回执](docs/qa/PUBLICATION-4.1.7.md) · [v4.1.7发布检查](docs/qa/RELEASE-4.1.7.md) · [v4.1.7配套与历史附件](docs/RELEASE-COMPONENTS.md) · [v3.1.2发布传输状态](docs/qa/DELIVERY-3.1.2.md) · [完整图文使用指南](docs/USER_GUIDE.md) · [网页剪藏安装](browser-extension/README.md) · [v1.0.2实际验收](docs/qa/RELEASE-1.0.2.md) · [v1.0.2发布回执](docs/qa/PUBLICATION-1.0.2.md)
 
@@ -37,7 +39,8 @@ v3.0.1 新增 **窗口截图**：鼠标高亮选择、Tab/Shift+Tab切换、Esc�
 - **编辑**：无损箭头/矩形/椭圆/文字/画笔/马赛克/模糊/编号，撤销重做、原分辨率PNG、贴图和离线OCR。
 - **整理**：SQLite素材库、网格/列表、科研知识卡片、笔记自动保存、跨项目标签、组合搜索、批量操作与双图对比。
 - **写作**：动态Markdown分栏、标注合成图插入、模板、大纲、离线LaTeX预览和系统其他应用打开。
-- **帮助**：27章任务式说明、177项功能示例、分层目录与正文搜索、44幅离线图示和原尺寸放大查看。
+- **浏览**：资料工作台内嵌独立WebView2网页、导航与缩放；不授予网页科研资料权限，真正Chrome入口保留。
+- **帮助**：38章任务式说明、286项功能示例、分层目录与正文搜索、76幅离线图示和原尺寸放大查看。
 
 v1.0.5 新增非破坏性标注版本历史：显式保存去重、版本说明、只读预览/对比、恢复追加新版本；schema5升级前备份，原图不重复保存。[本轮验收](docs/qa/RELEASE-1.0.5.md) · [发布核验](docs/qa/PUBLICATION-1.0.5.md)。Release继续附带兼容的 v1.0.2 浏览器插件包，不删除既有发布。
 
@@ -306,3 +309,13 @@ SQLite v2→v3升级会先验证并备份，新增projects、screenshot_projects
 v1.0.0 已发布为正式 Latest：[附件与匿名下载校验回执](docs/qa/PUBLICATION-1.0.0.md)。
 
 后续分阶段开发遵守[ResearchClip Pro规范](docs/PRO-DEVELOPMENT.md)。版本历史已在v1.0.5实现；WebDAV仍处于设计阶段，不开发PDF导出或独立备份恢复系统。[规范记录验收](docs/qa/PRO-CONSTRAINTS.md)。
+
+
+Step 2开发记录：[扩展与模型中心验收](docs/qa/STEP2_REPORT.md)、[可信组件目录与模型许可](docs/release/PACKAGE_CATALOG.md)。正式Catalog与Updater源尚未发布；中英文ONNX限单行选区，公式/语义模型及外部插件的未完成验收见报告。操作说明见[使用指南第36章](docs/USER_GUIDE.md#36-扩展与模型中心)。
+
+
+## 4.4.0当前发布验收
+
+4.4.0仍未公开发布。本轮已构建Windows x64 NSIS候选，完成六类Zotero批注原生显示/类型筛选、划词工具栏、导航调宽、30000条回归及组件/OCR安装测试。正式Catalog/Updater信任配置、独立Zotero宿主和公开资产验收仍阻塞稳定版发布。最右侧Google入口按用户确认采用真正Chrome，账号和书签同步由Chrome管理；保留真实桌面启动验收。
+
+详见[最终发布报告](docs/qa/FINAL_RELEASE_REPORT.md)、[候选发布说明](docs/release/RELEASE_NOTES.md)、[安装指南](docs/release/INSTALLATION_GUIDE.md)、[扩展指南](docs/release/EXTENSION_GUIDE.md)及[使用指南第37章](docs/USER_GUIDE.md#37-六类zotero批注划词工具栏与google入口)。这些文档不会将本地候选或测试签名宣称为正式在线版本。

@@ -75,6 +75,41 @@ fn durable_new_key_local_revision_and_pending_survive_process_reopen_without_a_s
     assert!(!serde_json::to_string(&restored).unwrap().contains("apiKey"));
 }
 #[test]
+fn zotero_normalized_reread_settles_pending_create_without_mutation_or_losing_original_draft() {
+    let t = tempfile::tempdir().unwrap();
+    let mut s = Storage::open(t.path().join("data")).unwrap();
+    let p = s.register_pdf("PDF", &"a".repeat(64), 12).unwrap();
+    let source = bind(&mut s, &p.document_id, &p.content_hash, "user", 42);
+    let mut input = create();
+    if let AnnotationWriteInput::Create { text, comment, .. } = &mut input {
+        *text = "Excerpt calibration \u{feff}".into();
+        *comment = " e\u{301} \n".into();
+    }
+    let mut entry = s
+        .stage_annotation_change(&p.document_id, &source, None, None, input.clone())
+        .unwrap();
+    entry.needs_verification = true;
+    let mut remote = entry.desired().unwrap().unwrap();
+    remote.version = 9;
+    remote.position.as_mut().unwrap().rects[0][2] =
+        f64::from_bits(remote.position.as_ref().unwrap().rects[0][2].to_bits() + 1);
+    assert_eq!(remote.text, "Excerpt calibration");
+    assert_eq!(remote.comment, "é");
+    assert_eq!(entry.local, Some(input.clone()));
+    let mut different = remote.clone();
+    different.text = "Excerpt  calibration".into();
+    assert!(!entry.matches_remote(&Some(different)));
+    let mut moved = remote.clone();
+    moved.position.as_mut().unwrap().rects[0][0] += 1.0;
+    assert!(!entry.matches_remote(&Some(moved)));
+    entry.observe(Some(remote), true, 20);
+    assert_eq!(entry.status, AnnotationSyncState::Synced);
+    assert!(!entry.needs_verification);
+    assert!(entry.local.is_none());
+    // Input changes only after a complete exact scoped reread has converged.
+    assert_ne!(input, create());
+}
+#[test]
 fn two_clients_keep_both_versions_and_conflict_resolution_archives_failed_input() {
     let t = tempfile::tempdir().unwrap();
     let mut s = Storage::open(t.path().join("data")).unwrap();
@@ -264,7 +299,10 @@ fn migration19_preserves_originals_markdown_cache_and_failed20_rolls_back() {
         .unwrap();
     drop(s);
     let s = Storage::open(path.clone()).unwrap();
-    assert_eq!(s.status().unwrap().schema_version, 20);
+    assert_eq!(
+        s.status().unwrap().schema_version,
+        super::super::migrations::SCHEMA_VERSION
+    );
     assert_eq!(s.screenshot_image(&shot.id, false).unwrap(), png);
     assert_eq!(std::fs::read(md).unwrap(), text);
     assert_eq!(std::fs::read(assets.join("keep.png")).unwrap(), png);
@@ -379,4 +417,121 @@ fn unfinished_draft_is_durable_but_cannot_be_sent_and_permission_failures_keep_i
         .unwrap();
     assert_eq!(snapshot.local, Some(input));
     assert_eq!(edited.status, AnnotationSyncState::LocalDirty);
+}
+
+#[test]
+fn thirty_thousand_cache_sync_records_survive_restart_and_bulk_observation_is_idempotent_and_atomic()
+ {
+    let t = tempfile::tempdir().unwrap();
+    let path = t.path().join("owned-30k");
+    let mut s = Storage::open(path.clone()).unwrap();
+    let p = s
+        .register_pdf("30k fictional PDF", &"a".repeat(64), 12)
+        .unwrap();
+    let source = bind(&mut s, &p.document_id, &p.content_hash, "user", 42);
+    let mut c = cache(&source, &p.content_hash);
+    let seed = c.annotations[0].clone();
+    c.annotations = (0..30_000)
+        .map(|n| {
+            let mut a = seed.clone();
+            a.identity.annotation_key = format!("N{n:07}");
+            a
+        })
+        .collect();
+    let first = s.commit_annotation_read(&p.document_id, &c).unwrap();
+    assert_eq!(first.entries.len(), 30_000);
+    let id = first.entries[0].id.clone();
+    let revision = first.entries[0].revision;
+    let again = s.observe_annotation_sync(&p.document_id, &c).unwrap();
+    assert_eq!(again.entries[0].id, id);
+    assert_eq!(again.entries[0].revision, revision);
+    drop(s);
+    let mut s = Storage::open(path).unwrap();
+    assert_eq!(
+        s.annotation_cache(&p.document_id, &source)
+            .unwrap()
+            .unwrap()
+            .annotations
+            .len(),
+        30_000
+    );
+    assert_eq!(
+        s.annotation_sync_snapshot(&p.document_id, &source)
+            .unwrap()
+            .entries
+            .len(),
+        30_000
+    );
+    s.connection.execute_batch("CREATE TRIGGER owned_bulk_fault BEFORE UPDATE ON zotero_annotation_sync WHEN NEW.annotation_key='N0010000' BEGIN SELECT RAISE(ABORT,'owned batch fault'); END;").unwrap();
+    for a in &mut c.annotations {
+        a.version = 2;
+    }
+    assert!(s.commit_annotation_read(&p.document_id, &c).is_err());
+    assert!(
+        s.annotation_cache(&p.document_id, &source)
+            .unwrap()
+            .unwrap()
+            .annotations
+            .iter()
+            .all(|a| a.version == 1)
+    );
+    let unchanged = s.annotation_sync_snapshot(&p.document_id, &source).unwrap();
+    assert!(
+        unchanged
+            .entries
+            .iter()
+            .all(|e| e.revision == 1 && e.remote.as_ref().unwrap().version == 1)
+    );
+    let count: i64 = s
+        .connection
+        .query_row(
+            "SELECT count(*) FROM zotero_annotation_sync_revisions",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap();
+    assert_eq!(count, 0);
+    s.connection
+        .execute_batch("DROP TRIGGER owned_bulk_fault")
+        .unwrap();
+    s.accept_annotation_read(&p.document_id, &source).unwrap();
+    let accepted = s.annotation_sync_snapshot(&p.document_id, &source).unwrap();
+    assert!(
+        accepted
+            .entries
+            .iter()
+            .all(|e| e.status == AnnotationSyncState::Synced && e.local.is_none())
+    );
+    s.accept_annotation_read(&p.document_id, &source).unwrap();
+    let count: i64 = s
+        .connection
+        .query_row(
+            "SELECT count(*) FROM zotero_annotation_sync_revisions",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap();
+    assert_eq!(count, 30_000);
+    // A full readonly PDF must still permit a local draft and retain historical identities.
+    let pending = s
+        .stage_annotation_change(&p.document_id, &source, None, None, create())
+        .unwrap();
+    for a in &mut c.annotations {
+        a.version = 1;
+    }
+    let all = s.commit_annotation_read(&p.document_id, &c).unwrap();
+    assert_eq!(all.entries.len(), 30_001);
+    assert!(
+        all.entries
+            .iter()
+            .any(|e| e.id == pending.id && e.local == pending.local)
+    );
+    assert_eq!(
+        s.annotation_cache(&p.document_id, &source)
+            .unwrap()
+            .unwrap()
+            .annotations
+            .len(),
+        30_000
+    );
 }

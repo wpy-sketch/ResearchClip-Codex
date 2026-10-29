@@ -24,6 +24,7 @@ import {useDesktopExperience} from '../features/desktop/use-desktop-experience';
 const KnowledgeGraph=lazy(()=>import('../features/links/KnowledgeGraph').then(m=>({default:m.KnowledgeGraph})));
 const CompareView=lazy(()=>import('../features/compare/CompareView').then(m=>({default:m.CompareView})));
 const GuideView=lazy(()=>import('../features/guide/GuideView').then(m=>({default:m.GuideView})));
+const PackageCenter=lazy(()=>import('../features/feature-packages/PackageCenter').then(m=>({default:m.PackageCenter})));
 
 import {workspaceManager} from '../features/workspace/manager';
 import {WorkspaceSplit} from '../features/document/WorkspaceSplit';
@@ -77,7 +78,7 @@ export function App() {
         <WorkspaceSplit><main id="workspace-content" className="workspace-scroll" tabIndex={-1}>
           {error && <div className="error-banner" role="alert">{error}</div>}
           {settingsError && activeView !== 'settings' && <div className="error-banner" role="alert">{settingsError}<button className="secondary-button ml-3" onClick={() => useUiStore.getState().navigate('settings')}>打开设置</button></div>}
-          {activeView==='graph'?<Suspense fallback={<p role="status">正在加载知识图谱…</p>}><KnowledgeGraph/></Suspense>:activeView==='compare'?<Suspense fallback={<p role="status">正在加载对比工作区…</p>}><CompareView/></Suspense>:activeView==='guide'?<Suspense fallback={<p role="status">正在加载使用指南…</p>}><GuideView/></Suspense>:activeView === 'editor' ? <p className="workspace-open-editor-hint">图片已在独立编辑标签中打开。可从上方标签切换，或返回截图素材。</p> : activeView==='card'?<KnowledgeCardView key={cardId}/>:activeView === 'settings' ? <SettingsView /> : activeView === 'tags' ? <TagsView /> : <LibraryView favorites={activeView === 'favorites'} />}
+          {activeView==='packages'?<Suspense fallback={<p role="status">正在加载扩展与模型中心…</p>}><PackageCenter/></Suspense>:activeView==='graph'?<Suspense fallback={<p role="status">正在加载知识图谱…</p>}><KnowledgeGraph/></Suspense>:activeView==='compare'?<Suspense fallback={<p role="status">正在加载对比工作区…</p>}><CompareView/></Suspense>:activeView==='guide'?<Suspense fallback={<p role="status">正在加载使用指南…</p>}><GuideView/></Suspense>:activeView === 'editor' ? <p className="workspace-open-editor-hint">图片已在独立编辑标签中打开。可从上方标签切换，或返回截图素材。</p> : activeView==='card'?<KnowledgeCardView key={cardId}/>:activeView === 'settings' ? <SettingsView /> : activeView === 'tags' ? <TagsView /> : <LibraryView favorites={activeView === 'favorites'} />}
         </main></WorkspaceSplit>
         <CommandStatus/>
         <footer className="workspace-footer"><span className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-faint" />本地工作区</span><span>图片与标注保存在本机</span></footer>

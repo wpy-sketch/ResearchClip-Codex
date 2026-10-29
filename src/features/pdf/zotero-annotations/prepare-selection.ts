@@ -1,0 +1,8 @@
+import type {PdfViewerSession} from '../PdfViewerSession';
+import type {AnnotationSource} from './model';
+import type {WriteInput,WriteKind} from './Writer';
+import {selectedTextLocation} from '../text-selection';
+import {currentPdfLocation} from '../source-notes';
+import type {PageRectangle} from '../excerpt-geometry';
+export function rectanglesForType(kind:WriteKind,rectangles:readonly PageRectangle[]){if(!rectangles.length||rectangles.length>100)throw Error('批注选区无效。');if(['highlight','underline'].includes(kind))return rectangles.map(r=>[r.x,r.y,r.width,r.height]);const x=Math.min(...rectangles.map(r=>r.x)),y=Math.min(...rectangles.map(r=>r.y)),right=Math.max(...rectangles.map(r=>r.x+r.width)),bottom=Math.max(...rectangles.map(r=>r.y+r.height));return [[x,y,right-x,bottom-y]];}
+export async function prepareSelection(session:PdfViewerSession,source:AnnotationSource,kind:WriteKind,selectionOnly=false){const writer=session.annotationWriter;await writer.endEditing();writer.bind(source);const loc=selectionOnly||['highlight','underline'].includes(kind)?await selectedTextLocation(session,window.getSelection()):await currentPdfLocation(session);const page=await session.document!.getPage(loc.pageIndex+1);const input:WriteInput={action:'create',annotationType:kind,color:'#ffd400',text:['highlight','underline'].includes(kind)?loc.textAnchor?.exact??'':'',comment:selectionOnly&&['note','text'].includes(kind)?loc.textAnchor?.exact??'':'',geometry:{pageIndex:loc.pageIndex,view:[...page.view],userUnit:page.userUnit,rectangles:rectanglesForType(kind,loc.rectangles)}};writer.draft(input);return input;}

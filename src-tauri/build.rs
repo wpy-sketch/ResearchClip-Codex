@@ -1,6 +1,10 @@
 fn main() {
     tauri_build::try_build(tauri_build::Attributes::new().app_manifest(
         tauri_build::AppManifest::new().commands(&[
+            "package_center",
+            "open_research_web",
+            "research_browser",
+            "app_update",
             "document_directory",
             "create_document_folder",
             "delete_document_folder",
@@ -80,6 +84,9 @@ fn main() {
             "annotation_revision",
             "save_annotation_revision",
             "restore_annotation_revision",
+            "zotero_connector",
+            "connector_pdf_context",
+            "zotero_plugin_source",
             "clipper_status",
             "clipper_connection",
             "scroll_targets",

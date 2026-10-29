@@ -368,8 +368,8 @@ pub async fn zotero_annotation_sync(
    AnnotationSyncRequest::History{change_id}=>{history=Some(library.with(|s|s.annotation_sync_history(&record.document_id,&source,&change_id))?);},
    AnnotationSyncRequest::Revision{change_id,revision_id}=>{historical_entry=Some(library.with(|s|s.annotation_sync_revision(&record.document_id,&source,&change_id,&revision_id))?);},
    AnnotationSyncRequest::Refresh=>{
-    let read=(||{let (_file,path,current)=pdf.verified_source(&token).map_err(|_|ZoteroWriteError {code:"ZOTERO_WRITE_UNAVAILABLE",message:"请重新选择原件并核对摘要；旧缓存与待处理记录保留。"})?;client.read_annotations(&source,&path,&current.content_hash,&cancel).map_err(|e|read_error(&e))})();
-    match read {Ok(fresh)=>{if cancel.load(Ordering::Relaxed){return Err(fail("刷新已取消，本地修改保留。"));}library.with(|s|{s.save_annotation_cache(&record.document_id,&fresh)?;s.observe_annotation_sync(&record.document_id,&fresh)})?;cache=Some(fresh);},Err(e)=>{let snapshot=library.with(|s|s.annotation_sync_snapshot(&record.document_id,&source))?;for entry in snapshot.entries.into_iter().filter(|e|e.local.is_some()){let uncertain=entry.needs_verification;save_failure(&library,entry,e,uncertain)?;}let mut scope=snapshot.scope;scope.message=e.message.into();library.with(|s|s.save_annotation_sync_scope(&record.document_id,&source,&scope))?;diag=Some(diagnostic(e));}}
+    let read=(||{let (_file,path,current)=pdf.verified_source(&token).map_err(|_|ZoteroWriteError {code:"ZOTERO_WRITE_UNAVAILABLE",message:"请重新选择原件并核对摘要；旧缓存与待处理记录保留。"})?;let previous=library.with(|s|s.annotation_cache(&record.document_id,&source)).map_err(|_|ZoteroWriteError {code:"ZOTERO_WRITE_UNAVAILABLE",message:"本地缓存不可读，未忽略错误或删除缓存。"})?;client.read_annotations_cached(&source,&path,&current.content_hash,&cancel,previous.as_ref()).map_err(|e|read_error(&e))})();
+    match read {Ok(fresh)=>{if cancel.load(Ordering::Relaxed){return Err(fail("刷新已取消，本地修改保留。"));}library.with(|s|{s.commit_annotation_read(&record.document_id,&fresh)})?;cache=Some(fresh);},Err(e)=>{let snapshot=library.with(|s|s.annotation_sync_snapshot(&record.document_id,&source))?;for entry in snapshot.entries.into_iter().filter(|e|e.local.is_some()){let uncertain=entry.needs_verification;save_failure(&library,entry,e,uncertain)?;}let mut scope=snapshot.scope;scope.message=e.message.into();library.with(|s|s.save_annotation_sync_scope(&record.document_id,&source,&scope))?;diag=Some(diagnostic(e));}}
    },
    AnnotationSyncRequest::Submit{change_id,revision}|AnnotationSyncRequest::Verify{change_id,revision}=>{
     let verify_only=verify_only_request;let mut scope=library.with(|s|s.annotation_sync_snapshot(&record.document_id,&source))?.scope;scope.last_attempt_at=Some(timestamp()?);library.with(|s|s.save_annotation_sync_scope(&record.document_id,&source,&scope))?;
@@ -385,7 +385,7 @@ pub async fn zotero_annotation_sync(
     }
     library.with(|s|s.save_annotation_sync_entry(entry,revision,true))?;
    },
-   AnnotationSyncRequest::AcceptRead=>{let snapshot=library.with(|s|s.annotation_sync_snapshot(&record.document_id,&source))?;let time=timestamp()?;for mut entry in snapshot.entries.into_iter().filter(|e|e.local.is_none()&&e.status==AnnotationSyncState::RemoteChanged){let rev=entry.revision;entry.accept_remote(time,"已接受最近读取的远端变化，未向Zotero写入。");library.with(|s|s.save_annotation_sync_entry(entry,rev,true))?;}}
+   AnnotationSyncRequest::AcceptRead=>{library.with(|s|s.accept_annotation_read(&record.document_id,&source))?;}
   }
   let mut snapshot=library.with(|s|s.annotation_sync_snapshot(&record.document_id,&source))?;
   if outcome.as_ref().is_some_and(|o|o.verified)&&snapshot.entries.iter().all(|e|e.local.is_none()){snapshot.scope.last_synced_at=Some(timestamp()?);library.with(|s|s.save_annotation_sync_scope(&record.document_id,&source,&snapshot.scope))?;}

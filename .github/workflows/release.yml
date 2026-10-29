@@ -1,0 +1,121 @@
+name: Verified Windows manual release
+on:
+  push:
+    tags: ['v[0-9]*']
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Build manual-install assets, or publish an already tested build
+        type: choice
+        options: [build, publish]
+        default: build
+      build_run_id:
+        description: Required for publish; run that produced windows-manual-assets
+        type: string
+      receipt_path:
+        description: Committed actual independent Windows/Zotero acceptance receipt
+        type: string
+        default: docs/qa/evidence/final-release-ready.json
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.2'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - name: Fixed project Rust toolchain
+        run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
+      - name: Use verified toolchain
+        run: rustup override set 1.99.0
+      - name: Validate target, version and tag without mutation
+        shell: pwsh
+        run: |
+          $audit = python scripts/release_gate.py | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Release audit failed' }
+          if ($audit.repository -ne '${{ github.repository }}') { throw 'origin mismatch' }
+          if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}' -ne ('v'+$audit.version)) { throw 'Tag/version mismatch' }
+      - run: npm ci
+      - run: npm run check
+      - run: npm run format:rust
+      - run: npm run test:rust
+        env:
+          RUST_TEST_THREADS: '4'
+      - run: npm run check:rust
+      - run: npm run check:docs
+      - name: Test release gate failures
+        run: python -m unittest discover -s scripts -p test_release_gate.py
+  build:
+    needs: validate
+    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'build'
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.2'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - run: rustup toolchain install 1.99.0 --profile minimal
+      - run: rustup override set 1.99.0
+      - run: npm ci
+      - name: Build manual NSIS and exact compiled components; no signing keys
+        run: python scripts/build_manual_release.py --output artifacts/manual-release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-manual-assets
+          path: artifacts/manual-release/*
+          if-no-files-found: error
+          retention-days: 14
+  publish:
+    needs: validate
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'publish'
+    runs-on: windows-2025
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.2'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - run: rustup toolchain install 1.99.0 --profile minimal
+      - run: rustup override set 1.99.0
+      - run: npm ci
+      - name: Retrieve the exact accepted build without rebuilding
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+        shell: pwsh
+        run: |
+          if ($env:BUILD_RUN_ID -notmatch '^[0-9]+$') { throw 'A verified build run ID is required' }
+          gh run download $env:BUILD_RUN_ID --repo '${{ github.repository }}' --name windows-manual-assets --dir artifacts/manual-release
+          if ($LASTEXITCODE -ne 0) { throw 'Build artifact download failed' }
+      - name: Verify exact assets, compiled hashes, real native receipt and permissions; publish only then
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECEIPT_PATH: ${{ inputs.receipt_path }}
+        shell: pwsh
+        run: |
+          if ($env:RECEIPT_PATH -notmatch '^docs/qa/evidence/[a-zA-Z0-9_.-]+\.json$') { throw 'Receipt must be a committed QA evidence file' }
+          python scripts/publish_verified_release.py --assets artifacts/manual-release --receipt $env:RECEIPT_PATH
+          if ($LASTEXITCODE -ne 0) { throw 'Stable release was not verified' }

@@ -1,0 +1,8 @@
+import {useState,type ReactNode} from 'react';
+import {pageWindow} from './paging';
+/** Pagination bounds mounted DOM, never the searchable data or persisted records. */
+export function PagedRows<T>({items,label,className,render,focusIndex=-1,focusKey=''}:{items:readonly T[];label:string;className:string;render:(item:T)=>ReactNode;focusIndex?:number;focusKey?:string}){
+ const [cursor,setCursor]=useState({page:0,focus:'',size:50}),[size,setSize]=useState(50),token=focusKey||String(focusIndex),page=focusIndex>=0&&(cursor.focus!==token||cursor.size!==size)?Math.floor(focusIndex/size):cursor.page,view=pageWindow(items,page,size);
+ const setPage=(page:number)=>setCursor({page,focus:token,size});
+ return <div className="zotero-paged-rows"><nav className="zotero-list-pager" aria-label={label+'分页'}><span role="status">{view.start}–{view.end} / {items.length} 条</span><label>每页<select aria-label={label+'每页条数'} value={size} onChange={e=>{setSize(Number(e.target.value));setPage(0);}}>{[25,50,100].map(n=><option key={n} value={n}>{n}</option>)}</select></label><div><button aria-label={label+'上一页'} disabled={view.current===0} onClick={()=>setPage(view.current-1)}>上一页</button><label>页<input aria-label={label+'页码'} type="number" min={1} max={view.pages} value={view.current+1} onChange={e=>{const n=Number(e.target.value);if(Number.isSafeInteger(n))setPage(Math.max(0,Math.min(view.pages-1,n-1)));}}/></label><span>/ {view.pages}</span><button aria-label={label+'下一页'} disabled={view.current+1===view.pages} onClick={()=>setPage(view.current+1)}>下一页</button></div></nav><ol className={className} start={view.start||1}>{view.rows.map(render)}</ol></div>;
+}

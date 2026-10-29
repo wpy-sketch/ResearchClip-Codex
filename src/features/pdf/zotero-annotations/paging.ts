@@ -1,0 +1,1 @@
+export function pageWindow<T>(items:readonly T[],page:number,size:number){const pages=Math.max(1,Math.ceil(items.length/size)),current=Math.max(0,Math.min(pages-1,page));return {pages,current,rows:items.slice(current*size,(current+1)*size),start:items.length?current*size+1:0,end:Math.min(items.length,(current+1)*size)};}

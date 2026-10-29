@@ -22,6 +22,8 @@ pub struct PdfDocumentService {
 }
 pub struct PdfJob {
     pub cancelled: AtomicBool,
+    opening: AtomicBool,
+    connector: Mutex<Option<super::zotero_connector::model::OpenGrant>>,
     loaded: AtomicU64,
     total: AtomicU64,
     file: Mutex<Option<(File, PdfRecord, Option<PathBuf>)>>,
@@ -34,7 +36,14 @@ pub struct PdfProgress {
 }
 impl PdfJob {
     pub fn check(&self) -> Result<()> {
-        if self.cancelled.load(Ordering::Relaxed) {
+        let connector_cancelled = self.opening.load(Ordering::Relaxed)
+            && self
+                .connector
+                .lock()
+                .map_err(|_| StorageError::Invalid("Connector请求授权锁异常。"))?
+                .as_ref()
+                .is_some_and(|(_, flag)| flag.load(Ordering::Relaxed));
+        if self.cancelled.load(Ordering::Relaxed) || connector_cancelled {
             Err(StorageError::Invalid("PDF加载已取消。"))
         } else {
             Ok(())
@@ -69,6 +78,8 @@ impl PdfDocumentService {
     pub fn verify_managed(path: &Path, record: &PdfRecord) -> Result<()> {
         let job = PdfJob {
             cancelled: AtomicBool::new(false),
+            opening: AtomicBool::new(true),
+            connector: Mutex::new(None),
             loaded: AtomicU64::new(0),
             total: AtomicU64::new(0),
             file: Mutex::new(None),
@@ -90,6 +101,8 @@ impl PdfDocumentService {
         }
         let job = Arc::new(PdfJob {
             cancelled: AtomicBool::new(false),
+            opening: AtomicBool::new(true),
+            connector: Mutex::new(None),
             loaded: AtomicU64::new(0),
             total: AtomicU64::new(0),
             file: Mutex::new(None),
@@ -157,10 +170,47 @@ impl PdfDocumentService {
         *j.file
             .lock()
             .map_err(|_| StorageError::Invalid("PDF授权锁异常。"))? = Some((file, record, source));
+        j.opening.store(false, Ordering::Relaxed);
         Ok(())
+    }
+    pub fn attach_connector(
+        &self,
+        id: &str,
+        grant: Option<super::zotero_connector::model::OpenGrant>,
+    ) -> Result<()> {
+        let job = self
+            .jobs
+            .lock()
+            .map_err(|_| StorageError::Invalid("PDF服务锁异常。"))?
+            .get(id)
+            .cloned()
+            .ok_or(StorageError::NotFound)?;
+        *job.connector
+            .lock()
+            .map_err(|_| StorageError::Invalid("Connector授权锁异常。"))? = grant;
+        job.check()
+    }
+    pub fn connector_context(
+        &self,
+        id: &str,
+    ) -> Result<Option<super::zotero_connector::model::OpenGrant>> {
+        let job = self
+            .jobs
+            .lock()
+            .map_err(|_| StorageError::Invalid("PDF服务锁异常。"))?
+            .get(id)
+            .cloned()
+            .ok_or(StorageError::NotFound)?;
+        let value = job
+            .connector
+            .lock()
+            .map_err(|_| StorageError::Invalid("Connector授权锁异常。"))?
+            .clone();
+        Ok(value)
     }
     pub fn adopt_source(&self, from: &str, to: &str) -> Result<()> {
         let (source, record) = self.source(from)?;
+        let connector = self.connector_context(from)?;
         let job = self
             .jobs
             .lock()
@@ -181,6 +231,10 @@ impl PdfDocumentService {
             return Err(StorageError::Invalid("不能在不同PDF资源之间转交来源授权。"));
         }
         *path = Some(source);
+        drop(file);
+        *job.connector
+            .lock()
+            .map_err(|_| StorageError::Invalid("Connector授权锁异常。"))? = connector;
         Ok(())
     }
     pub fn verified_source(&self, id: &str) -> Result<(File, PathBuf, PdfRecord)> {
@@ -447,5 +501,57 @@ mod tests {
         assert!(s.adopt_source(&a, &b).is_err());
         s.cancel(&b).unwrap();
         assert!(s.source(&b).is_err());
+    }
+    #[test]
+    fn connector_cancel_revokes_pending_import_but_keeps_loaded_pdf_readable() {
+        use crate::services::zotero_connector::model::{Identity, Metadata, OpenContext, Target};
+        let context = OpenContext {
+            connection_id: "c".repeat(32),
+            request_id: "d".repeat(32),
+            identity: Identity {
+                library_type: "user".into(),
+                library_id: 0,
+                local_library_id: Some(1),
+                item_key: "PARENT01".into(),
+                attachment_key: "ATTACH01".into(),
+            },
+            metadata: Metadata {
+                title: "fixture".into(),
+                authors: vec![],
+                year: None,
+                doi: String::new(),
+            },
+            target: Target {
+                page_index: Some(0),
+                annotation_key: None,
+            },
+            server_id: None,
+        };
+        let service = PdfDocumentService::default();
+        let id = "a".repeat(32);
+        let job = service.begin(&id).unwrap();
+        let flag = Arc::new(AtomicBool::new(false));
+        service
+            .attach_connector(&id, Some((context.clone(), flag.clone())))
+            .unwrap();
+        flag.store(true, Ordering::Relaxed);
+        assert!(job.check().is_err());
+        service.cancel(&id).unwrap();
+        let job = service.begin(&id).unwrap();
+        let flag = Arc::new(AtomicBool::new(false));
+        service
+            .attach_connector(&id, Some((context, flag.clone())))
+            .unwrap();
+        let d = tempfile::tempdir().unwrap();
+        let path = d.path().join("fixture.pdf");
+        std::fs::write(&path, b"%PDF-1.7\nabc").unwrap();
+        service
+            .finish(&id, File::open(&path).unwrap(), dummy(), Some(path))
+            .unwrap();
+        flag.store(true, Ordering::Relaxed);
+        job.check().unwrap();
+        assert_eq!(service.read(&id, 0, 5).unwrap(), b"%PDF-");
+        service.cancel(&id).unwrap();
+        assert!(service.read(&id, 0, 1).is_err());
     }
 }

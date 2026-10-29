@@ -8,6 +8,7 @@ export default tseslint.config(
   { ignores: ['dist/**', 'browser-extension/dist/**', 'browser-extension/target/**', 'browser-extension/native-host/target/**', 'browser-extension/protocol/target/**', 'node_modules/**', 'src-tauri/**', '.tools/**', 'artifacts/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  { files: ['zotero-connector/bootstrap.js'], rules: { '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^(install|startup|onMainWindowLoad|onMainWindowUnload|shutdown|uninstall)$' }] } },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   {
     files: ['src/**/*.{ts,tsx}'],

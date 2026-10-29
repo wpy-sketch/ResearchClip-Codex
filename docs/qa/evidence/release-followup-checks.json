@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-28",
+  "scope": "additional cfg(test) HTTP roundtrip coverage and owner-confirmed scope documentation; production source, dependencies, migrations and installer bytes unchanged",
+  "publication": "BLOCKED_NOT_PUBLISHED",
+  "realZoteroAcceptance": "WAITING_FOR_USER_TO_RESTORE_DESKTOP",
+  "newTests": 3,
+  "checks": [
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --locked zotero_local::write_transport::tests -- --nocapture",
+      "exitCode": 0,
+      "passed": 9,
+      "ignored": 1,
+      "fixture": "in-process loopback HTTP server; never a real Zotero host"
+    },
+    {
+      "command": "npm run test:rust",
+      "exitCode": 0,
+      "passed": 353,
+      "ignored": 12
+    },
+    {
+      "command": "npm run format:rust",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run check:rust",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run check:docs",
+      "exitCode": 0,
+      "localLinks": 1265
+    },
+    {
+      "command": "python -m unittest discover -s scripts -p test_release_gate.py -v",
+      "exitCode": 0,
+      "passed": 6
+    }
+  ],
+  "failureAndRepair": "Initial new fixture omitted stripping URL query parameters; failed before mutation. Fixture routing corrected and affected/full checks rerun; product validation unchanged.",
+  "notRerun": [
+    "Frontend and native UI (no production changes)",
+    "Real Zotero install/authorization/cloud sync (user deferred until operable desktop)",
+    "Signed main-program update/public production catalog (user confirmed secrets not configured)"
+  ],
+  "productionSigningConfigured": false,
+  "tagOrReleaseCreated": false,
+  "acceptanceReceipt": false,
+  "candidateInstallerSha256Unchanged": "fa4c354c262b6f8ae23c62f95cbb98863d691cc12f688f4808ac19abb16c739e"
+}

@@ -148,7 +148,39 @@ impl ZoteroClient {
         cancel: &AtomicBool,
         start: Instant,
     ) -> Result<Option<(reqwest::header::HeaderMap, Vec<u8>)>> {
-        Self::check(cancel, start)?;
+        self.get_until(path, query, server, cancel, start, Duration::from_secs(12))
+    }
+    fn get_until(
+        &self,
+        path: &str,
+        query: &[(&str, &str)],
+        server: Option<&str>,
+        cancel: &AtomicBool,
+        start: Instant,
+        budget: Duration,
+    ) -> Result<Option<(reqwest::header::HeaderMap, Vec<u8>)>> {
+        self.get_conditionally(path, query, server, cancel, (start, budget, None))
+            .map(|reply| reply.map(|(headers, body, _)| (headers, body)))
+    }
+    fn get_conditionally(
+        &self,
+        path: &str,
+        query: &[(&str, &str)],
+        server: Option<&str>,
+        cancel: &AtomicBool,
+        policy: (Instant, Duration, Option<u64>),
+    ) -> Result<Option<(reqwest::header::HeaderMap, Vec<u8>, bool)>> {
+        let (start, budget, modified_since) = policy;
+        let check = || -> Result<()> {
+            if cancel.load(Ordering::Relaxed) {
+                Err("Zotero查询已取消。".into())
+            } else if start.elapsed() > budget {
+                Err("Zotero查询达到时限；旧缓存保留，请重试。".into())
+            } else {
+                Ok(())
+            }
+        };
+        check()?;
         let mut url = self.base.join(path).map_err(|_| "Zotero接口路径无效。")?;
         url.query_pairs_mut().extend_pairs(query.iter().copied());
         if url.origin() != self.base.origin() || !url.path().starts_with("/api/") {
@@ -162,7 +194,10 @@ impl ZoteroClient {
         if let Some(server) = server {
             request = request.header("Zotero-Server-ID", server);
         }
-        let remaining = Duration::from_secs(12).saturating_sub(start.elapsed());
+        if let Some(version) = modified_since {
+            request = request.header("If-Modified-Since-Version", version.to_string());
+        }
+        let remaining = budget.saturating_sub(start.elapsed());
         let response = request
             .timeout(remaining.min(Duration::from_secs(2)))
             .send()
@@ -173,8 +208,10 @@ impl ZoteroClient {
                     "无法连接Zotero Local API。可继续阅读PDF；请检查Zotero是否启动及API设置。"
                 }
             })?;
-        Self::check(cancel, start)?;
+        check()?;
+        let not_modified = response.status().as_u16() == 304;
         match response.status().as_u16() {
+            304 if modified_since.is_some() => {}
             404 => return Ok(None),
             403 => {
                 return Err("Zotero拒绝读取；请在设置→高级允许本机应用通信。PDF仍可阅读。".into());
@@ -199,6 +236,9 @@ impl ZoteroClient {
         if server.is_some_and(|expected| expected != current) {
             return Err("Zotero数据实例已经切换，来源查询未保存。".into());
         }
+        if not_modified {
+            return Ok(Some((headers, Vec::new(), true)));
+        }
         if response
             .content_length()
             .is_some_and(|len| len > BODY_LIMIT as u64)
@@ -213,8 +253,8 @@ impl ZoteroClient {
         if bytes.len() > BODY_LIMIT {
             return Err("Zotero响应超过2MiB保护预算。".into());
         }
-        Self::check(cancel, start)?;
-        Ok(Some((headers, bytes)))
+        check()?;
+        Ok(Some((headers, bytes, false)))
     }
     pub fn health(&self, cancel: &AtomicBool, start: Instant) -> Result<ZoteroHealth> {
         let (headers, _) = self
@@ -450,9 +490,24 @@ impl ZoteroClient {
         pdf_hash: &str,
         cancel: &AtomicBool,
     ) -> Result<super::zotero_annotations::AnnotationReadCache> {
-        use super::zotero_annotations::{AnnotationReadCache, parse_annotation};
+        self.read_annotations_cached(source, original, pdf_hash, cancel, None)
+    }
+    pub fn read_annotations_cached(
+        &self,
+        source: &super::zotero_annotations::AnnotationSource,
+        original: &Path,
+        pdf_hash: &str,
+        cancel: &AtomicBool,
+        cached: Option<&super::zotero_annotations::AnnotationReadCache>,
+    ) -> Result<super::zotero_annotations::AnnotationReadCache> {
+        use super::zotero_annotations::{
+            AnnotationReadCache, MAX_ANNOTATIONS, MAX_CACHE_BYTES, parse_annotation,
+        };
         let start = Instant::now();
         let (health, scope) = self.annotation_context(source, original, cancel, start)?;
+        let cached = cached.filter(|c| {
+            c.source == *source && c.pdf_content_hash == pdf_hash && c.validate().is_ok()
+        });
         let mut annotations: std::collections::BTreeMap<
             String,
             super::zotero_annotations::ZoteroAnnotation,
@@ -460,31 +515,71 @@ impl ZoteroClient {
         let mut library_version = None;
         let mut truncated = false;
         let mut bytes = 0;
-        for page in 0..50 {
-            Self::check(cancel, start)?;
-            let offset = (page * 20).to_string();
+        let mut offset = 0usize;
+        let mut batch_size = 100usize;
+        while offset <= MAX_ANNOTATIONS {
+            let probe = offset == MAX_ANNOTATIONS;
+            let requested = if probe {
+                1
+            } else {
+                batch_size.min(MAX_ANNOTATIONS - offset)
+            };
+            let limit = requested.to_string();
+            let offset_text = offset.to_string();
             let path = format!(
                 "{}/items/{}/children",
                 scope.prefix(),
                 source.attachment_key
             );
-            let (headers, body) = self
-                .get(
-                    &path,
-                    &[
-                        ("itemType", "annotation"),
-                        ("format", "json"),
-                        ("limit", "20"),
-                        ("start", &offset),
-                    ],
-                    Some(&health.server_id),
-                    cancel,
+            let response = self.get_conditionally(
+                &path,
+                &[
+                    ("itemType", "annotation"),
+                    ("format", "json"),
+                    ("limit", &limit),
+                    ("start", &offset_text),
+                ],
+                Some(&health.server_id),
+                cancel,
+                (
                     start,
-                )?
-                .ok_or("Zotero未提供附件批注读取接口或附件已经删除。")?;
+                    Duration::from_secs(300),
+                    if offset == 0 {
+                        cached.and_then(|c| c.library_version)
+                    } else {
+                        None
+                    },
+                ),
+            );
+            let (headers, body, not_modified) = match response {
+                Err(error) if error.contains("2MiB") && batch_size > 1 && !probe => {
+                    batch_size = if batch_size > 20 { 20 } else { 1 };
+                    continue;
+                }
+                other => other?.ok_or("Zotero未提供附件批注读取接口或附件已经删除。")?,
+            };
+            if not_modified {
+                let previous = cached.ok_or("304响应没有匹配缓存。")?;
+                let version = headers
+                    .get("Last-Modified-Version")
+                    .and_then(|v| v.to_str().ok())
+                    .and_then(|v| v.parse::<u64>().ok());
+                if version != previous.library_version {
+                    return Err("304响应的库版本与缓存不一致，旧缓存保留。".into());
+                }
+                let mut fresh = previous.clone();
+                fresh.fetched_at = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map_err(|_| "系统时间无效。")?
+                    .as_millis()
+                    .try_into()
+                    .map_err(|_| "系统时间超限。")?;
+                fresh.product_version = health.product_version;
+                return Ok(fresh);
+            }
             bytes += body.len();
-            if bytes > 8 * 1024 * 1024 {
-                return Err("批注读取超过8MiB预算，原缓存保留。".into());
+            if bytes > 128 * 1024 * 1024 {
+                return Err("批注读取超过128MiB传输预算，原缓存保留。".into());
             }
             let version = headers
                 .get("Last-Modified-Version")
@@ -492,7 +587,7 @@ impl ZoteroClient {
                 .map(str::parse::<u64>)
                 .transpose()
                 .map_err(|_| "Zotero库版本头无效。")?;
-            if page == 0 {
+            if offset == 0 {
                 library_version = version;
             } else if library_version.is_none() || version != library_version {
                 return Err(
@@ -502,8 +597,15 @@ impl ZoteroClient {
             let batch: Vec<Value> =
                 serde_json::from_slice(&body).map_err(|_| "Zotero批注列表JSON无效。")?;
             let count = batch.len();
-            if count > 20 {
+            if count > requested {
                 return Err("Zotero未遵守批注分页上限。".into());
+            }
+            if probe {
+                for item in &batch {
+                    parse_annotation(item, source)?;
+                }
+                truncated = count > 0;
+                break;
             }
             for item in batch {
                 let a = parse_annotation(&item, source)?;
@@ -518,14 +620,14 @@ impl ZoteroClient {
                 }
                 annotations.insert(key, a);
             }
-            if count < 20 {
+            offset += count;
+            if count < requested {
                 break;
             }
-            if page == 49 {
-                truncated = true;
-            }
         }
-        Self::check(cancel, start)?;
+        if cancel.load(Ordering::Relaxed) {
+            return Err("Zotero查询已取消。".into());
+        }
         let fetched_at = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .map_err(|_| "系统时间无效。")?
@@ -550,7 +652,62 @@ impl ZoteroClient {
             truncated,
         };
         result.validate()?;
+        if serde_json::to_vec(&result)
+            .map_err(|_| "批注序列化失败。")?
+            .len()
+            > MAX_CACHE_BYTES
+        {
+            return Err("批注快照超过64MiB，旧缓存保留。".into());
+        }
         Ok(result)
+    }
+    /// Verify explicit plugin identity against the current Local API and authorized file.
+    /// No filename inference and no binding until the existing user confirmation flow.
+    pub fn connector_lookup(
+        &self,
+        identity: &super::zotero_connector::model::Identity,
+        server: &str,
+        original: &Path,
+        cancel: &AtomicBool,
+    ) -> Result<ZoteroLookup> {
+        identity.validate().map_err(str::to_owned)?;
+        let scope = ZoteroScope {
+            library_type: identity.library_type.clone(),
+            library_id: identity.library_id,
+        };
+        scope.validate_request()?;
+        let start = Instant::now();
+        let health = self.health(cancel, start)?;
+        if health.server_id != server {
+            return Err("插件与Local API不属于同一个Zotero实例。".into());
+        }
+        let attachment = self
+            .item(&scope, &identity.attachment_key, &health, cancel, start)?
+            .ok_or("已选附件不存在。")?;
+        let parent = self
+            .item(&scope, &identity.item_key, &health, cancel, start)?
+            .ok_or("已选父文献不存在。")?;
+        let candidate = metadata_candidate(&health, &scope, &attachment, &parent)?;
+        if candidate.item_key != identity.item_key
+            || candidate.attachment_key != identity.attachment_key
+            || !self.file_matches(
+                &scope,
+                &identity.attachment_key,
+                &health,
+                original,
+                cancel,
+                start,
+            )?
+        {
+            return Err("插件来源与已授权的PDF文件不匹配，未建立关联。".into());
+        }
+        Ok(ZoteroLookup {
+            health,
+            candidates: vec![candidate],
+            message:
+                "已核对插件来源、API实例、父文献、附件与原始文件；请确认元数据后保存来源关联。"
+                    .into(),
+        })
     }
     pub fn revalidate(
         &self,

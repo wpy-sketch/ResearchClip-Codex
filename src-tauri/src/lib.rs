@@ -6,6 +6,8 @@ pub mod qa_math;
 #[cfg(debug_assertions)]
 pub mod qa_ocr;
 #[cfg(debug_assertions)]
+pub mod qa_packages;
+#[cfg(debug_assertions)]
 pub mod qa_revisions;
 pub mod research;
 pub mod services;
@@ -66,6 +68,7 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
             }
         }))
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_opener::Builder::new()
                 .open_js_links_on_click(false)
@@ -89,6 +92,7 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
         .manage(Arc::new(services::zotero_session::ZoteroSessions::default()))
         .manage(Arc::new(services::pdf::PdfDocumentService::default()))
         .manage(services::desktop::DesktopService::default())
+        .manage(Arc::new(commands::research_browser::BrowserHost::default()))
         .manage(Arc::new(commands::references::ReferenceNetwork::default()))
         .manage(Arc::new(
             services::window_capture::WindowCaptureService::default(),
@@ -99,6 +103,9 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
             services::similarity_index::SimilarityIndex::default(),
         ))
         .manage(services::clipper::ClipperService::default())
+        .manage(Arc::new(
+            services::zotero_connector::ConnectorService::default(),
+        ))
         .manage(Arc::new(services::scrolling::ScrollService::default()))
         .manage(Arc::new(services::pins::PinManager::default()))
         .manage(Arc::new(std::sync::Mutex::new(
@@ -134,6 +141,41 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
             let settings = Arc::new(services::settings::SettingsService::load(
                 path.join("settings.json"),
             ));
+            let package_service = (|| {
+                crate::storage::files::directory(&path)
+                    .map_err(|_| "组件配置目录不可用。".to_owned())?;
+                #[cfg(debug_assertions)]
+                if std::env::var_os("RESEARCHCLIP_TEST_SETTINGS_DIR").is_some()
+                    && path.join("package-test-trust.json").exists()
+                {
+                    let bytes = std::fs::read(path.join("package-test-trust.json"))
+                        .map_err(|_| "测试公钥不可读。".to_owned())?;
+                    if bytes.len() > 8192 {
+                        return Err("测试公钥配置过大。".to_owned());
+                    }
+                    let trust = serde_json::from_slice(&bytes)
+                        .map_err(|_| "测试公钥格式无效。".to_owned())?;
+                    return services::packages::PackageManager::new(
+                        path.join("packages-v1"),
+                        trust,
+                    )
+                    .map(Arc::new);
+                }
+                services::packages::PackageManager::production(path.join("packages-v1"))
+                    .map(Arc::new)
+            })();
+            app.manage(Arc::new(services::app_update::AppUpdater::default()));
+            // This runtime is a hashed main-program resource, never a model download.
+            if let Ok(resources) = app.path().resource_dir()
+                && let Err(message) = services::packages::ocr_model::configure_runtime(&resources)
+            {
+                services::desktop::notice(app.handle(), &message);
+            }
+            let package_service = package_service.and_then(|service| {
+                service.revalidate_installed()?;
+                Ok(service)
+            });
+            app.manage(services::packages::PackageHost(package_service));
             let data_root = if cfg!(debug_assertions) {
                 std::env::var_os("RESEARCHCLIP_TEST_SETTINGS_DIR")
                     .map(|p| std::path::PathBuf::from(p).join("workspace"))
@@ -225,6 +267,10 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
             }
         })
         .invoke_handler(tauri::generate_handler![
+            commands::packages::package_center,
+            commands::research_web::open_research_web,
+            commands::research_browser::research_browser,
+            commands::app_update::app_update,
             commands::similarity_ai::similarity_ai_status,
             commands::similarity_ai::choose_similarity_ai_bundle,
             commands::similarity_ai::start_similarity_ai,
@@ -292,6 +338,9 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
             commands::sync::sync_stop,
             commands::sync::sync_resolve,
             commands::sync::sync_authorize_documents,
+            commands::zotero_connector::zotero_connector,
+            commands::zotero_connector::connector_pdf_context,
+            commands::zotero_plugins::zotero_plugin_source,
             commands::clipper::clipper_status,
             commands::clipper::clipper_connection,
             commands::scrolling::scroll_targets,
@@ -418,6 +467,12 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
                 }
             }
             tauri::RunEvent::Exit => {
+                if let Ok(service) = &app.state::<services::packages::PackageHost>().0 {
+                    service.cancel();
+                }
+                let _ = app
+                    .state::<Arc<services::app_update::AppUpdater>>()
+                    .cancel();
                 let _ = app
                     .state::<Arc<services::embeddings::EmbeddingService>>()
                     .cancel();
@@ -427,6 +482,8 @@ fn run_inner(fixture: Option<capture::RawFrame>) {
                 app.state::<Arc<services::ocr_index::OcrIndexService>>()
                     .cancel();
                 app.state::<services::clipper::ClipperService>().stop();
+                app.state::<Arc<services::zotero_connector::ConnectorService>>()
+                    .stop();
                 app.remove_tray_by_id(services::desktop::TRAY_ID);
             }
             _ => {}

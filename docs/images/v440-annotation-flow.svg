@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
+<rect width="1200" height="680" rx="28" fill="#f8fafd"/>
+<g font-family="Microsoft YaHei, sans-serif" fill="#202124">
+<text x="48" y="62" font-size="30" font-weight="700">当前 PDF · 最多 30,000 条 Zotero 标准批注</text><text x="48" y="102" font-size="19" fill="#5f6368">操作流程示意图 · 不是应用截图或真实 Zotero 验收证据</text>
+<g stroke="#dadce0" stroke-width="2"><rect x="48" y="148" width="340" height="190" rx="20" fill="#e8f0fe"/><rect x="430" y="148" width="340" height="190" rx="20" fill="#e6f4ea"/><rect x="812" y="148" width="340" height="190" rx="20" fill="#fef7e0"/></g>
+<text x="72" y="189" font-size="23" font-weight="600">1  核对来源，再读取</text><text x="72" y="230" font-size="19">实例 / library ID / 附件键</text><text x="72" y="269" font-size="19">20 条一页，最多 30,000 条</text><text x="72" y="307" font-size="19">边界再探测 1 条，识别超限</text>
+<text x="454" y="189" font-size="23" font-weight="600">2  完整搜索，分页浏览</text><text x="454" y="230" font-size="19">搜索覆盖全部已载入批注</text><text x="454" y="269" font-size="19">每页 25 / 50 / 100 张卡片</text><text x="454" y="307" font-size="19">颜色筛选、排序、跳到末页</text>
+<text x="836" y="189" font-size="23" font-weight="600">3  返回原文位置</text><text x="836" y="230" font-size="19">点击卡片 → PDF 页内矩形</text><text x="836" y="269" font-size="19">旋转 / 缩放后仍对应原坐标</text><text x="836" y="307" font-size="19">配对后可在 Zotero 中打开</text>
+<path d="M396 242h26m-9-9 9 9-9 9M778 242h26m-9-9 9 9-9 9" stroke="#4285f4" stroke-width="4" fill="none"/>
+<rect x="48" y="386" width="1104" height="236" rx="22" fill="#fff" stroke="#dadce0" stroke-width="2"/><path d="M72 416v174" stroke="#34a853" stroke-width="6"/>
+<text x="96" y="430" font-size="23" font-weight="600">完整性与用户数据保护</text><text x="96" y="474" font-size="20">批注与同步比较一起提交；取消、失败或库版本变化 → 保留上次快照和本地修改。</text><text x="96" y="515" font-size="20">超过条数或字节预算会明确提示；未完整读取时，不推断缺席批注已经删除。</text><text x="96" y="556" font-size="20">SQLite schema 21 仅迁移 ResearchClip 缓存；不写 Zotero 数据库或原 PDF。</text><text x="96" y="595" font-size="18" fill="#5f6368">独立测试配置验证通过前，不把模拟接口结果当作真实插件安装、配对或写入成功。</text></g></svg>

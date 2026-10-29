@@ -1,6 +1,6 @@
 [package]
 name = "researchclip"
-version = "4.2.7"
+version = "5.0.0"
 description = "Local research screenshot and knowledge card workspace"
 edition = "2024"
 rust-version = "1.99"
@@ -17,6 +17,7 @@ researchclip-clipper-protocol = { path = "../browser-extension/protocol" }
 tauri = { version = "2", features = ["tray-icon"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+httparse = "=1.10.1"
 rusqlite = { version = "0.37", features = ["bundled"] }
 thiserror = "2"
 png = "0.18.1"
@@ -30,6 +31,16 @@ tauri-plugin-clipboard-manager = "2.4.2"
 tauri-plugin-dialog = "2"
 tauri-plugin-opener = "=2.7.1"
 tauri-plugin-single-instance = "=2.5.3"
+tauri-plugin-updater = { version = "=2.14.1", default-features = false, features = ["native-tls"] }
+minisign-verify = "=0.3.0"
+semver = "1"
+zip = { version = "=9.1.3", default-features = false, features = ["deflate"] }
+ort = { version = "=2.0.0-rc.12", default-features = false, features = ["std", "load-dynamic", "api-23"] }
+tokenizers = { version = "=0.22.2", default-features = false, features = ["fancy-regex"] }
+
+[dev-dependencies]
+# Existing locked codec; release verification only, not a downloaded application runtime.
+base64 = "=0.22.1"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.62.2", features = ["Foundation", "Globalization", "Graphics_Imaging", "Media_Ocr", "Storage_Streams", "Graphics_Capture", "Graphics_DirectX_Direct3D11", "Win32_Graphics_Direct3D", "Win32_Graphics_Direct3D11", "Win32_Graphics_Dxgi_Common", "Win32_System_WinRT_Direct3D11", "Win32_System_WinRT_Graphics_Capture", "Win32_System_WinRT", "Win32_Foundation", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_UI_Shell", "Win32_UI_HiDpi", "Win32_UI_WindowsAndMessaging", "Win32_Security", "Win32_Security_Credentials", "Win32_System_JobObjects", "Win32_System_Threading", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_DataExchange", "Win32_System_Memory"] }

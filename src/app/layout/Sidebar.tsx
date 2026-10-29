@@ -1,5 +1,5 @@
 import appIcon from '../../../assets/app-icon.svg';
-import { Network, BookOpen, BookMarked, ScanSearch, Columns2, HardDrive, Images, Plus, Settings2, Star, Tags } from 'lucide-react';
+import { Boxes, Network, BookOpen, BookMarked, ScanSearch, Columns2, HardDrive, Images, Plus, Settings2, Star, Tags } from 'lucide-react';
 import {useSimilarityStore} from '../../features/similarity/store';
 import {useReferenceStore} from '../../features/references/store';
 import { useUiStore } from '../ui-store';
@@ -15,6 +15,7 @@ const items = [
   { id: 'similarity', label: '相似与重复', icon: ScanSearch },
   { id: 'references', label: '文献引用', icon: BookMarked },
   { id: 'graph', label: '知识图谱', icon: Network },
+  { id: 'packages', label: '扩展与模型中心', icon: Boxes },
   { id: 'settings', label: '设置', icon: Settings2 },
 ] as const;
 

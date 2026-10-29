@@ -1,0 +1,14 @@
+import {describe,it,expect} from 'vitest';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {PagedRows} from './PagedRows';
+import {pageWindow} from './paging';
+import {parseAnnotationCache,filterAnnotations,type AnnotationSource,type AnnotationReadCache,type ZoteroAnnotation} from './model';
+const source:AnnotationSource={instanceId:'a'.repeat(32),libraryType:'user',libraryId:42,itemKey:'PARENT01',attachmentKey:'ATTACH01'},hash='b'.repeat(64);
+const rows:ZoteroAnnotation[]=Array.from({length:30000},(_,n)=>({identity:{source,annotationKey:'N'+String(n).padStart(7,'0')},version:1,annotationType:n%2?'note':'highlight',color:n%2?'#ff6666':'#ffd400',text:n===29999?'末尾科研批注':'内容 '+n,comment:'保留 <script> 原文',pageLabel:String(n%300+1),position:{pageIndex:n%300,rects:[[10,20,100,40]],nextPageRects:[]},unsupportedReason:null}));
+const cache:AnnotationReadCache={formatVersion:1,source,pdfContentHash:hash,fetchedAt:1234,productVersion:'10.0.6-fixture',libraryVersion:5,annotations:rows,truncated:false};
+describe('30,000 annotations: full data, bounded DOM and reachable final record',()=>{
+ it('roundtrips a full scoped snapshot and finds the last annotation across every page',()=>{const parsed=parseAnnotationCache(JSON.parse(JSON.stringify(cache)),source,hash);expect(parsed.annotations).toHaveLength(30000);expect(filterAnnotations(parsed.annotations,'末尾科研','')[0].identity.annotationKey).toBe('N0029999');expect(filterAnnotations(rows,'','#ff6666')).toHaveLength(15000);});
+ it('does not silently accept 30,001 records or a foreign item at the end',()=>{expect(()=>parseAnnotationCache({...cache,annotations:[...rows,rows[0]]},source,hash)).toThrow();expect(()=>parseAnnotationCache({...cache,annotations:[...rows.slice(0,-1),{...rows[29999],identity:{source:{...source,libraryId:43},annotationKey:'N0029999'}}]},source,hash)).toThrow();});
+ it('bounds mounted rows to 50 while every one of 600 pages remains navigable',()=>{const html=renderToStaticMarkup(<PagedRows items={rows} label="批注测试" className="rows" render={a=><li key={a.identity.annotationKey}>{a.identity.annotationKey}</li>}/>);expect(html.match(/<li /g)?.length??html.match(/<li>/g)?.length).toBe(50);expect(html).toContain('30000 条');expect(html).not.toContain('N0029999');const end=pageWindow(rows,599,50);expect(end.pages).toBe(600);expect(end.rows.at(-1)?.identity.annotationKey).toBe('N0029999');expect(end.end).toBe(30000);});
+ it('clamps a stale page after filtering without losing results, and handles empty lists',()=>{expect(pageWindow(rows.slice(-1),599,50).rows[0].identity.annotationKey).toBe('N0029999');expect(pageWindow([],10,50)).toEqual({pages:1,current:0,rows:[],start:0,end:0});for(const size of [25,50,100]){const found=new Set<string>();for(let p=0;p<30000/size;p++)for(const a of pageWindow(rows,p,size).rows)found.add(a.identity.annotationKey);expect(found.size).toBe(30000);}});
+});

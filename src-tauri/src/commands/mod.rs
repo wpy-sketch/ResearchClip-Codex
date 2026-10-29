@@ -3,6 +3,7 @@ use serde::Serialize;
 use std::sync::Arc;
 use tauri::{State, WebviewWindow};
 pub mod anchors;
+pub mod app_update;
 pub mod capture;
 pub mod citations;
 pub mod desktop;
@@ -15,6 +16,7 @@ pub mod library;
 pub mod links;
 pub mod markdown;
 pub mod ocr;
+pub mod packages;
 pub mod pins;
 pub mod references;
 pub mod region;
@@ -92,3 +94,9 @@ pub mod zotero_annotations;
 pub mod zotero_write;
 
 pub mod zotero_sync;
+
+pub mod zotero_connector;
+pub mod zotero_plugins;
+
+pub mod research_browser;
+pub mod research_web;

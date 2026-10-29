@@ -14,7 +14,7 @@ export function validLocalInput(input:unknown):input is WriteInput {
  const v=input as WriteInput|null;if(!v||!['create','update','delete'].includes(v.action))return false;
  if(v.action!=='create'&&(!key(v.annotationKey)||!Number.isSafeInteger(v.expectedVersion)||v.expectedVersion<=0))return false;
  if(v.action==='delete')return Object.keys(v).every(k=>['action','annotationKey','expectedVersion'].includes(k));
- if(!['highlight','underline','note'].includes(v.annotationType)||!/^#[a-f0-9]{6}$/i.test(v.color)||!text(v.text)||!text(v.comment)||v.annotationType==='note'&&!!v.text)return false;
+ if(!['highlight','underline','note','text','image'].includes(v.annotationType)||!/^#[a-f0-9]{6}$/i.test(v.color)||!text(v.text)||!text(v.comment)||['note','text','image'].includes(v.annotationType)&&!!v.text)return false;
  if(v.action==='update')return Object.keys(v).every(k=>['action','annotationKey','expectedVersion','annotationType','color','text','comment'].includes(k));
  const g=v.geometry;if(!g||!Number.isInteger(g.pageIndex)||g.pageIndex<0||g.pageIndex>=2000||!Array.isArray(g.view)||g.view.length!==4||!g.view.every(Number.isFinite)||g.view[2]<=g.view[0]||g.view[3]<=g.view[1]||!Number.isFinite(g.userUnit)||g.userUnit<=0||g.userUnit>1000||!Array.isArray(g.rectangles)||!g.rectangles.length||g.rectangles.length>100||!g.rectangles.every(r=>r.length===4&&r.every(Number.isFinite)&&r[0]>=0&&r[1]>=0&&r[2]>0&&r[3]>0))return false;
  return Object.keys(v).every(k=>['action','annotationType','color','text','comment','geometry'].includes(k));
@@ -27,7 +27,7 @@ export function parseSyncEntry(value:unknown,source:AnnotationSource,expectedHas
 }
 export function parseSyncResponse(value:unknown,source:AnnotationSource,expectedHash?:string,documentId?:string):AnnotationSyncResponse {
  const r=value as AnnotationSyncResponse|null,s=r?.snapshot,scope=s?.scope;
- if(!r||!(r.activeId===null||id(r.activeId))||!s||!Array.isArray(s.entries)||s.entries.length>1000||!scope||![0,30,60,300].includes(scope.refreshInterval)||!time(scope.lastRefreshedAt)||!time(scope.lastAttemptAt)||!time(scope.lastSyncedAt)||!text(scope.message,4000))throw Error('批注同步快照或刷新设置无效。');
+ if(!r||!(r.activeId===null||id(r.activeId))||!s||!Array.isArray(s.entries)||s.entries.length>100000||!scope||![0,30,60,300].includes(scope.refreshInterval)||!time(scope.lastRefreshedAt)||!time(scope.lastAttemptAt)||!time(scope.lastSyncedAt)||!text(scope.message,4000))throw Error('批注同步快照或刷新设置无效。');
  const entries=s.entries.map(e=>parseSyncEntry(e,source,expectedHash,documentId));if(new Set(entries.map(e=>e.id)).size!==entries.length||new Set(entries.map(e=>e.annotationKey)).size!==entries.length)throw Error('同步记录身份重复。');
  if(!(r.diagnostic===null||r.diagnostic&&/^[A-Z_]{1,96}$/.test(r.diagnostic.code)&&text(r.diagnostic.message,4000)))throw Error('同步诊断格式无效。');
  if(!(r.outcome===null||r.outcome&&typeof r.outcome.verified==='boolean'&&key(r.outcome.annotationKey)&&text(r.outcome.message,4000)))throw Error('同步写入回执无效。');

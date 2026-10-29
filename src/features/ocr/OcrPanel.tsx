@@ -3,6 +3,7 @@ import {Modal} from '../../shared/ui/Modal';
 import {useDocumentStore} from '../document/store';
 import {useOcrStore} from './store';
 import {regionFromDrag} from './model';
+import {useUiStore} from '../../app/ui-store';
 export function OcrPanel(){const key=useOcrStore(s=>s.source?.url??'none');return <OcrSession key={key}/>;}
 function OcrSession(){
   const s=useOcrStore(),document=useDocumentStore(d=>d.document),documentPhase=useDocumentStore(d=>d.phase);
@@ -22,8 +23,8 @@ function OcrSession(){
     </div><div className="mt-3 flex flex-wrap gap-2"><button className="secondary-button" disabled={busy} aria-pressed={!selecting} onClick={()=>{drag.current=null;setSelecting(false);s.setRegion(null);}}>整张图片</button><button className="secondary-button" disabled={busy||imageFailed} aria-pressed={selecting} onClick={()=>setSelecting(true)}>框选区域</button></div>
       <p className="mt-2 text-xs text-muted">{selecting?(region?`选区 ${region.width} × ${region.height} 原图像素`:'请在图片上拖动选区；零面积不会开始识别。'):`整图 ${source.widthPx} × ${source.heightPx} 像素`}</p>
       <label className="mt-4 block text-xs text-muted">识别语言<select aria-label="OCR 语言" className="mt-2 w-full rounded border border-edge bg-canvas p-2 text-primary" value={s.language} disabled={busy||!s.status?.languages.length} onChange={e=>s.setLanguage(e.target.value)}>{s.status?.languages.map(l=><option key={l.tag} value={l.tag}>{l.name} · {l.tag}</option>)}</select></label>
-      <p className="mt-2 text-xs text-muted">仅列出本机已安装的 OCR 语言。英文组件缺失时可先尝试中文引擎；识别质量需校对。{s.status&&` 单边上限 ${s.status.maxDimension.toLocaleString()} 像素。`}</p>
-      <button className="capture-button mt-4" disabled={busy||imageFailed||!s.language||!s.status?.languages.length||(selecting&&!region)} onClick={()=>{if(s.text!==s.recognizedText)setReplace(true);else run();}}>{s.phase==='recognizing'?'正在识别…':'开始识别'}</button>
+      <p className="mt-2 text-xs text-muted">列出系统语言及已启用的本地行识别模型。ONNX模式只用于单行选区，整页请使用Windows OCR。识别质量需校对。{s.status&&` 系统OCR单边上限 ${s.status.maxDimension.toLocaleString()} 像素。`}</p><button className="secondary-button mt-2" disabled={busy} onClick={()=>{s.close();useUiStore.getState().navigate('packages');}}>查看OCR模型与语言组件</button>
+      {s.status?.systemError&&<p role="alert" className="error-banner">{s.status.systemError}</p>}<button className="capture-button mt-4" disabled={busy||imageFailed||!s.language||!s.status?.languages.length||(selecting&&!region)} onClick={()=>{if(s.text!==s.recognizedText)setReplace(true);else run();}}>{s.phase==='recognizing'?'正在识别…':'开始识别'}</button>
       {replace&&<div className="mt-3 text-sm" role="alert">重新识别会替换已修改的结果。<div className="mt-2 flex gap-2"><button className="secondary-button" onClick={run}>确认重新识别</button><button className="secondary-button" onClick={()=>setReplace(false)}>保留编辑</button></div></div>}
     </div><div className="flex min-w-0 flex-col"><label className="text-sm" htmlFor="ocr-result">识别结果（可修改）</label><textarea id="ocr-result" aria-label="OCR 识别结果" className="ocr-result mt-2 rounded-lg border border-edge bg-canvas p-3 text-sm" value={s.text} spellCheck={false} disabled={busy} onChange={e=>{s.edit(e.target.value);setInserted(false);}} placeholder="识别结果会显示在这里…"/>
       <div className="mt-3 flex flex-wrap gap-2"><button className="secondary-button" disabled={busy||!s.text.trim()} onClick={()=>void s.copy()}>复制识别文字</button><button className="secondary-button" disabled={busy||!s.text.trim()||!document||documentPhase!=='idle'} onClick={()=>{if(useDocumentStore.getState().insertText(s.text)){setInserted(true);useOcrStore.setState({error:null});}else useOcrStore.setState({error:useDocumentStore.getState().error??'插入失败，请检查 Markdown 文档状态。'});}}>插入到 Markdown</button></div>

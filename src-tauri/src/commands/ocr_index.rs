@@ -37,6 +37,7 @@ pub async fn start_ocr_index(
     window: WebviewWindow,
     service: State<'_, Arc<LibraryService>>,
     jobs: State<'_, Arc<OcrIndexService>>,
+    packages: State<'_, crate::services::packages::PackageHost>,
     language: String,
     id: Option<String>,
     failed_only: bool,
@@ -44,6 +45,7 @@ pub async fn start_ocr_index(
     check(&window)?;
     let library = Arc::clone(service.inner());
     let worker = Arc::clone(jobs.inner());
+    let packages = packages.0.as_ref().ok().cloned();
     tauri::async_runtime::spawn_blocking(move || {
         let ids = library.with(|s| {
             if let Some(id) = id {
@@ -53,7 +55,7 @@ pub async fn start_ocr_index(
                 s.pending_ocr(failed_only)
             }
         })?;
-        worker.begin(library, ids, language)
+        worker.begin_with_packages(library, ids, language, packages)
     })
     .await
     .map_err(|_| CommandError {

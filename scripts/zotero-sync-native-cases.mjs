@@ -3,11 +3,11 @@ import {join} from 'node:path';
 export async function runSyncCases(c){
  const {getPage,report,out,until,forward,source,setMode,delay,quit,launch}=c;let page=getPage();setMode('normal');await forward([source]);await until(()=>page.getByText('已聚焦相同PDF并更新本次来源授权',{exact:false}).isVisible(),'source regrant');
  let panel,writer,sync,select;
- async function bind(){panel=page.getByRole('region',{name:'Zotero标准批注（只读）'});writer=panel.getByRole('region',{name:'Zotero受控批注写入'});sync=panel.getByRole('region',{name:'Zotero批注同步状态'});select=panel.getByRole('combobox',{name:'Zotero批注来源'});await until(()=>select.isEnabled(),'sources ready');const options=await select.locator('option').evaluateAll(ns=>ns.map(n=>({value:n.value,text:n.textContent})));await select.selectOption(options.find(o=>o.text.includes('个人库0')).value);await until(()=>sync.getByRole('button',{name:'读取并比较变化',exact:true}).isEnabled(),'sync ready');}
+ async function bind(){await page.locator('.zotero-tools-details:not([open])>summary').click();panel=page.getByRole('region',{name:'Zotero标准批注（只读）'});writer=panel.getByRole('region',{name:'Zotero受控批注写入'});sync=panel.getByRole('region',{name:'Zotero批注同步状态'});select=panel.getByRole('combobox',{name:'Zotero批注来源'});await until(()=>select.isEnabled(),'sources ready');const options=await select.locator('option').evaluateAll(ns=>ns.map(n=>({value:n.value,text:n.textContent})));await select.selectOption(options.find(o=>o.text.includes('个人库0')).value);await until(()=>sync.getByRole('button',{name:'读取并比较变化',exact:true}).isEnabled(),'sync ready');}
  await page.locator('.pdf-editor').getByRole('button',{name:'Zotero批注',exact:true}).click();await bind();
  const settle=()=>until(()=>sync.getByRole('button',{name:'读取并比较变化',exact:true}).isEnabled(),'sync job settled');
  const click=async name=>{await sync.getByRole('button',{name,exact:true}).click();await settle();};
- await click('读取并比较变化');assert.equal(await sync.locator('[data-sync-key]').count(),3);report.checks.push('native schema20 seeds three standard annotation sidecars from full scoped read, default auto refresh remains off');
+ await click('读取并比较变化');assert.equal(await sync.locator('[data-sync-key]').count(),3);report.checks.push('native schema21 seeds three standard annotation sidecars from full scoped read, default auto refresh remains off');
  assert.equal(await sync.getByRole('combobox',{name:'Zotero自动刷新间隔'}).inputValue(),'0');
  await writer.getByRole('button',{name:'检测批注写入能力',exact:true}).click();await settle();await writer.getByRole('button',{name:'请求Zotero写入授权',exact:true}).click();await settle();
  await writer.locator('details summary').click();const target=()=>writer.locator('details .zotero-annotation-actions').filter({hasText:'UN000001'});

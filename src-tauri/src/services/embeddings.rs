@@ -68,6 +68,7 @@ pub struct SemanticJob {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SemanticStatus {
+    pub native_model: bool,
     pub model_id: &'static str,
     pub model_bytes: u64,
     pub models_present: bool,
@@ -117,6 +118,7 @@ impl EmbeddingService {
         let manifest = Self::manifest()?;
         let models = self.models();
         Ok(SemanticStatus {
+            native_model: false,
             model_id: MODEL_ID,
             model_bytes: manifest.files.iter().map(|f| f.size).sum(),
             models_present: files::ordinary(&models).is_ok()
@@ -161,6 +163,14 @@ impl EmbeddingService {
         input: Option<&Path>,
         models: &Path,
     ) -> Result<serde_json::Value, CommandError> {
+        if python.as_os_str().is_empty() && matches!(kind, "image" | "text") {
+            return super::packages::semantic_model::execute(
+                models,
+                kind,
+                input.ok_or_else(|| error("原生语义输入缺失。"))?,
+            )
+            .map_err(error);
+        }
         super::math_ocr::execute_worker(
             python,
             WORKER,
@@ -228,6 +238,11 @@ impl EmbeddingService {
             .spawn(move || {
                 let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(
                     || -> Result<(), CommandError> {
+                        let model_root = if matches!(kind.as_str(), "image" | "query" | "index") {
+                            source.clone().unwrap_or_else(|| service.models())
+                        } else {
+                            service.models()
+                        };
                         match kind.as_str() {
                             "download" => {
                                 let stage = tempfile::tempdir_in(&service.root)
@@ -252,7 +267,7 @@ impl EmbeddingService {
                                     &python,
                                     "text",
                                     Some(input.path()),
-                                    &service.models(),
+                                    &model_root,
                                 )?;
                                 let vector = decode(&result)?;
                                 if !service.cancel.load(Ordering::Acquire) {
@@ -289,7 +304,7 @@ impl EmbeddingService {
                                             &python,
                                             "image",
                                             Some(input.path()),
-                                            &service.models(),
+                                            &model_root,
                                         )?;
                                         if service.cancel.load(Ordering::Acquire) {
                                             break;

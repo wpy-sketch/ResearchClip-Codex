@@ -9,5 +9,11 @@ function candidate(value:unknown):Candidate{if(!object(value)||typeof value.inst
 export function preview(value:unknown):Preview{if(!object(value)||!object(value.health)||value.health.apiVersion!==3||!Array.isArray(value.candidates)||value.candidates.length>8||typeof value.message!=='string'||value.message.length>2000)throw Error('Zotero预览响应无效。');return {health:{apiVersion:3,schemaVersion:typeof value.health.schemaVersion==='number'?value.health.schemaVersion:null,productVersion:typeof value.health.productVersion==='string'?value.health.productVersion:null},candidates:value.candidates.map(item=>{if(!object(item)||typeof item.id!=='string'||!/^[a-f0-9]{32}$/.test(item.id))throw Error('来源预览标识无效。');return {id:item.id,candidate:candidate(item.candidate)};}),message:value.message};}
 export async function sources(id:string):Promise<Saved[]>{const result=await invoke<unknown>('pdf_zotero_sources',{documentId:id});if(!Array.isArray(result)||result.length>100)throw Error('已存来源响应无效。');return result.map(value=>({...candidate(value),reference:parseReference(value.reference),snapshot:value.snapshot}));}
 
+// Confirmation belongs to the PDF owner, even if its source pane unmounts.
+export async function confirmSource(token:string,previewId:string,onConfirmed?:()=>Promise<void>):Promise<void>{
+ await invoke('confirm_pdf_zotero',{token,previewId});
+ await onConfirmed?.();
+}
+
 export interface SetupInfo{executablePath:string;apiUrl:string;readOnly:true;apiKeyRequired:false}
 export function parseZoteroSetup(v:unknown):SetupInfo{if(!v||typeof v!=='object')throw Error('Zotero配置响应无效。');const p=v as SetupInfo;if(typeof p.executablePath!=='string'||!p.executablePath||p.executablePath.length>32760||typeof p.apiUrl!=='string'||!/^http:\/\/127\.0\.0\.1:\d{1,5}\/api\/$/.test(p.apiUrl)||p.readOnly!==true||p.apiKeyRequired!==false||Number(p.apiUrl.split(':')[2]?.split('/')[0])<1||Number(p.apiUrl.split(':')[2]?.split('/')[0])>65535||[...p.executablePath].some(c=>c.charCodeAt(0)<32))throw Error('Zotero配置协议不受支持。');return p;}

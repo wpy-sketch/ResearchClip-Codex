@@ -6,6 +6,8 @@ use rusqlite::{OptionalExtension, params};
 use serde::Serialize;
 
 pub const ENGINE: &str = "Windows.Media.Ocr (system-managed; version not exposed)";
+pub const PACKAGE_ENGINE: &str =
+    "ResearchClip PP-OCRv4 line 48fc40f24f6d / ONNX Runtime CPU 1.23.2";
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OcrContent {
@@ -41,7 +43,12 @@ impl Storage {
         {
             return Err(StorageError::Invalid("OCR语言无效。"));
         }
-        self.connection.execute("INSERT INTO ocr_content VALUES (?1,'',?2,'running',?3,?4,?5,1,NULL,0) ON CONFLICT(screenshot_id) DO UPDATE SET recognition_status='running',language=?2,updated_at=?4,error=NULL,revision=revision+1",params![id,language,ENGINE,now()?,format!("original-v1:{id}")])?;
+        let engine = if language == "researchclip-ocr-line" {
+            PACKAGE_ENGINE
+        } else {
+            ENGINE
+        };
+        self.connection.execute("INSERT INTO ocr_content VALUES (?1,'',?2,'running',?3,?4,?5,1,NULL,0) ON CONFLICT(screenshot_id) DO UPDATE SET recognition_status='running',language=?2,updated_at=?4,error=NULL,revision=revision+1",params![id,language,engine,now()?,format!("original-v1:{id}")])?;
         Ok(self
             .ocr_content(id)?
             .ok_or(StorageError::NotFound)?
@@ -56,7 +63,7 @@ impl Storage {
         let count = match result {
             Ok(text) => {
                 validate_text(text)?;
-                self.connection.execute("UPDATE ocr_content SET recognized_text=?1,recognition_status='completed',updated_at=?2,revision=revision+1,error=NULL,corrected=0 WHERE screenshot_id=?3 AND revision=?4 AND recognition_status='running'",params![text,now()?,id,revision])?
+                self.connection.execute("UPDATE ocr_content SET recognized_text=?1,recognition_status='completed',updated_at=?2,revision=revision+1,error=NULL,corrected=0,ocr_engine_version=CASE WHEN language='researchclip-ocr-line' THEN ?5 ELSE ?6 END WHERE screenshot_id=?3 AND revision=?4 AND recognition_status='running'",params![text,now()?,id,revision,PACKAGE_ENGINE,ENGINE])?
             }
             Err(message) => {
                 if message.len() > 512 {
@@ -153,6 +160,27 @@ mod tests {
         )
         .unwrap()
         .total
+    }
+    #[test]
+    fn provider_metadata_commits_only_on_success_and_reuses_fts() {
+        let t = tempfile::tempdir().unwrap();
+        let mut s = Storage::open(t.path().into()).unwrap();
+        let id = add(&mut s);
+        let r = s.start_ocr(&id, "en-US").unwrap();
+        s.finish_ocr(&id, r, Ok("original OCR")).unwrap();
+        let r = s.start_ocr(&id, "researchclip-ocr-line").unwrap();
+        s.finish_ocr(&id, r, Err("model failed")).unwrap();
+        let old = s.ocr_content(&id).unwrap().unwrap();
+        assert_eq!(old.recognized_text, "original OCR");
+        assert_eq!(old.ocr_engine_version, ENGINE);
+        let r = s.start_ocr(&id, "researchclip-ocr-line").unwrap();
+        s.finish_ocr(&id, r, Ok("ResearchClip 2026 中文测试"))
+            .unwrap();
+        assert_eq!(
+            s.ocr_content(&id).unwrap().unwrap().ocr_engine_version,
+            PACKAGE_ENGINE
+        );
+        assert_eq!(count(&s, "中文测试", SearchSource::Ocr), 1);
     }
     #[test]
     fn actual_tokenizer_short_chinese_literal_fts_source_filter_and_rebuild() {

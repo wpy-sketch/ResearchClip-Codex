@@ -1,7 +1,7 @@
 //! Bounded standard-annotation operations. No arbitrary JSON, URL, path or SQL.
 use super::zotero_local::valid_item_key;
 use serde::{Deserialize, Serialize};
-pub const WRITE_TYPES: [&str; 3] = ["highlight", "underline", "note"];
+pub const WRITE_TYPES: [&str; 5] = ["highlight", "underline", "note", "text", "image"];
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct WriteGeometry {
@@ -106,8 +106,10 @@ impl AnnotationWriteInput {
             } => {
                 validate_content(annotation_type, color, text, comment, complete)?;
                 geometry.raw_rectangles()?;
-                if annotation_type == "note" && geometry.rectangles.len() != 1 {
-                    return Err("普通文字便签只绑定一个页面区域。");
+                if matches!(annotation_type.as_str(), "note" | "text" | "image")
+                    && geometry.rectangles.len() != 1
+                {
+                    return Err("便签、自由文本和区域批注只绑定一个页面区域。");
                 }
             }
             Self::Update {
@@ -148,8 +150,9 @@ fn validate_content(
     if !super::zotero_annotations::color_valid(color)
         || !validate_text(text)
         || !validate_text(comment)
-        || kind == "note" && (!text.is_empty() || complete && comment.trim().is_empty())
-        || complete && kind != "note" && text.trim().is_empty()
+        || matches!(kind, "note" | "text" | "image") && !text.is_empty()
+        || matches!(kind, "note" | "text") && complete && comment.trim().is_empty()
+        || complete && matches!(kind, "highlight" | "underline") && text.trim().is_empty()
     {
         return Err("批注文字、颜色或便签内容无效。");
     }
@@ -165,8 +168,40 @@ pub struct AnnotationWriteCapabilities {
     pub message: String,
 }
 pub fn tested_write_version(version: Option<&str>) -> bool {
-    // Enable only the exact installed version exercised against a separate real library.
+    // Version gate for the reviewed Local API contract. Native host acceptance is an additional release gate.
     version == Some("10.0.6")
+}
+/// Zotero10.0.6 Item annotation setters use JavaScript trim().normalize() (NFC).
+/// Keep persisted draft input intact; canonicalize only the submitted/desired value.
+pub(crate) fn normalized_annotation_text(value: &str) -> String {
+    let trimmed = value.trim_matches(|c| {
+        matches!(c,
+        '\u{0009}'..='\u{000d}' | '\u{0020}' | '\u{00a0}' | '\u{1680}' |
+        '\u{2000}'..='\u{200a}' | '\u{2028}' | '\u{2029}' | '\u{202f}' |
+        '\u{205f}' | '\u{3000}' | '\u{feff}')
+    });
+    let mut normalized = tokenizers::NormalizedString::from(trimmed);
+    normalized.nfc();
+    normalized.get().to_owned()
+}
+#[cfg(test)]
+mod normalization_tests {
+    use super::normalized_annotation_text as normalize;
+    #[test]
+    fn matches_zotero_ecmascript_trim_and_nfc_without_collapsing_internal_content() {
+        assert_eq!(
+            normalize("\u{feff} Excerpt calibration \n"),
+            "Excerpt calibration"
+        );
+        assert_eq!(
+            normalize("\u{3000}e\u{301}\n  数学  证明\u{00a0}"),
+            "é\n  数学  证明"
+        );
+        assert_eq!(normalize("Ａ ﬁ ①"), "Ａ ﬁ ①"); // NFC, never NFKC
+        assert_eq!(normalize("\u{0085}x\u{0085}"), "\u{0085}x\u{0085}");
+        assert_ne!(normalize("alpha beta"), normalize("alpha  beta"));
+        assert_ne!(normalize("e\u{301}"), normalize("e"));
+    }
 }
 /// Zotero's external, library-scoped key. Never used as a ResearchClip global ID.
 pub(crate) fn new_foreign_annotation_key() -> Result<String, &'static str> {
@@ -257,6 +292,51 @@ mod tests {
                 .is_err()
             );
         }
+    }
+    #[test]
+    fn all_five_standard_types_validate_without_admitting_private_ink() {
+        for kind in WRITE_TYPES {
+            let text = if matches!(kind, "highlight" | "underline") {
+                "多行选文\n公式"
+            } else {
+                ""
+            };
+            let create = AnnotationWriteInput::Create {
+                annotation_type: kind.into(),
+                color: "#ffd400".into(),
+                text: text.into(),
+                comment: "可编辑注释".into(),
+                geometry: geometry(),
+            };
+            assert!(create.validate().is_ok(), "{kind}");
+            let update = AnnotationWriteInput::Update {
+                annotation_key: "ANN00001".into(),
+                expected_version: 3,
+                annotation_type: kind.into(),
+                color: "#ff6666".into(),
+                text: text.into(),
+                comment: "修改".into(),
+            };
+            assert!(update.validate().is_ok(), "{kind}");
+        }
+        for kind in ["note", "text", "image"] {
+            let mut multi = geometry();
+            multi.rectangles.push([2.0, 2.0, 4.0, 4.0]);
+            assert!(
+                AnnotationWriteInput::Create {
+                    annotation_type: kind.into(),
+                    color: "#ffd400".into(),
+                    text: "".into(),
+                    comment: "注释".into(),
+                    geometry: multi
+                }
+                .validate()
+                .is_err()
+            );
+        }
+        assert!(validate_content("ink", "#ffd400", "", "原始笔迹只读", true).is_err());
+        assert!(validate_content("text", "#ffd400", "", "", true).is_err());
+        assert!(validate_content("image", "#ffd400", "", "", true).is_ok());
     }
     #[test]
     fn validates_scoped_foreign_identity_version_content_and_unverified_clients() {

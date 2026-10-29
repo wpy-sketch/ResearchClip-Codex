@@ -1,8 +1,12 @@
+v4.4.0开发验收：当前PDF30,000条Zotero标准批注、schema21缓存扩容、批量原子比较和有界DOM/密集绘制；[规模决策](architecture/ZOTERO_ANNOTATION_SCALE_440.md)。用户明确停止IDE开发，前序研究不接入主应用。
+
 v4.2.7 Step16：沿用模块化单体与现有Zotero适配，schema20增量保存标准批注待处理意图、处理修订和来源刷新设置；详见[同步决策](architecture/ZOTERO_ANNOTATION_SYNC_STEP16.md)与[实际验收](qa/RELEASE-4.2.7.md)。
 
 v4.2.6 Step15：复用Zotero只读适配和schema19，增加官方Local API受控授权与写入、条件版本和复读确认；详见[写入决策](architecture/ZOTERO_ANNOTATION_WRITES_STEP15.md)与[实际验收](qa/RELEASE-4.2.6.md)。
 
 # ResearchClip 架构设计
+
+5.0.0候选：Windows工作台原生内嵌WebView2浏览器，独立WS_CHILD、main视图精确能力、原编辑会话保留；无数据库迁移及新依赖。见[浏览器决策](architecture/RESEARCH_BROWSER.md)和[本轮检查](qa/BROWSER_WORKSPACE_500.md)。
 
 v4.2.5 Step14：只读ZoteroAnnotationIdentity/Repository/CoordinateAdapter/ReadCache，SQLite19派生缓存、GET-only及原件授权，来源冲突停止叠加。见[只读适配](architecture/ZOTERO_ANNOTATIONS_STEP14.md)及[实际验收](qa/RELEASE-4.2.5.md)。
 

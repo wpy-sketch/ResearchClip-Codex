@@ -16,8 +16,33 @@ pub struct OcrLanguage {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OcrStatus {
+    pub system_error: Option<String>,
     pub languages: Vec<OcrLanguage>,
     pub max_dimension: u32,
+}
+pub fn with_package_status(
+    system: Result<OcrStatus, CaptureError>,
+    package_ready: bool,
+) -> Result<OcrStatus, CaptureError> {
+    let mut status = match system {
+        Ok(s) => s,
+        Err(error) if package_ready => OcrStatus {
+            languages: vec![],
+            max_dimension: 4096,
+            system_error: Some(format!(
+                "系统OCR不可用：{}；本地ONNX行模型仍可用。",
+                error.message
+            )),
+        },
+        Err(error) => return Err(error),
+    };
+    if package_ready {
+        status.languages.push(OcrLanguage {
+            tag: "researchclip-ocr-line".into(),
+            name: "中英文行文本 · 本地ONNX（单行选区）".into(),
+        });
+    }
+    Ok(status)
 }
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -211,6 +236,7 @@ mod native {
             });
         }
         Ok(OcrStatus {
+            system_error: None,
             languages,
             max_dimension: OcrEngine::MaxImageDimension().map_err(error)?,
         })
@@ -285,6 +311,18 @@ mod native {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn package_ocr_remains_available_when_system_provider_fails() {
+        let status = with_package_status(Err(failure("system unavailable")), true).unwrap();
+        assert!(
+            status
+                .languages
+                .iter()
+                .any(|l| l.tag == "researchclip-ocr-line")
+        );
+        assert!(status.system_error.is_some());
+        assert!(with_package_status(Err(failure("system unavailable")), false).is_err());
+    }
     #[test]
     fn chinese_word_spacing_does_not_destroy_latin_words_or_mixed_boundaries() {
         assert_eq!(

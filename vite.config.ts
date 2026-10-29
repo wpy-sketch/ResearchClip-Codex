@@ -16,5 +16,5 @@ export default defineConfig({
     watch: { ignored: ['**/src-tauri/**', '**/.tools/**', '**/artifacts/**'] },
   },
   build: { assetsInlineLimit: (filePath) => /\.(woff2?|ttf|otf)$/i.test(filePath) ? false : undefined, target: ['es2022', 'chrome105', 'safari15.4'] },
-  test: { environment: 'node', include: ['src/**/*.test.{ts,tsx}'], clearMocks: true },
+  test: { environment: 'node', include: ['src/**/*.test.{ts,tsx}', 'zotero-connector/**/*.test.ts'], clearMocks: true },
 });

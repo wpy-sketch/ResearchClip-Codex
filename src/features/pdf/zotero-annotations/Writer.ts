@@ -1,3 +1,4 @@
+import {completeLocalChange} from './auto-sync';
 import {create} from 'zustand';
 import {invoke} from '@tauri-apps/api/core';
 import {sourceKey,annotationSource,type AnnotationSource,type ZoteroAnnotation,type AnnotationReadCache} from './model';
@@ -5,7 +6,7 @@ import {errorMessage} from '../../../shared/api/errors';
 import {ZoteroRequest} from '../ZoteroRequest';
 import type {PdfRecord} from '../PdfDocumentService';
 import {parseSyncResponse,type AnnotationSyncSnapshot,type AnnotationSyncResponse,type SyncRequest} from './sync-model';
-export const writeKinds=['highlight','underline','note'] as const;
+export const writeKinds=['highlight','underline','note','text','image'] as const;
 export type WriteKind=typeof writeKinds[number];
 export interface WriteGeometry {pageIndex:number;view:number[];userUnit:number;rectangles:number[][]}
 export type WriteInput={action:'create';annotationType:WriteKind;color:string;text:string;comment:string;geometry:WriteGeometry}|{action:'update';annotationKey:string;expectedVersion:number;annotationType:WriteKind;color:string;text:string;comment:string}|{action:'delete';annotationKey:string;expectedVersion:number};
@@ -13,7 +14,7 @@ export interface WriteCapabilities {productVersion:string|null;supportedTypes:st
 export interface WriteOutcome {verified:boolean;annotationKey:string;annotation:ZoteroAnnotation|null;message:string}
 export interface WriteResponse {capabilities:WriteCapabilities|null;outcome:WriteOutcome|null;pending:boolean}
 export type WriteRequest={operation:'capabilities'|'authorize'|'forget'|'verify'}|{operation:'submit';input:WriteInput};
-interface WriteState {source:string;busy:boolean;persisting:boolean;capabilities:WriteCapabilities|null;pending:boolean;message:string;error:string;draft:WriteInput|null;activeId:string|null;sync:AnnotationSyncSnapshot|null;autoPaused:boolean;progress:string;editing:boolean}
+interface WriteState {source:string;busy:boolean;persisting:boolean;capabilities:WriteCapabilities|null;pending:boolean;message:string;error:string;draft:WriteInput|null;activeId:string|null;sync:AnnotationSyncSnapshot|null;autoPaused:boolean;progress:string;editing:boolean;liveSync:boolean}
 interface Buffer {source:AnnotationSource;input:WriteInput;generation:number;saved:number;id:string|null;revision:number|null;error:string}
 interface Options {record?:()=>PdfRecord|null;onCache?:(source:AnnotationSource,cache:AnnotationReadCache)=>void;isVisible?:()=>boolean;report?:(e:unknown)=>void}
 export function parseWriteResponse(value:unknown):WriteResponse {
@@ -22,7 +23,7 @@ export function parseWriteResponse(value:unknown):WriteResponse {
 }
 /** Per PDF owner, not a second global store. Keys never reach this class. */
 export class ZoteroAnnotationWriter {
- readonly state=create<WriteState>(()=>({source:'',busy:false,persisting:false,capabilities:null,pending:false,message:'本地待处理记录会保留；写入仍需主动授权。',error:'',draft:null,activeId:null,sync:null,autoPaused:false,progress:'',editing:false}));
+ readonly state=create<WriteState>(()=>({source:'',busy:false,persisting:false,capabilities:null,pending:false,message:'本地待处理记录会保留；写入仍需主动授权。',error:'',draft:null,activeId:null,sync:null,autoPaused:false,progress:'',editing:false,liveSync:true}));
  private disposed=false;private source:AnnotationSource|null=null;private owner=new ZoteroRequest();private buffers=new Map<string,Buffer>();private saveTimer:ReturnType<typeof setTimeout>|null=null;private autoTimer:ReturnType<typeof setTimeout>|null=null;private saveQueue:Promise<void>=Promise.resolve();private cancelled=false;private autoEnabled=true;private deferred:AnnotationSource|null=null;
  constructor(private token:string,private options:Options={}){}
  get hasUnsaved(){return [...this.buffers.values()].some(b=>b.generation!==b.saved||!!b.error);}
@@ -49,14 +50,16 @@ export class ZoteroAnnotationWriter {
  });}
  async refresh(source:AnnotationSource){return this.run(source,async()=>{const response=await this.call(source,{operation:'refresh'});this.apply(response,source);this.state.setState({autoPaused:!!response.diagnostic});return response;});}
  async setRefresh(source:AnnotationSource,interval:number){return this.run(source,async()=>{const response=await this.call(source,{operation:'setRefresh',interval});this.apply(response,source);this.state.setState({autoPaused:false});return response;});}
- async synchronize(source:AnnotationSource){return this.run(source,async()=>{let response=await this.call(source,{operation:'refresh'});this.apply(response,source);if(response.diagnostic)return response;response=await this.call(source,{operation:'acceptRead'});this.apply(response,source);const pending=response.snapshot.entries.filter(e=>e.local&&e.status!=='CONFLICT');let count=0;for(const row of pending){if(this.cancelled)break;this.state.setState({progress:`处理 ${++count}/${pending.length} · ${row.annotationKey}`});const latest=this.state.getState().sync?.entries.find(e=>e.id===row.id);if(!latest?.local)continue;response=await this.call(source,{operation:'submit',changeId:latest.id,revision:latest.revision});this.apply(response,source);if(response.diagnostic&&['ZOTERO_WRITE_AUTH_REQUIRED','ZOTERO_WRITE_FORBIDDEN','ZOTERO_WRITE_UNAVAILABLE','ZOTERO_WRITE_SOURCE_MISMATCH'].includes(response.diagnostic.code))break;}
+ async synchronize(source:AnnotationSource,automatic=false){return this.run(source,async()=>{let response=await this.call(source,{operation:'refresh'});this.apply(response,source);if(response.diagnostic)return response;response=await this.call(source,{operation:'acceptRead'});this.apply(response,source);const pending=response.snapshot.entries.filter(e=>e.local&&e.status!=='CONFLICT'&&(!automatic||e.status==='LOCAL_DIRTY'));let count=0;for(const row of pending){if(this.cancelled)break;this.state.setState({progress:`处理 ${++count}/${pending.length} · ${row.annotationKey}`});const latest=this.state.getState().sync?.entries.find(e=>e.id===row.id);if(!latest?.local)continue;response=await this.call(source,{operation:'submit',changeId:latest.id,revision:latest.revision});this.apply(response,source);if(response.diagnostic&&['ZOTERO_WRITE_AUTH_REQUIRED','ZOTERO_WRITE_FORBIDDEN','ZOTERO_WRITE_UNAVAILABLE','ZOTERO_WRITE_SOURCE_MISMATCH'].includes(response.diagnostic.code))break;}
   if(!this.cancelled&&!response.diagnostic){response=await this.call(source,{operation:'refresh'});this.apply(response,source);}this.state.setState({message:this.cancelled?'同步已取消，已落盘与已完成项保留。':'本次处理结束；请查看逐项状态，冲突和失败修改仍保留。',autoPaused:!!response.diagnostic});return response;});}
  async resolve(source:AnnotationSource,id:string,choice:'local'|'remote'){return this.run(source,async()=>{const row=this.state.getState().sync?.entries.find(e=>e.id===id);if(!row)throw Error('待处理记录已变化，请重新载入。');const response=await this.call(source,{operation:'resolve',changeId:id,revision:row.revision,remoteVersion:row.remote?.version??null,choice});this.apply(response,source);return response;});}
  async history(source:AnnotationSource,id:string){return this.run(source,async()=>this.call(source,{operation:'history',changeId:id}));}
  async revision(source:AnnotationSource,id:string,revisionId:string){return this.run(source,async()=>this.call(source,{operation:'revision',changeId:id,revisionId}));}
  async cancel(){this.cancelled=true;const id=this.owner.cancel();if(id)await invoke('cancel_zotero_lookup',{lookupId:id});this.state.setState({message:'已请求取消；已提交的写入仍按固定key复核，落盘修改保留。'});}
  private clearAuto(){if(this.autoTimer)clearTimeout(this.autoTimer);this.autoTimer=null;}
- private armAuto(){this.clearAuto();const state=this.state.getState(),seconds=state.sync?.scope.refreshInterval;if(this.disposed||!this.autoEnabled||state.autoPaused||!seconds||!this.source)return;this.autoTimer=setTimeout(()=>{this.autoTimer=null;const s=this.state.getState();if(s.busy||s.persisting||s.editing||this.hasUnsaved||this.options.isVisible&&!this.options.isVisible()){this.armAuto();return;}if(this.source)void this.refresh(this.source);},seconds*1000);}
+ private armAuto(){this.clearAuto();const state=this.state.getState(),seconds=state.liveSync&&state.capabilities?.authorized&&state.capabilities.remembered&&state.sync?.entries.some(e=>e.status==='LOCAL_DIRTY'&&completeLocalChange(e.local))?2:state.sync?.scope.refreshInterval||(state.liveSync?30:0);if(this.disposed||!this.autoEnabled||state.autoPaused||!seconds||!this.source)return;this.autoTimer=setTimeout(()=>{this.autoTimer=null;const s=this.state.getState();if(s.busy||s.persisting||s.editing||this.hasUnsaved||this.options.isVisible&&!this.options.isVisible()){this.armAuto();return;}if(this.source){const live=s.liveSync&&s.capabilities?.authorized&&s.capabilities.remembered&&s.sync?.entries.some(e=>e.status==='LOCAL_DIRTY'&&completeLocalChange(e.local));void(live?this.synchronize(this.source,true):this.refresh(this.source));}},seconds*1000);}
+ connectorChanged(){const s=this.state.getState();if(this.disposed||!this.autoEnabled||s.autoPaused||s.busy||s.persisting||s.editing||this.hasUnsaved||this.options.isVisible&&!this.options.isVisible()||!this.source)return;void this.refresh(this.source);}
+ setLiveSync(enabled:boolean){this.state.setState({liveSync:enabled,autoPaused:false});this.armAuto();}
  pauseAuto(){this.autoEnabled=false;this.clearAuto();}
  resumeAuto(){this.autoEnabled=true;this.armAuto();}
  async dispose(){await this.flush();this.disposed=true;this.clearAuto();if(this.saveTimer)clearTimeout(this.saveTimer);const id=this.owner.clear();if(id)await invoke('cancel_zotero_lookup',{lookupId:id});this.buffers.clear();this.state.setState({draft:null,sync:null,capabilities:null});}

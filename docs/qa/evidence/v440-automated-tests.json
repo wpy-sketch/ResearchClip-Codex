@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "appVersion": "4.4.0",
+  "sqliteVersion": 21,
+  "mode": "automated isolated app verification; NOT actual Zotero host acceptance",
+  "realZoteroAcceptance": "NOT_VERIFIED",
+  "published": false,
+  "environment": {
+    "windows": "Windows-11-10.0.26300-SP0",
+    "node": "v22.22.2",
+    "cargo": "1.99.0",
+    "zoteroInstalledVersion": "10.0.6"
+  },
+  "frontend": {
+    "command": "npm run check",
+    "exitCode": 0,
+    "files": 96,
+    "tests": 762,
+    "log": "artifacts/dock-evaluation/v440-front-check-final.log"
+  },
+  "rust": {
+    "command": "npm run test:rust",
+    "exitCode": 0,
+    "passed": 327,
+    "ignored": 8,
+    "log": "artifacts/dock-evaluation/v440-rust-full-final.log"
+  },
+  "clippy": {
+    "command": "npm run check:rust",
+    "exitCode": 0,
+    "log": "artifacts/dock-evaluation/v440-clippy-last.log"
+  },
+  "format": {
+    "command": "npm run format:rust",
+    "exitCode": 0,
+    "log": "artifacts/dock-evaluation/v440-rust-format-last.log"
+  },
+  "runs": [
+    {
+      "file": "artifacts/zotero-native-v440-large-d/report.json",
+      "result": "PASS",
+      "checks": 20,
+      "errors": 0,
+      "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+      "read30000Ms": 13391
+    },
+    {
+      "file": "artifacts/zotero-native-v440-annotations-a/report.json",
+      "result": "PASS",
+      "checks": 28,
+      "errors": 0,
+      "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+      "read30000Ms": null
+    },
+    {
+      "file": "artifacts/zotero-native-v440-writes-b/report.json",
+      "result": "PASS",
+      "checks": 25,
+      "errors": 0,
+      "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+      "read30000Ms": null
+    },
+    {
+      "file": "artifacts/zotero-native-v440-sync-b/report.json",
+      "result": "PASS",
+      "checks": 22,
+      "errors": 0,
+      "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+      "read30000Ms": null
+    },
+    {
+      "file": "artifacts/zotero-connector-native-v440-connector-a/report.json",
+      "result": "PASS",
+      "checks": 9,
+      "errors": 0,
+      "mode": "actual Windows Tauri/WebView2/Rust; isolated workspace; unauthenticated socket boundaries only, not real Zotero plugin acceptance",
+      "read30000Ms": null
+    },
+    {
+      "file": "artifacts/pdf-quality-v440-quality-a/report.json",
+      "result": "PASS",
+      "checks": 5,
+      "errors": 0,
+      "mode": "actual Windows WebView2; independent known lossless raster pixels; CDP DPR and CSS zoom are simulations, not physical monitor acceptance",
+      "read30000Ms": null
+    },
+    {
+      "file": "artifacts/pdf-layout-v440-layout-a/report.json",
+      "result": "PASS",
+      "checks": 5,
+      "errors": 0,
+      "mode": "actual Windows WebView2, mixed-size generated PDF and isolated settings; no physical DPI claim",
+      "read30000Ms": null
+    },
+    {
+      "file": "artifacts/guide-reader-v440-a/report.json",
+      "result": "PASS",
+      "checks": 14,
+      "errors": 0,
+      "mode": "local isolated headless Edge renderer; no native capture, user database, credential or clipboard claims",
+      "read30000Ms": null
+    }
+  ],
+  "installer": {
+    "result": "PASS",
+    "checks": 5,
+    "runId": "v440-final-b",
+    "size": 18187721,
+    "sha256": "171fae59792fff0d460db8124f94785d9910d0e9e7002cc3ffb120157fe5fddc",
+    "installationStillPresent": false
+  },
+  "dataAudit": {
+    "files": 32,
+    "mode": "read-only default AppData hash comparison; WebView cache excluded; not a backup/restore feature",
+    "result": "PASS",
+    "changed": 0
+  },
+  "history": {
+    "priorReleases": 47,
+    "sourceAssets": 4738,
+    "companions": 328,
+    "result": "PASS",
+    "publishedCurrent": false
+  }
+}

@@ -2,7 +2,7 @@ use super::StorageError;
 use rusqlite::{Connection, OpenFlags, TransactionBehavior};
 use std::path::Path;
 
-pub const SCHEMA_VERSION: u32 = 20;
+pub const SCHEMA_VERSION: u32 = 21;
 
 fn apply_migration(
     connection: &mut Connection,
@@ -192,6 +192,13 @@ pub fn migrate(connection: &mut Connection, root: Option<&Path>) -> Result<(), S
             connection,
             20,
             include_str!("../../migrations/020_zotero_annotation_sync.sql"),
+        )?;
+    }
+    if version < 21 {
+        apply_migration(
+            connection,
+            21,
+            include_str!("../../migrations/021_zotero_annotation_capacity.sql"),
         )?;
     }
     validate_schema(connection, SCHEMA_VERSION)?;

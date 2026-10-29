@@ -9,7 +9,7 @@ const read = (file) => readFileSync(join(root, file), 'utf8');
 const collectDocs = (directory) => readdirSync(join(root, directory), { withFileTypes: true })
   .flatMap((entry) => entry.isDirectory() ? collectDocs(join(directory, entry.name))
     : entry.name.endsWith('.md') ? [join(directory, entry.name)] : []);
-const docs = ['math-ocr/README.md','browser-extension/README.md','browser-extension/PROTOCOL.md','README.md', 'AGENTS.md', ...(existsSync(join(root, 'CHANGELOG.md')) ? ['CHANGELOG.md'] : []), ...collectDocs('docs')];
+const docs = ['zotero-connector/README.md','math-ocr/README.md','browser-extension/README.md','browser-extension/PROTOCOL.md','README.md', 'AGENTS.md', ...(existsSync(join(root, 'CHANGELOG.md')) ? ['CHANGELOG.md'] : []), ...collectDocs('docs')];
 let links = 0;
 for (const file of docs) {
   const content = read(file);
@@ -34,7 +34,9 @@ assert.equal(lock.version, config.version);
 assert.equal(lock.packages[''].version, config.version);
 assert.equal(read('src-tauri/Cargo.toml').match(/^version\s*=\s*"([^"]+)"/m)?.[1], config.version);
 assert.deepEqual(config.app.security.capabilities, [main.identifier, overlay.identifier, pins.identifier, "scroll-control", "window-picker"]);
-assert.deepEqual(main.windows, ['main']);
+assert.equal(main.windows, undefined, 'Window-wide grants would expose child browser webviews');
+assert.deepEqual(main.webviews, ['main']);
+assert.equal(main.remote, undefined, 'Remote pages must never acquire native capabilities');
 assert.deepEqual(overlay.windows, ['capture-overlay-*']);
 const syncCommands=['sync_status','sync_configure','sync_start','sync_stop','sync_resolve','sync_authorize_documents'];for(const command of syncCommands){assert.ok(main.permissions.includes('allow-'+command.replaceAll('_','-')));assert.ok(read('src-tauri/src/lib.rs').includes('commands::sync::'+command));assert.ok(read('src-tauri/build.rs').includes('"'+command+'"'));}
 const aiCommands=['similarity_ai_status','choose_similarity_ai_bundle','start_similarity_ai','cancel_similarity_ai'];for(const command of aiCommands){assert.ok(main.permissions.includes('allow-'+command.replaceAll('_','-')));assert.ok(read('src-tauri/src/lib.rs').includes('commands::similarity_ai::'+command));assert.ok(read('src-tauri/build.rs').includes('"'+command+'"'));}
@@ -56,6 +58,9 @@ const ocrCommands=['ocr_status','recognize_ocr','copy_ocr_text'];
 const editorCommands = ['save_editor_project','open_editor_project','export_editor_png','copy_editor_png'];
 const documentCommands = ['open_markdown_external','save_markdown_document','open_markdown_document','release_markdown_document','rename_markdown_document','list_markdown_templates','load_markdown_template','create_markdown_template','rename_markdown_template','delete_markdown_template'];
 const markdownCommands = ['export_knowledge_markdown'];
+const connectorCommands=['zotero_connector','connector_pdf_context','zotero_plugin_source'];for(const command of connectorCommands){assert.ok(main.permissions.includes('allow-'+command.replaceAll('_','-')));assert.ok(read('src-tauri/build.rs').includes('"'+command+'"'));for(const other of [pins,overlay])assert.ok(!other.permissions.includes('allow-'+command.replaceAll('_','-')));}
+assert.equal(config.bundle.resources['../docs/licenses/httparse-LICENSE-MIT.txt'],'licenses/httparse-LICENSE-MIT.txt');
+const connectorManifest=JSON.parse(read('zotero-connector/manifest.json'));assert.equal(connectorManifest.applications.zotero.id,'researchclip-connector@wpy-sketch.github.io');assert.equal(connectorManifest.version,'1.0.1');assert.equal(connectorManifest.applications.zotero.update_url,'https://github.com/wpy-sketch/ResearchClip-Codex/releases/latest/download/zotero-updates.json');assert.equal(connectorManifest.applications.zotero.strict_min_version,'10.0.6');assert.equal(connectorManifest.applications.zotero.strict_max_version,'10.0.6');
 const desktopCommands = ['desktop_status','desktop_action','complete_desktop_exit'];
 const libraryCommands=['create_screenshot','library_status','reconcile_library','list_screenshots','screenshot_page','get_knowledge_card','save_knowledge_card','open_card_source','get_screenshot','screenshot_image','update_screenshot','delete_screenshot','list_notes','save_note','delete_note','list_tags','save_tag','delete_tag','get_screenshot_tags','set_screenshot_tags'];
 const permission = (command) => `allow-${command.replaceAll('_', '-')}`;
@@ -76,7 +81,7 @@ execFileSync('git', ['diff', '--exit-code', '--', 'src-tauri/migrations/003_proj
 execFileSync('git', ['diff', '--exit-code', '--', 'src-tauri/migrations/004_ocr_index.sql'], { cwd: root, stdio: 'pipe' });
 execFileSync('git', ['diff', '--exit-code', '--', 'src-tauri/migrations/005_annotation_revisions.sql'], { cwd: root, stdio: 'pipe' });
 const currentSchema = Number(read('src-tauri/src/storage/migrations.rs').match(/pub const SCHEMA_VERSION: u32 = (\d+);/)?.[1]);
-assert.equal(currentSchema, 20);
+assert.equal(currentSchema, 21);
 assert.ok(existsSync(join(root,'src-tauri/migrations/013_document_organization.sql')));
 assert.ok(existsSync(join(root, 'src-tauri/migrations/012_research_resources.sql')));
 execFileSync('git', ['diff', '--exit-code', '--', 'src-tauri/migrations/006_sync.sql'], { cwd: root, stdio: 'pipe' });
@@ -89,7 +94,7 @@ assert.ok(read('src-tauri/migrations/002_library.sql').includes('CREATE TABLE pe
 execFileSync('git', ['diff', '--check'], { cwd: root, stdio: 'pipe' });
 for(const command of ['document_directory','create_document_folder','delete_document_folder','organize_document','markdown_history','markdown_revision_text','load_markdown_revision','relink_markdown_document']){assert.ok(main.permissions.includes('allow-'+command.replaceAll('_','-')));assert.ok(read('src-tauri/build.rs').includes('"'+command+'"'));assert.ok(read('src-tauri/src/lib.rs').includes('commands::document_organization::'+command));for(const other of [pins,overlay])assert.ok(!other.permissions.includes('allow-'+command.replaceAll('_','-')));}
 execFileSync('git',['diff','--exit-code','--','src-tauri/migrations/012_research_resources.sql'],{cwd:root,stdio:'pipe'});
-console.log(JSON.stringify({ result: 'passed', documents: docs.length, localLinks: links, commandPermissions: 'consistent; no fs or window-create grants', storageAndMigrations: `schema v${currentSchema}; published migrations001–019 unchanged` }, null, 2));
+console.log(JSON.stringify({ result: 'passed', documents: docs.length, localLinks: links, commandPermissions: 'consistent; no fs or window-create grants', storageAndMigrations: `schema v${currentSchema}; published migrations001–020 unchanged` }, null, 2));
 
 for(const command of ["annotation_history","annotation_revision","save_annotation_revision","restore_annotation_revision"]){assert.ok(main.permissions.includes("allow-"+command.replaceAll("_","-")));assert.ok(read("src-tauri/src/lib.rs").includes("commands::revisions::"+command));assert.ok(read("src-tauri/build.rs").includes("\""+command+"\""));}
 
@@ -120,3 +125,6 @@ for(const command of ['save_pdf_excerpt','pdf_excerpts','get_pdf_excerpt','resol
 
 for(const command of ['zotero_annotation_sync']){assert.ok(main.permissions.includes('allow-'+command.replaceAll('_','-')));assert.ok(read('src-tauri/build.rs').includes('"'+command+'"'));assert.ok(read('src-tauri/src/lib.rs').includes('commands::zotero_sync::'+command));for(const other of [pins,overlay])assert.ok(!other.permissions.includes('allow-'+command.replaceAll('_','-')));}
 execFileSync('git',['diff','--exit-code','--','src-tauri/migrations/019_zotero_annotation_cache.sql'],{cwd:root,stdio:'pipe'});
+
+execFileSync('git',['diff','--exit-code','--','src-tauri/migrations/020_zotero_annotation_sync.sql'],{cwd:root,stdio:'pipe'});
+assert.ok(read('src-tauri/migrations/021_zotero_annotation_capacity.sql').includes('67108864'));

@@ -1,0 +1,9 @@
+{
+  "version": "1.23.2",
+  "source": "https://github.com/microsoft/onnxruntime/releases/download/v1.23.2/onnxruntime-win-x64-1.23.2.zip",
+  "archiveSHA256": "0b38df9af21834e41e73d602d90db5cb06dbd1ca618948b8f1d66d607ac9f3cd",
+  "name": "onnxruntime.dll",
+  "size": 14186016,
+  "sha256": "dec964ab1ee36cc9b0ae247d13b376627992fc57dec0454354017ab8fd84f1ea",
+  "license": "MIT"
+}

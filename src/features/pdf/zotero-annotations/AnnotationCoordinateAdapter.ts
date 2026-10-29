@@ -4,6 +4,7 @@ export interface AnnotationViewport {width:number;height:number;convertToViewpor
 export interface AnnotationRegion {box:PageRectangle;line:{x1:number;y1:number;x2:number;y2:number}|null}
 export function pageAnnotationRects(a:ZoteroAnnotation,pageIndex:number){const p=a.position;return !p?[]:p.pageIndex===pageIndex?p.rects:p.pageIndex+1===pageIndex?p.nextPageRects:[];}
 export class AnnotationCoordinateAdapter {
+ static strokes(a:ZoteroAnnotation,pageIndex:number,viewport:AnnotationViewport){if(a.annotationType!=='ink'||a.position?.pageIndex!==pageIndex)return [];return (a.position.paths??[]).map(path=>{const points:number[]=[];for(let i=0;i<path.length;i+=2){const p=viewport.convertToViewportPoint(path[i],path[i+1]);if(!p.every(Number.isFinite))throw Error('ink页面变换无效。');points.push(...p);}const origin=viewport.convertToViewportPoint(0,0),end=viewport.convertToViewportPoint(a.position!.width??1,0);return {points,width:Math.hypot(end[0]-origin[0],end[1]-origin[1])};});}
  static regions(a:ZoteroAnnotation,pageIndex:number,viewport:AnnotationViewport):AnnotationRegion[]{
   if(![viewport.width,viewport.height].every(Number.isFinite)||!(viewport.width>0&&viewport.height>0))throw Error('批注页面尺寸无效。');
   return pageAnnotationRects(a,pageIndex).flatMap(r=>{const left=viewport.convertToViewportPoint(r[0],r[1]),right=viewport.convertToViewportPoint(r[2],r[3]);if(left.length!==2||right.length!==2||![...left,...right].every(Number.isFinite))throw Error('批注页面变换无效。');

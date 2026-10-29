@@ -1,0 +1,148 @@
+{
+  "scope": "ResearchClip Step1 only; no Step2, release, dependency update or schema change",
+  "recordedAt": "2026-10-27T15:31:08.129379+00:00",
+  "gitBase": "ec867a9",
+  "appVersion": "4.4.0",
+  "schemaVersion": 21,
+  "environment": {
+    "os": "Windows-11-10.0.26300-SP0",
+    "node": "22.22.2",
+    "npm": "10.9.7",
+    "rustc": "1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "1.99.0 (5f94df478 2026-08-27)",
+    "shell": "PowerShell 7.6.5"
+  },
+  "checks": [
+    {
+      "command": "npm run check",
+      "exitCode": 0,
+      "includes": [
+        "typecheck",
+        "ESLint zero warnings",
+        "Vitest 98 files / 779 passed",
+        "frontend build"
+      ]
+    },
+    {
+      "command": "npm run lint (after new native smoke script)",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run format:rust",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run test:rust",
+      "exitCode": 0,
+      "passed": 327,
+      "ignored": 8,
+      "failed": 0
+    },
+    {
+      "command": "npm run check:rust",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/with-rust.mjs cargo test --manifest-path src-tauri/Cargo.toml --locked migration",
+      "exitCode": 0,
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "command": "npm run tauri -- build --debug --no-bundle",
+      "exitCode": 0,
+      "mode": "actual Windows custom-protocol development binary, no installer bundle"
+    },
+    {
+      "command": "node scripts/feature-packages-native-smoke.mjs step1-a",
+      "exitCode": 0,
+      "passedChecks": 8,
+      "pageErrors": 0
+    },
+    {
+      "command": "default-data-audit.ps1 verify via PowerShell 7.6.5",
+      "exitCode": 0,
+      "files": 32,
+      "changed": 0
+    },
+    {
+      "command": "npm run check:docs",
+      "exitCode": 0,
+      "result": "PASS",
+      "documents": 228,
+      "localLinks": 1236
+    }
+  ],
+  "earlierFailuresRetained": [
+    {
+      "command": "clipper regression tests before fix",
+      "exitCode": 1,
+      "failed": 3,
+      "resolvedBy": "generation guard, clear stale error, native DTO validation"
+    },
+    {
+      "command": "initial typecheck-c",
+      "exitCode": 1,
+      "reason": "TS2591 node builtin types missing in new test file",
+      "resolvedBy": "existing node type reference; final npm run check passed"
+    },
+    {
+      "command": "default-data-audit.ps1 via Windows PowerShell5.1",
+      "exitCode": 1,
+      "reason": "framework lacks Path.GetRelativePath",
+      "resolvedBy": "reran unchanged script via PowerShell7.6.5,32 files unchanged"
+    }
+  ],
+  "notExecuted": [
+    "7 ignored WebDAV tests requiring independent loopback HTTP/TLS fixture; current Python lacks wsgidav",
+    "1 ignored real Zotero test requiring explicit independent marked host profile",
+    "physical mixed-DPI/HDR/OS screenshot matrix",
+    "real browser extension/native host install",
+    "real optional model inference",
+    "installer generation/upgrade/release (not Step1 scope)"
+  ],
+  "protectedSourcesUnchanged": [
+    "package.json",
+    "package-lock.json",
+    "src-tauri/Cargo.toml",
+    "src-tauri/Cargo.lock",
+    "src-tauri/tauri.conf.json",
+    "src-tauri/migrations/001_workspace.sql",
+    "src-tauri/migrations/002_library.sql",
+    "src-tauri/migrations/003_projects.sql",
+    "src-tauri/migrations/004_ocr_index.sql",
+    "src-tauri/migrations/005_annotation_revisions.sql",
+    "src-tauri/migrations/006_sync.sql",
+    "src-tauri/migrations/007_image_features.sql",
+    "src-tauri/migrations/008_references.sql",
+    "src-tauri/migrations/009_internal_links.sql",
+    "src-tauri/migrations/010_annotation_anchors.sql",
+    "src-tauri/migrations/011_semantic_embeddings.sql",
+    "src-tauri/migrations/012_research_resources.sql",
+    "src-tauri/migrations/013_document_organization.sql",
+    "src-tauri/migrations/014_citation_keys.sql",
+    "src-tauri/migrations/015_pdf_reading.sql",
+    "src-tauri/migrations/016_zotero_scope.sql",
+    "src-tauri/migrations/017_pdf_excerpts.sql",
+    "src-tauri/migrations/018_pdf_note_links.sql",
+    "src-tauri/migrations/019_zotero_annotation_cache.sql",
+    "src-tauri/migrations/020_zotero_annotation_sync.sql",
+    "src-tauri/migrations/021_zotero_annotation_capacity.sql"
+  ],
+  "logSHA256": {
+    "check-final.log": "161ed0d4f0ccda7bde0a97cd52d54175438be15e71125a14f0c2854f33313188",
+    "lint-final.log": "dfbdf0d94d7729e0fd5d099a6ec20b134b3b9dc008eefe45293d649fa16a027a",
+    "rust-fmt.log": "b294b3f4706c22cd08ec693e1c5f96d3c8547bcad702d08b61f2b0eb0dafd25c",
+    "rust-tests.log": "2c1e27aa52a1f6817b993f012c4cbd74f16cd79e4be7250710b904c1e6a44ca3",
+    "rust-clippy.log": "82f600b8a2e973f4194449c9fc619e3de87c8b7c2514a240354e5d9a7cd62797",
+    "migration-tests.log": "abfb13fca152ac3958fdf54af16bfc671732470ba6e5070146785848a46bea93",
+    "tauri-debug-build.log": "33ad352120e55d35f7f5a81beff1fbef4e5bcf642a5f9beb281b19a01d796dcd",
+    "native-catalog-a.log": "4e88f2903a0079d325397fc30a20bddc3788a06c3702c1c167a20b57b38848e2",
+    "clipper-regressions-before.log": "32e46fa9699ff4b5ce8b7690e16726748e5abfb8a15635c6f299e1bd0ed5370a",
+    "clipper-regressions-after.log": "9a778f6a372686b114a3eb28aeba4b9b0e583d1385b0453f4b53c057582ff74c",
+    "typecheck-c.log": "bfd77a51b6e814686dd3147aabebd9a5f8867dcc0d4d42b8bc38a8352586bc09",
+    "user-data-audit.log": "874c306e37eecef61126669c4d7601c766b921aa10ebe0b9504c112480a745cc",
+    "user-data-audit-final.log": "e4c8bc7b2b0d22ecda5968faf9694bb849297a995f62a4cb03a2cf0fdd877c45",
+    "docs-check.log": "685937b4ea3af2691fc2970119da70091cb442aba1cf68a8c1fb71fa00112435"
+  }
+}

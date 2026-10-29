@@ -70,8 +70,7 @@ pub async fn refresh_zotero_annotations(
         }
         pdf.source(&token).map_err(super::library::error)?;
         library.with(|s| {
-            s.save_annotation_cache(&record.document_id, &cache)?;
-            s.observe_annotation_sync(&record.document_id, &cache)?;
+            s.commit_annotation_read(&record.document_id, &cache)?;
             Ok(())
         })?;
         Ok::<_, CommandError>(cache)

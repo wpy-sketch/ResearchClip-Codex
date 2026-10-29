@@ -1,0 +1,160 @@
+{
+  "status": "UNPUBLISHED",
+  "schemaVersion": 1,
+  "catalogPublicKey": null,
+  "catalogUrl": null,
+  "packages": [
+    {
+      "id": "model.ocr-line",
+      "name": "中英文ONNX行识别",
+      "description": "PaddleOCR转换模型；单行选区识别，整页继续使用Windows OCR。",
+      "version": "1.0.1",
+      "publisher": "ResearchClip / SWHL RapidOCR / PaddlePaddle",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/SWHL/RapidOCR/blob/main/README.md",
+      "source": "https://huggingface.co/SWHL/RapidOCR",
+      "kind": "MODEL_PACKAGE",
+      "appVersion": "=5.0.0",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "dependencies": [],
+      "adapter": "ocr-line",
+      "files": [
+        {
+          "path": "rec.onnx",
+          "url": "https://huggingface.co/SWHL/RapidOCR/resolve/1cfba2e90fc938db55889873735088de210cc173/PP-OCRv4/ch_PP-OCRv4_rec_infer.onnx",
+          "size": 10857958,
+          "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b",
+          "entries": []
+        },
+        {
+          "path": "characters.txt",
+          "url": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/v2.7.3/ppocr/utils/ppocr_keys_v1.txt",
+          "size": 26249,
+          "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "plugin.browser-clipper",
+      "name": "Chrome/Edge网页剪藏扩展",
+      "description": "真实v4.2.7历史附件，内含扩展与Native Host；下载后按浏览器机制和包内说明主动安装，不自动运行脚本。 项目主代码没有独立许可证声明；第三方许可见包内逐项文件，不能笼统声称全包MIT。",
+      "version": "1.0.2",
+      "publisher": "ResearchClip",
+      "license": "Project license undeclared; bundled third-party notices",
+      "licenseUrl": "https://github.com/wpy-sketch/ResearchClip/releases/tag/v4.2.7",
+      "source": "https://github.com/wpy-sketch/ResearchClip/releases/tag/v4.2.7",
+      "kind": "EXTERNAL_PLUGIN",
+      "appVersion": "=5.0.0",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "dependencies": [],
+      "adapter": "external",
+      "files": [
+        {
+          "path": "ResearchClip-WebClipper-v1.0.2-windows-x64.zip",
+          "url": "https://github.com/wpy-sketch/ResearchClip/releases/download/v4.2.7/ResearchClip-WebClipper-v1.0.2-windows-x64.zip",
+          "size": 541479,
+          "sha256": "1e456e8cc198f1b366afc47614cc5ad3dbf14410ad5a52aad21cf61d551cd4ce",
+          "entries": []
+        }
+      ]
+    }
+  ],
+  "blockedComponents": [
+    {
+      "id": "model.latex",
+      "reason": "No separately verified model-weight redistribution license; trusted bundled math runtime not delivered"
+    },
+    {
+      "id": "plugin.zotero-connector",
+      "version": "1.0.0",
+      "url": null,
+      "reason": "Unpublished; real host acceptance pending"
+    },
+    {
+      "id": "model.semantic",
+      "reason": "Pinned visual ONNX repo and upstream model card do not declare a separate weights license; code MIT is not sufficient. Native adapter tested, managed install disabled."
+    }
+  ],
+  "researchOnlyPackages": [
+    {
+      "id": "model.semantic",
+      "name": "中英文图文语义搜索 · CPU",
+      "description": "原生CPU技术适配已真实测试；视觉ONNX权重许可未核实，不作为已核准的一键分发组件。",
+      "version": "1.0.0",
+      "publisher": "ResearchClip / Sentence Transformers / Xenova",
+      "license": "Text Apache-2.0 / vision weights UNVERIFIED",
+      "licenseUrl": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/blob/58edf8cada9e398793dca955574a48cbb7f18be2/README.md",
+      "source": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1",
+      "kind": "MODEL_PACKAGE",
+      "appVersion": "=4.4.0",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "dependencies": [],
+      "adapter": "semantic",
+      "files": [
+        {
+          "path": "text.onnx",
+          "size": 135377779,
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/onnx/model_quint8_avx2.onnx",
+          "sha256": "fbc8fbeaa5237d96bd1bf430057c70d34de8334a463e933a5faa305f6caeed9c",
+          "entries": []
+        },
+        {
+          "path": "tokenizer.json",
+          "size": 1961847,
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/tokenizer.json",
+          "sha256": "5b4e1a8171c81dfd666ae40265b9530c6e0b3d53923fe8ac493dcc84229adf81",
+          "entries": []
+        },
+        {
+          "path": "dense.safetensors",
+          "size": 1572984,
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/2_Dense/model.safetensors",
+          "sha256": "d12568dc7300970a4d3dbb49068ad16cd89b99840b74b026f8e48071e9414f74",
+          "entries": []
+        },
+        {
+          "path": "pooling.json",
+          "size": 190,
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/1_Pooling/config.json",
+          "sha256": "a37f83ada23e7887be6b88f4998927dbeac0038af301553c7cd5461413bf1a56",
+          "entries": []
+        },
+        {
+          "path": "dense.json",
+          "size": 115,
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/2_Dense/config.json",
+          "sha256": "48f4dfaf605a6c2869cd200970e54911c6c15053781d2bdcf3e81e89e77662ed",
+          "entries": []
+        },
+        {
+          "path": "sentence.json",
+          "size": 53,
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/sentence_bert_config.json",
+          "sha256": "70f4448f31320443fe3557cacea5abf2dcc4915dda8c80646bec9f3bb0aa5a1f",
+          "entries": []
+        },
+        {
+          "path": "vision.onnx",
+          "size": 89117001,
+          "url": "https://huggingface.co/Xenova/clip-vit-base-patch32/resolve/d15189d7028b43f1d3e65039190477f6af591c2a/onnx/vision_model_quantized.onnx",
+          "sha256": "583fd1110a514667812fee7d684952aaf82a99b959760c8d7dca7e0ab9839299",
+          "entries": []
+        },
+        {
+          "path": "preprocessor.json",
+          "size": 520,
+          "url": "https://huggingface.co/Xenova/clip-vit-base-patch32/resolve/d15189d7028b43f1d3e65039190477f6af591c2a/preprocessor_config.json",
+          "sha256": "6f638fb9401a6d6296feff533ee7efe657b787c49f954f82f5906b36ef2a1b1f",
+          "entries": []
+        }
+      ]
+    }
+  ]
+}

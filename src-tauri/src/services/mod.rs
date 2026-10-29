@@ -39,3 +39,9 @@ pub mod zotero_annotations;
 pub mod zotero_write_model;
 
 pub mod zotero_sync_model;
+
+pub mod zotero_connector;
+
+pub mod app_update;
+pub mod packages;
+pub mod zotero_plugins;

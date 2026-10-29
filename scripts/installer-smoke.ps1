@@ -122,6 +122,26 @@ try {
     $report.licenseNotices['pdfjs-NOTICES.txt'] = (Get-FileHash -LiteralPath $pdfNotice -Algorithm SHA256).Hash
   }
 
+  if ([Version]$version -ge [Version]'4.4.0') {
+    $httpNotice = Join-Path $installRoot 'licenses/httparse-LICENSE-MIT.txt'
+    Assert-Check ((Test-Path -LiteralPath $httpNotice) -and ((Get-FileHash -LiteralPath $httpNotice -Algorithm SHA256).Hash -eq (Get-FileHash -LiteralPath (Join-Path $projectRoot 'docs/licenses/httparse-LICENSE-MIT.txt') -Algorithm SHA256).Hash)) 'Installed HTTP parser license missing or changed.'
+    $report.licenseNotices['httparse-LICENSE-MIT.txt'] = (Get-FileHash -LiteralPath $httpNotice -Algorithm SHA256).Hash
+    $runtimeManifest = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'src-tauri/resources/onnx-runtime.json') | ConvertFrom-Json
+    $runtimePath = Join-Path $installRoot 'native/onnxruntime.dll'
+    Assert-Check ((Test-Path -LiteralPath $runtimePath) -and (Get-Item -LiteralPath $runtimePath).Length -eq $runtimeManifest.size) 'Bundled CPU runtime missing or wrong size.'
+    Assert-Check ((Get-FileHash -LiteralPath $runtimePath -Algorithm SHA256).Hash -eq $runtimeManifest.sha256) 'Bundled CPU runtime differs from reviewed hash.'
+    $runtimeSignature = Get-AuthenticodeSignature -LiteralPath $runtimePath
+    Assert-Check ($runtimeSignature.Status -eq 'Valid' -and $runtimeSignature.SignerCertificate.Subject.Contains('Microsoft Corporation')) 'Bundled runtime publisher signature is not valid.'
+    $report.nativeRuntime = [ordered]@{version=$runtimeManifest.version;sha256=$runtimeManifest.sha256;size=$runtimeManifest.size;authenticode=[string]$runtimeSignature.Status}
+    foreach($noticePair in @(@('licenses/onnxruntime-MIT.txt','src-tauri/resources/native/LICENSE'),@('licenses/onnxruntime-ThirdPartyNotices.txt','src-tauri/resources/native/ThirdPartyNotices.txt'),@('licenses/PaddleOCR-Apache-2.0.txt','docs/licenses/PaddleOCR-Apache-2.0.txt'))) {
+      $installedNotice = Join-Path $installRoot $noticePair[0]
+      Assert-Check ((Test-Path -LiteralPath $installedNotice) -and (Get-FileHash -LiteralPath $installedNotice -Algorithm SHA256).Hash -eq (Get-FileHash -LiteralPath (Join-Path $projectRoot $noticePair[1]) -Algorithm SHA256).Hash) 'Installed model/runtime license missing or changed.'
+      $report.licenseNotices[$noticePair[0]] = (Get-FileHash -LiteralPath $installedNotice -Algorithm SHA256).Hash
+    }
+    $report.checks.Add('Installed CPU runtime matches exact reviewed size/SHA and valid Microsoft Authenticode; ONNX Runtime and OCR notices match original licensed files.')
+
+  }
+
   if ([Version]$version -ge [Version]'4.1.5') {
     $codeNotice = Join-Path $installRoot 'licenses/lowlight-NOTICES.txt'
     Assert-Check ((Test-Path -LiteralPath $codeNotice) -and ((Get-FileHash -LiteralPath $codeNotice -Algorithm SHA256).Hash -eq (Get-FileHash -LiteralPath (Join-Path $projectRoot 'docs/licenses/lowlight-NOTICES.txt') -Algorithm SHA256).Hash)) 'Installed code-highlighting notices missing or changed.'

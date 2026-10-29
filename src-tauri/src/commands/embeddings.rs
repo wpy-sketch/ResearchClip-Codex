@@ -19,17 +19,29 @@ pub async fn semantic_status(
     store: State<'_, Arc<LibraryService>>,
     service: State<'_, Arc<EmbeddingService>>,
     runtime: State<'_, Arc<MathOcrService>>,
+    packages: State<'_, crate::services::packages::PackageHost>,
 ) -> Result<SemanticStatus, CommandError> {
     check(&window)?;
     let library = Arc::clone(store.inner());
     let worker = Arc::clone(service.inner());
-    let configured = runtime.runtime_python().is_ok();
-    tauri::async_runtime::spawn_blocking(move || worker.status(&library, configured))
-        .await
-        .map_err(|_| CommandError {
-            code: "SEMANTIC",
-            message: "语义状态读取失败。".into(),
-        })?
+    let native = packages
+        .0
+        .as_ref()
+        .is_ok_and(|p| p.is_ready("model.semantic"));
+    let configured = native || runtime.runtime_python().is_ok();
+    tauri::async_runtime::spawn_blocking(move || {
+        let mut status = worker.status(&library, configured)?;
+        if native {
+            status.models_present = true;
+        }
+        status.native_model = native;
+        Ok(status)
+    })
+    .await
+    .map_err(|_| CommandError {
+        code: "SEMANTIC",
+        message: "语义状态读取失败。".into(),
+    })?
 }
 #[tauri::command]
 #[allow(clippy::too_many_arguments)]
@@ -38,6 +50,7 @@ pub fn semantic_start(
     store: State<'_, Arc<LibraryService>>,
     service: State<'_, Arc<EmbeddingService>>,
     runtime: State<'_, Arc<MathOcrService>>,
+    packages: State<'_, crate::services::packages::PackageHost>,
     kind: String,
     query: Option<String>,
     rebuild: bool,
@@ -51,10 +64,23 @@ pub fn semantic_start(
             message: "请明确确认索引或模型下载操作。".into(),
         });
     }
-    let python = runtime.runtime_python().map_err(|e| CommandError {
-        code: "SEMANTIC",
-        message: e.message,
-    })?;
+    let native = if matches!(kind.as_str(), "query" | "index") {
+        packages
+            .0
+            .as_ref()
+            .ok()
+            .and_then(|p| p.model_root("model.semantic").ok())
+    } else {
+        None
+    };
+    let python = if native.is_some() {
+        std::path::PathBuf::new()
+    } else {
+        runtime.runtime_python().map_err(|e| CommandError {
+            code: "SEMANTIC",
+            message: e.message,
+        })?
+    };
     service.inner().begin(
         Arc::clone(store.inner()),
         python,
@@ -62,7 +88,7 @@ pub fn semantic_start(
         query,
         rebuild,
         scope.unwrap_or_default(),
-        None,
+        native,
     )
 }
 #[tauri::command]

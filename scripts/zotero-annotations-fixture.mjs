@@ -1,6 +1,7 @@
 // Fictional protocol fixtures only. Never connected to a real Zotero library.
-export function annotationFixture(library,start,mode){
+export function annotationFixture(library,start,mode,limit=20){
  const item=(key,type,pageIndex,rects,color='#ffd400',text='专用练习批注')=>({key,version:1,library,data:{key,itemType:'annotation',parentItem:'ATTACH01',annotationType:type,annotationColor:color,annotationText:text,annotationComment:'只读练习；未核实文献',annotationPageLabel:String(pageIndex+1),annotationPosition:JSON.stringify({pageIndex,rects})}});
+ if(mode==='large30000'||mode==='large30001')return Array.from({length:Math.max(0,Math.min(limit,(mode==='large30000'?30000:30001)-start))},(_,i)=>{const n=start+i;return item('N'+String(n).padStart(7,'0'),'highlight',0,[[30+n%100,300+n%300,32+n%100,303+n%300]],n%2?'#ffd400':'#ff6666',n===29999?'末尾科研批注 N0029999':'三万条隔离练习 '+n);});
  const list=[
   item('HL000001','highlight',0,[[100,550,300,650]],'#ffd400','矩阵高亮（虚构）'),
   item('UN000001','underline',0,[[100,500,300,525]],'#ff6666','旋转下划线'),
@@ -16,8 +17,9 @@ export function annotationFixture(library,start,mode){
  const cross=JSON.parse(list[5].data.annotationPosition);cross.nextPageRects=[[30,770,200,790]];list[5].data.annotationPosition=JSON.stringify(cross);
  list[6].data.annotationPosition=JSON.stringify({pageIndex:0,paths:[[10,20,30,40]],width:1});
  list[7].data.annotationPosition='{broken';
- if(start===20){const newer=structuredClone(list[0]);newer.version=2;newer.data.annotationText+=' · v2';const batch=[newer,item('EX000001','note',1,[[40,50,70,80]],'#5fb236','第二页响应')];if(library.type==='group')for(const a of batch)a.data.annotationComment='群组库7独立批注';return batch;}
+ const newer=structuredClone(list[0]);newer.version=2;newer.data.annotationText+=' · v2';list.push(newer,item('EX000001','note',1,[[40,50,70,80]],'#5fb236','第二页响应'));
+ if(mode==='annotationVersionShift')for(let n=0;n<100;n++)list.push(item('V'+String(n).padStart(7,'0'),'highlight',0,[[20,40,40,60]],'#ffd400','分页版本变化练习'));
  if(mode==='annotationWrongLibrary')list[0].library={type:library.type,id:99};
  if(library.type==='group')for(const a of list)a.data.annotationComment='群组库7独立批注';
- return list;
+ return list.slice(start,start+limit);
 }

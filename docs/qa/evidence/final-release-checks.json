@@ -1,0 +1,182 @@
+{
+  "date": "2026-10-28",
+  "version": "4.4.0",
+  "publication": "BLOCKED_NOT_PUBLISHED",
+  "acceptanceReceipt": false,
+  "repository": "https://github.com/wpy-sketch/ResearchClip-Codex",
+  "checks": {
+    "cleanInstall": {
+      "command": "npm ci",
+      "exitCode": 0,
+      "packages": 327
+    },
+    "frontend": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "files": 102,
+      "tests": 804
+    },
+    "rust": {
+      "command": "npm run test:rust",
+      "exitCode": 0,
+      "passed": 350,
+      "ignored": 12
+    },
+    "fmt": {
+      "command": "npm run format:rust",
+      "exitCode": 0
+    },
+    "clippy": {
+      "command": "npm run check:rust",
+      "exitCode": 0
+    },
+    "ocr": {
+      "command": "cargo test ... real_onnx_cpu_ocr_self_test_and_offline_reopen -- --ignored --nocapture",
+      "exitCode": 0,
+      "passed": 1,
+      "actualModels": true,
+      "scope": "native CPU English/Chinese, local files, not production download"
+    },
+    "packageNative": {
+      "command": "node scripts/package-center-native-smoke.mjs release-r1 --verified-cache",
+      "exitCode": 0,
+      "checks": 10,
+      "scope": "actual own Tauri/WebView2 with isolated test signatures and reviewed real cached weights; offline test uses failing HTTP proxy"
+    },
+    "pdfNative": {
+      "command": "node scripts/pdf-excerpts-native-smoke.mjs release-r1-render --render-only",
+      "exitCode": 0,
+      "scope": "actual native PDF rendering/excerpt/MD insertion and edit; file-picker save/reopen explicitly excluded",
+      "checks": 12
+    },
+    "zoteroAllTypesNative": {
+      "command": "node scripts/zotero-alltypes-native-smoke.mjs release-r1-e",
+      "exitCode": 0,
+      "checks": 7,
+      "result": "PASS",
+      "scope": "actual own Windows Tauri/WebView2, native HTTP/cache and 30000 fictional Zotero records; not real Zotero host acceptance",
+      "childrenRequestsFor30000": 301,
+      "mountedRows": 50,
+      "lastAnnotation": "N0029999",
+      "debugExecutableSha256": "cebc85f8719f20b6a51a9f6b13f9889c283bd59bee7a80bafbb2b73667718a3c"
+    },
+    "productionSignatures": {
+      "status": "NOT_READY",
+      "reason": "Production trust fields null; formal build gate exits1 and creates no assets"
+    },
+    "realZotero": {
+      "status": "BLOCKED",
+      "version": "10.0.6",
+      "error": "GetCursorPos access denied 0x80070005"
+    },
+    "independentWindowsPublishedAssets": {
+      "status": "NOT_EXECUTED",
+      "reason": "No published assets or trusted production configuration"
+    },
+    "releaseGate": {
+      "command": "python -m unittest discover -s scripts -p test_release_gate.py -v",
+      "exitCode": 0,
+      "passed": 6
+    },
+    "signatureVerifier": {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --locked --example verify_release_signatures",
+      "exitCode": 0,
+      "passed": 1,
+      "scope": "actual official test signature, rejects tampered bytes, wrong key/version; no production key"
+    },
+    "tauriDebug": {
+      "command": "npm run tauri -- build --debug --no-bundle",
+      "exitCode": 0
+    },
+    "docs": {
+      "command": "npm run check:docs",
+      "exitCode": 0,
+      "localLinks": 1262
+    },
+    "nsis": {
+      "command": "npm run desktop:bundle",
+      "exitCode": 0,
+      "name": "ResearchClip_4.4.0_x64-setup.exe",
+      "size": 23414021,
+      "sha256": "fa4c354c262b6f8ae23c62f95cbb98863d691cc12f688f4808ac19abb16c739e",
+      "authenticode": "NotSigned",
+      "tauriUpdaterSignature": "NOT_READY",
+      "scope": "local unsigned-updater candidate, NOT a public release"
+    },
+    "installer": {
+      "command": "./scripts/installer-smoke.ps1 -RunId release-20261028-r1-runtime -TargetDir src-tauri/target",
+      "exitCode": 0,
+      "result": "passed",
+      "checks": 6,
+      "userDataFilesHashed": 34,
+      "nativeRuntime": {
+        "version": "1.23.2",
+        "sha256": "dec964ab1ee36cc9b0ae247d13b376627992fc57dec0454354017ab8fd84f1ea",
+        "size": 14186016,
+        "authenticode": "Valid"
+      },
+      "scope": "actual NSIS in own Chinese-path install dir, busy guards, PDF association/default preservation and uninstall; production main app NOT launched against real user data; no independent machine upgrade acceptance"
+    },
+    "userDataAudit": {
+      "command": "./scripts/default-data-audit.ps1 -Mode verify -RunId release-20261028-r1",
+      "exitCode": 0,
+      "result": "PASS",
+      "files": 34,
+      "changed": 0,
+      "scope": "read-only default AppData comparison; WebView cache excluded"
+    },
+    "diffWhitespace": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "github": {
+    "ghAuthExit": 0,
+    "pushPermission": true,
+    "repositorySecrets": 0,
+    "environments": 0,
+    "tagCreated": false,
+    "releaseCreated": false,
+    "uploadedAssets": []
+  },
+  "preparedResources": {
+    "ocr": [
+      {
+        "name": "rec.onnx",
+        "size": 10857958,
+        "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b",
+        "license": "Apache-2.0",
+        "published": false
+      },
+      {
+        "name": "characters.txt",
+        "size": 26249,
+        "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7",
+        "license": "Apache-2.0",
+        "published": false
+      }
+    ],
+    "zoteroConnector": {
+      "version": "1.0.0",
+      "sha256": "e9a8fbd71daae4625e8b5cc5c1f4cbb0899f4f961a02ae910af52cdcaedd61e4",
+      "size": 10461,
+      "license": "MIT",
+      "hostInstalledVerified": false,
+      "published": false
+    },
+    "excluded": [
+      "formula native model chain",
+      "semantic visual weights with unverified distribution license",
+      "browser extension archive without declared project license"
+    ]
+  },
+  "ownerDecisions": {
+    "date": "2026-10-28",
+    "source": "direct user clarification in current conversation",
+    "googleBrowser": "Launch genuine Chrome; Chrome owns sign-in and bookmark sync; embedding is out of scope",
+    "productionSigning": "Not configured; user requests development and other acceptance first",
+    "realZotero": "Wait until the user restores an operable desktop; do not count HTTP fixtures as native acceptance",
+    "stablePublication": "Still blocked until all required signing and actual acceptance gates pass",
+    "annotationConversion": "Native display and Zotero standard synchronization are sufficient; no separate editable private copy required"
+  }
+}
