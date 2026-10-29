@@ -1,8 +1,8 @@
-# ResearchClip5.0.1发布验收（进行中）
+# ResearchClip5.0.1正式发布验收
 
-2026-10-29。本轮目标：左侧Google浏览器入口、可持久编辑/排序/移除的一键网页书签、指南阅读排序，并按用户最新要求准备正式发布。旧5.0.0 Tag/14资产草稿保留；[旧报告](FINAL_RELEASE_REPORT-5.0.0.md)是历史结果，不替代本轮测试。
+2026-10-29。本轮目标：左侧Google浏览器入口、可持久编辑/排序/移除的一键网页书签、指南阅读排序，并按用户最新要求正式发布。旧5.0.0 Tag/14资产草稿保留；[旧报告](FINAL_RELEASE_REPORT-5.0.0.md)是历史结果，不替代本轮测试。
 
-实际origin：[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。当前尚未创建5.0.1 Tag或Release，不能声称发布成功。版本配置已统一5.0.1；SQLite仍21，无新增迁移或依赖。
+实际origin：[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。已实际公开稳定版5.0.1，Tag为v5.0.1，14项资产匿名下载SHA全部核对通过。版本配置已统一5.0.1；SQLite仍21，无新增迁移或依赖。
 
 ## 实现与修改
 
@@ -30,16 +30,31 @@
 | 五类Zotero写入 | 写入协议未变，本轮仅修正共用授权路径比较；相同Connector1.0.1字节在5.0.0完成15项真实CRUD；不说成当前版重新执行 |
 | 发布单元测试 | 12项通过；仅模拟Gate/URL变化/失败回草稿，不是真实GitHub发布结果 |
 | NSIS/用户数据 | Windows x64 NSIS构建退出0，22.39MiB；6组本机隔离安装/运行中保护/PDF关联/卸载通过；34份默认资料SHA逐项未变，未启动生产程序读取用户库 |
-| 公开下载 | 待实际上传及匿名下载验证，结果后补 |
+| 公开下载 | 14项草稿下载回读及公开匿名下载SHA均通过；匿名Release页面HTTP200，latest为v5.0.1；原生组件中心实际下载公开XPI并核对SHA/大小，状态为DOWNLOADED_HOST_INSTALL_REQUIRED |
 
-旧5.0.0 Actions运行40832931773失败（路径表示与夹具换行），本轮修复并保留日志；授权路径别名临时目录下21项通过、1项忽略，当前真实Zotero再读通过。新版本Actions运行40872773995进行中，不把本机通过说成CI通过。失败日志保留。旧测试默认展开目录预期已改为验证新章节概览；低高度网页与书签栏改为同一行网格；CRLF夹具纠正重复换行转换，并保留LF/CRLF及篡改拒绝断言。
+旧5.0.0 Actions运行40832931773失败（路径表示与夹具换行），本轮修复并保留日志；授权路径别名临时目录下21项通过、1项忽略，当前真实Zotero再读通过。运行40872773995重跑后的验证阶段（类型/ESLint/Vitest/Rust/fmt/Clippy/文档/发布单测）通过；后续独立打包因Git换行转换导致XPI哈希变化而正确拒绝。仅固定5个插件源文件的Git换行保存方式，提交6f1748f，工作区应用字节及已发布XPI均未变化；新运行40878478092进行中，未计为通过。失败日志保留。旧测试默认展开目录预期已改为验证新章节概览；低高度网页与书签栏改为同一行网格；CRLF夹具纠正重复换行转换，并保留LF/CRLF及篡改拒绝断言。
 
 ## 未验证与发布前置条件
 
 当前没有另一台干净Windows或虚拟机。独立Windows安装/生产程序首次启动、真实旧版升级、物理混合DPI/HDR、多屏、真实群组权限/云账号同步尚未验收。当前网络未确认Google首页，example.com/example.org已实际可用。部分公式/语义模型和浏览器安装归档继续不进入正式可安装目录。
 
-用户已审阅22.39MiB安装包与本机验收结果，并于2026-10-29明确答复“接受已列未验收项，按本机隔离验收正式发布”。[验收回执](evidence/v501-release-ready.json)如实记录local-only及未执行项，不是独立Windows或当前文件对话框/写入CRUD通过声明。自动更新为手动NSIS升级，不要求公私钥，不生成latest.json或.sig。新Tag及公开下载必须对应实际构建源码和资产，不移动5.0.0 Tag、不覆盖旧草稿。
+用户已审阅22.39MiB安装包与本机验收结果，并于2026-10-29明确答复“接受已列未验收项，按本机隔离验收正式发布”。[验收回执](evidence/v501-release-ready.json)如实记录local-only及未执行项，不是独立Windows或当前文件对话框/写入CRUD通过声明。自动更新为手动NSIS升级，不要求公私钥，不生成latest.json或.sig。已确认新Tag对应构建提交2d63ecd，未移动5.0.0 Tag或覆盖旧草稿。
 
 ## 最终构建
 
 构建源码提交：`2d63ecdc8890b21bc05c4c6372abf6b16ae2f976`。安装包`ResearchClip_5.0.1_x64-setup.exe`，SHA-256：`3b9d953cd7f5e2192b9d670012eb042ffd4af777d97e4b33a922c5f2eb1e415f`。安装包Windows Authenticode为NotSigned；内置运行时Microsoft签名和SHA核对通过。准备14个真实发布资产，OCR与Connector各1.0.1；不发布未验证的公式/语义模型。
+
+## 实际公开交付
+
+- 仓库：[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)
+- 版本/Tag：5.0.1 / v5.0.1；构建提交`2d63ecdc8890b21bc05c4c6372abf6b16ae2f976`。
+- [正式Release](https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v5.0.1)，ID427843960，draft=false/prerelease=false，实际latest。
+- [Windows x64安装包](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/ResearchClip_5.0.1_x64-setup.exe)
+- [SHA256SUMS](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/SHA256SUMS)
+- [Connector1.0.1](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/ResearchClip-Zotero-Connector-v1.0.1.xpi)，10503字节，MIT，实际目标Zotero10.0.6。
+- [OCR权重](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/rec.onnx)与[字典](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/characters.txt)，包装1.0.1，Apache-2.0。
+- 其他资源：两项Manifest、Catalog、兼容表、delivery.json、zotero-updates.json、来源、OCR许可、release-build.json。
+
+[完整资产、哈希及匿名验证证据](evidence/v501-publication.json)。首次草稿回读网络失败后保留草稿，按相同Release ID、Tag/提交、资产ID/全集/摘要重新核对，仅重试下载，未覆盖上传。公开后14项再次下载核对，并读取匿名页面及latest API。插件下载测试初期选择器/状态枚举预期错误已修正为实际界面与协议，失败日志保留；最终2项原生客户端下载检查通过，没有改动应用来迎合测试。
+
+自动更新：DISABLED_MANUAL_DOWNLOAD。无公私钥配置、.sig或latest.json，不伪造签名。纯本机书签不提供Chrome账号同步；Google首页在当前网络未确认。未验证项目继续保留人工验收，不把已获发布范围确认称为独立测试通过。

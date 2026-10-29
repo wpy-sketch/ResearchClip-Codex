@@ -1,0 +1,128 @@
+{
+  "result": "PUBLISHED_AND_PUBLIC_HASHES_VERIFIED",
+  "repository": "https://github.com/wpy-sketch/ResearchClip-Codex",
+  "version": "5.0.1",
+  "tag": "v5.0.1",
+  "releaseId": 427843960,
+  "sourceCommit": "2d63ecdc8890b21bc05c4c6372abf6b16ae2f976",
+  "releaseUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v5.0.1",
+  "installerUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/ResearchClip_5.0.1_x64-setup.exe",
+  "assets": [
+    {
+      "name": "catalog.json",
+      "size": 2467,
+      "sha256": "fb69b8ae925c6a2e3c8fe3f72c77eecb2bf6448a4ff238927caa6c909f5d07bb",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/catalog.json"
+    },
+    {
+      "name": "characters.txt",
+      "size": 26249,
+      "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/characters.txt"
+    },
+    {
+      "name": "compatibility.json",
+      "size": 254,
+      "sha256": "5fb5025f4d0c15aa8325c2c07afd23dd828e3c71b6fb2708427dde00eaaa84cc",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/compatibility.json"
+    },
+    {
+      "name": "COMPONENT-SOURCES.txt",
+      "size": 465,
+      "sha256": "de3f1ac85c91b3361ac41a76adf1b482373bd5cdf540f9f60fbe08da5eb04855",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/COMPONENT-SOURCES.txt"
+    },
+    {
+      "name": "delivery.json",
+      "size": 181,
+      "sha256": "6aeead83e61f4aefbf9eeba40156331b7ab5ecac8f9d4d836ca3ea79ab823727",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/delivery.json"
+    },
+    {
+      "name": "model.ocr-line.manifest.json",
+      "size": 1216,
+      "sha256": "0042147cd8ab28385f0e39ecc12fbb50aadba5ab439262bc08ae84a43bc1819a",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/model.ocr-line.manifest.json"
+    },
+    {
+      "name": "OCR-LICENSE-APACHE-2.0.txt",
+      "size": 11438,
+      "sha256": "ff6311c56c1b22c9209c96cc8afc16da91c24ee55a15e14ebc46fe1960dbd856",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/OCR-LICENSE-APACHE-2.0.txt"
+    },
+    {
+      "name": "plugin.zotero-connector.manifest.json",
+      "size": 926,
+      "sha256": "e721c419e145a70d697488c6280aef607aeb41187ea9acc0409bf315a0040066",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/plugin.zotero-connector.manifest.json"
+    },
+    {
+      "name": "rec.onnx",
+      "size": 10857958,
+      "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/rec.onnx"
+    },
+    {
+      "name": "ResearchClip-Zotero-Connector-v1.0.1.xpi",
+      "size": 10503,
+      "sha256": "1f98896eeef54ead00c5405d2460578d3269d82a5a011038779c9a9e2973fdc2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/ResearchClip-Zotero-Connector-v1.0.1.xpi"
+    },
+    {
+      "name": "ResearchClip_5.0.1_x64-setup.exe",
+      "size": 23472400,
+      "sha256": "3b9d953cd7f5e2192b9d670012eb042ffd4af777d97e4b33a922c5f2eb1e415f",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/ResearchClip_5.0.1_x64-setup.exe"
+    },
+    {
+      "name": "zotero-updates.json",
+      "size": 589,
+      "sha256": "15643cf2a00cfced2a5d1bfeecd0dd88f2824a884054528dc8e0931a33f8a7b2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/zotero-updates.json"
+    },
+    {
+      "name": "release-build.json",
+      "size": 2514,
+      "sha256": "11982eb6d72ab85de08d2941ae9511d88349d5c6fae1c47ae5e554ee2b3c1264",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/release-build.json"
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 1084,
+      "sha256": "1ff7527d8e39d0798478bf3d02e2390bdeaa512c7f3a3492ba10a45d9e55c439",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/SHA256SUMS"
+    }
+  ],
+  "updater": "DISABLED_MANUAL_DOWNLOAD",
+  "publicPage": {
+    "result": "PASS",
+    "anonymousPage": {
+      "status": 200,
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v5.0.1",
+      "title": "Release ResearchClip v5.0.1 · wpy-sketch/ResearchClip-Codex · GitHub"
+    },
+    "latestTag": "v5.0.1",
+    "assets": 14
+  },
+  "nativeClientConnector": {
+    "mode": "actual current native Windows client, actual anonymous GitHub v5.0.1 XPI download, isolated package registry; no Zotero host install or grant automation",
+    "checks": [
+      "compiled exact v5.0.1 URL downloads actual public XPI via native HTTPS, validates size/SHA and commits isolated package registry",
+      "download completion is DOWNLOADED_HOST_INSTALL_REQUIRED, never a false Zotero installed/connected or AI READY claim"
+    ],
+    "errors": [],
+    "result": "PASS"
+  },
+  "sourceCheckoutFix": {
+    "commit": "6f1748fe1e4c37568eed89acb28f9cc32220abd7",
+    "applicationDigestUnchanged": true,
+    "scope": "Git checkout byte preservation only; existing published files, app source working bytes and immutable v5.0.1 tag preserved"
+  },
+  "ci": {
+    "firstRun": 40872773995,
+    "validation": "success",
+    "packaging": "failed on checkout newline XPI hash mismatch, correctly refused",
+    "fixedRun": 40878478092,
+    "fixedRunStatus": "in_progress_not_yet_counted_pass"
+  }
+}

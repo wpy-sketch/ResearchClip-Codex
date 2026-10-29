@@ -2,12 +2,12 @@
 
 当前使用随主程序审核并内置的固定组件清单，无需配置公钥或私钥。组件中心显示定义、安装状态和真实错误，定义存在不代表已安装或可用。测试目录仅用于隔离验收，不是正式下载入口。
 
-## 1. 真实候选资源
+## 1. 已发布与未发布资源
 
 | 组件 | 来源与许可 | 当前交付状态 |
 | --- | --- | --- |
-| 中英文单行OCR | 固定版本PP-OCRv4 ONNX和PaddleOCR字典，Apache-2.0 | 真实CPU推理已验证；正式Release资产待发布 |
-| Zotero Connector1.0.1 | 本仓库原始MIT代码，目标Zotero10.0.6 | 独立宿主已实际安装、启用与配对；正式XPI仍未发布 |
+| 中英文单行OCR | 固定版本PP-OCRv4 ONNX和PaddleOCR字典，Apache-2.0 | 真实HTTPS下载、CPU推理与离线推理已验证；5.0.1资源已公开 |
+| Zotero Connector1.0.1 | 本仓库原始MIT代码，目标Zotero10.0.6 | 1.0.1在独立宿主已实际安装、启用与配对；5.0.1 XPI公开下载及原生客户端校验通过 |
 | 公式模型 | 完整原生模型链及分发许可未核实 | 不进入正式可安装目录 |
 | 视觉语义模型 | 实验推理与权重分发授权分开 | 托管安装禁用，不进入正式可安装目录 |
 | Chrome/Edge剪藏扩展 | 保留既有源码和宿主安装指引 | 未声明主代码分发许可证的历史归档不进入正式安装目录 |
@@ -44,3 +44,5 @@ OCR包装版本为1.0.1，兼容应用5.0.1，权重未变。详细权重URL、�
 ## 5. 从5.0.0升级
 
 已安装的精确5.0.0内置OCR文件保持原位。5.0.1只为相同哈希、大小及资源定义更新本机安装证明，随后重新校验与CPU自检；自检失败仍显示明确错误。更改过的定义、不匹配文件及未知来源不能借此自动启用。
+
+当前真实下载：[正式Release](https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v5.0.1)、[Connector XPI](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/ResearchClip-Zotero-Connector-v1.0.1.xpi)、[OCR权重](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/rec.onnx)、[OCR字典](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/characters.txt)。公开资源均已匿名下载核对SHA；中心成功下载XPI后显示DOWNLOADED_HOST_INSTALL_REQUIRED，仍需按Zotero机制安装并主动配对。
