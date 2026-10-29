@@ -91,6 +91,18 @@
       "errors": [],
       "annotationCount": 4,
       "result": "PASS"
+    },
+    "ocrOnline": {
+      "mode": "actual Windows Tauri/WebView2/Rust with compiled production manifest, real CPU OCR and isolated research data; no keys",
+      "checks": [
+        "production compiled manifest exposes only real OCR/Connector, requires no key files, disables auto-updater and rejects arbitrary IPC download URLs",
+        "actual upstream HTTPS transfer installs fixed OCR weights/dictionary through UI confirmation and native CPU inference; no signed catalog or key required",
+        "restart revalidates the exact compiled manifest and file hashes; installed OCR remains ready under a deliberately failing HTTP proxy",
+        "real OCR still runs offline, persists through existing SQLite/FTS and inserts recognized text into Markdown",
+        "enable/disable/uninstall preserve screenshots, OCR records and research database"
+      ],
+      "errors": [],
+      "result": "PASS"
     }
   },
   "googleHomepage": "NOT_CONFIRMED_ON_CURRENT_NETWORK",

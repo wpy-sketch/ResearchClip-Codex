@@ -1,6 +1,6 @@
-# ResearchClip5.0.1发布说明（验收中）
+# ResearchClip5.0.1
 
-当前未公开发布5.0.1，正式状态以[最终报告](../qa/FINAL_RELEASE_REPORT.md)为准。实际仓库为[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。旧5.0.0草稿和Tag保持原样。
+Windows x64手动安装版本；实际检查及验收范围见[最终报告](https://github.com/wpy-sketch/ResearchClip-Codex/blob/main/docs/qa/FINAL_RELEASE_REPORT.md)。实际仓库为[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。旧5.0.0草稿和Tag保持原样。
 
 ## 新增与修复
 
@@ -16,3 +16,5 @@
 应用5.0.1、SQLite21，新增设置字段有兼容默认值，无新增依赖。Connector仍1.0.1（Zotero10.0.6），OCR包装1.0.1，原始权重/字典不变。仅已验证OCR与Connector进入固定组件目录；不包含未验证的公式/语义模型。
 
 内置网页为独立WebView2，不是完整Chrome；账号与Chrome书签同步由外部Chrome管理。本地书签不跨设备同步；自动更新继续停用，手动安装NSIS并核对SHA-256，无需密钥配置。Google可达性取决于网络。未新增Markdown→PDF或独立备份恢复功能。
+
+本机已通过819项前端测试、366项Rust测试（12忽略）、原生书签/网页、PDF摘录、真实Zotero读取、真实下载与离线CPU OCR。未在另一台干净Windows或物理混合DPI设备验收；当前版未重新运行原生Markdown保存对话框或Zotero写入CRUD，相同服务/插件的上一版真实结果保留在报告。安装包未做Windows代码签名。
