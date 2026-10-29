@@ -53,7 +53,7 @@
     "pdf": "artifacts/pdf-excerpts-v501-r1/report.json (render-only)",
     "ocrActualHttpsAndOffline": "artifacts/builtin-packages-native-v501-online-r1/report.json",
     "zoteroConnection": "artifacts/zotero-live-read-v501-r3/report.json (actual read-only host)",
-    "zoteroAllTypes": "artifacts/zotero-alltypes-v501-r1/report.json (native fixture not30000 real-host annotations)",
+    "zoteroAllTypes": "artifacts/zotero-alltypes-native-v501-r1/report.json (native fixture not30000 real-host annotations)",
     "extensionInstall": "same Connector1.0.1 exact bytes already installed/enabled in actual Zotero10.0.6; current501 real read verified; public501 client download verified after publication",
     "markdownReopen": "prior5.0.0 actual native save/reopen of unchanged Markdown persistence service plus current Rust/819 frontend and native draft/restart tests; current picker NOT rerun",
     "windowsInstall": "artifacts/installer-v501-r1/report.json (6 checks, owned local path, production launch excluded)",

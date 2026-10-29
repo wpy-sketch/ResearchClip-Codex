@@ -56,3 +56,5 @@
 - `src/features/workspace/bookmarks.ts`
 - `src/features/workspace/workspace.css`
 - `src/shared/api/settings.ts`
+
+发布验收补充：`docs/qa/evidence/v501-release-ready.json`及最终公开资产验证记录。
