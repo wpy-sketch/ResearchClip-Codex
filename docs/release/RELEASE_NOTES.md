@@ -1,6 +1,8 @@
-# ResearchClip 5.0.0 候选发布说明
+# ResearchClip 5.0.0 验收草稿说明
 
 状态：**未公开发布，发布验收未全部通过**。实际origin为[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。本文件不是已发布Release公告，不提供虚构下载地址。
+
+已按用户选择上传[实际Release草稿](https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/untagged-f5601cf22562c6ed206e)，Tag v5.0.0/提交1c1bb6b；14个真实资产全部经认证回下载并核对SHA-256。草稿及资产需要权限，不是匿名公开稳定下载。独立干净Windows验收保留，不自动转正。
 
 ## 本轮变化
 
@@ -33,7 +35,7 @@
 
 ## 发布前尚需完成
 
-最终安装器重新构建与验收、公开资产下载及独立Windows机器验收仍未完成。真实Zotero已完成XPI安装、配对、写入授权、五类CRUD、变化通知、重启重新配对和反向定位；群组库、云账号同步及物理混合DPI仍需人工验收。详见[最终发布报告](../qa/FINAL_RELEASE_REPORT.md)。
+最终NSIS已重建并完成本机隔离安装器验收，14个草稿资产经认证下载哈希一致；独立干净Windows安装/启动、匿名公开下载仍未完成。真实Zotero已完成XPI安装、配对、写入授权、五类CRUD、变化通知、重启重新配对和反向定位；群组库、云账号同步及物理混合DPI仍需人工验收。详见[最终发布报告](../qa/FINAL_RELEASE_REPORT.md)。
 
 未验证的公式、视觉语义模型及许可证未明确的浏览器安装归档不进入正式可安装目录。没有新增PDF导出或独立备份恢复系统。
 

@@ -1,0 +1,121 @@
+{
+  "result": "DRAFT_UPLOADED_AND_AUTHENTICATED_DOWNLOAD_HASHES_VERIFIED",
+  "repository": "https://github.com/wpy-sketch/ResearchClip-Codex",
+  "version": "5.0.0",
+  "tag": "v5.0.0",
+  "sourceCommit": "1c1bb6b68b0b413d2b7bad63ef4caef06288206a",
+  "releaseUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/untagged-f5601cf22562c6ed206e",
+  "draft": true,
+  "prerelease": true,
+  "publicStableRelease": false,
+  "independentWindows": "NOT_EXECUTED_USER_REQUESTED_DRAFT",
+  "updater": "DISABLED_MANUAL_DOWNLOAD",
+  "assets": [
+    {
+      "name": "catalog.json",
+      "size": 2467,
+      "sha256": "6c0a439e84b0b2edf5a2137cf822b04982196db79b77349cfabe316441f61c7c",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/catalog.json"
+    },
+    {
+      "name": "characters.txt",
+      "size": 26249,
+      "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/characters.txt"
+    },
+    {
+      "name": "compatibility.json",
+      "size": 254,
+      "sha256": "d8d84938254b3ae42d13248635dc432382ef452fe77fe86722b70005897dfc66",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/compatibility.json"
+    },
+    {
+      "name": "COMPONENT-SOURCES.txt",
+      "size": 465,
+      "sha256": "de3f1ac85c91b3361ac41a76adf1b482373bd5cdf540f9f60fbe08da5eb04855",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/COMPONENT-SOURCES.txt"
+    },
+    {
+      "name": "delivery.json",
+      "size": 181,
+      "sha256": "6aeead83e61f4aefbf9eeba40156331b7ab5ecac8f9d4d836ca3ea79ab823727",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/delivery.json"
+    },
+    {
+      "name": "model.ocr-line.manifest.json",
+      "size": 1216,
+      "sha256": "e43a40775f4bbfdbc12a3705e20dc95773531da6e1009d17f75b4b98dc841001",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/model.ocr-line.manifest.json"
+    },
+    {
+      "name": "OCR-LICENSE-APACHE-2.0.txt",
+      "size": 11438,
+      "sha256": "ff6311c56c1b22c9209c96cc8afc16da91c24ee55a15e14ebc46fe1960dbd856",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/OCR-LICENSE-APACHE-2.0.txt"
+    },
+    {
+      "name": "plugin.zotero-connector.manifest.json",
+      "size": 926,
+      "sha256": "085d05896617a9a2a3de4451edb4048717156d7a6eaf2152a415de842923103e",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/plugin.zotero-connector.manifest.json"
+    },
+    {
+      "name": "rec.onnx",
+      "size": 10857958,
+      "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/rec.onnx"
+    },
+    {
+      "name": "ResearchClip-Zotero-Connector-v1.0.1.xpi",
+      "size": 10503,
+      "sha256": "1f98896eeef54ead00c5405d2460578d3269d82a5a011038779c9a9e2973fdc2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/ResearchClip-Zotero-Connector-v1.0.1.xpi"
+    },
+    {
+      "name": "ResearchClip_5.0.0_x64-setup.exe",
+      "size": 23473876,
+      "sha256": "4bc8cbaf2f486f219dfd0a1a0edf3e3d4a61a652fac9f278f6763a6a827f8fbc",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/ResearchClip_5.0.0_x64-setup.exe"
+    },
+    {
+      "name": "zotero-updates.json",
+      "size": 589,
+      "sha256": "5f2e2444da81732ce5d32112510f7605f68a4ac0314fc316b11120a9f39b2ac7",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/zotero-updates.json"
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 1084,
+      "sha256": "7e2f3df2694ff68b5f8e8350ba6bb43eb3e5f46b521f3862c10b7741f3c41e3a",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/SHA256SUMS"
+    },
+    {
+      "name": "release-build.json",
+      "size": 2514,
+      "sha256": "09523bf8430505325cdacd396ee34d824c305fc4ea99e3dd6f25c42ab7bf5cdc",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/untagged-f5601cf22562c6ed206e/release-build.json"
+    }
+  ],
+  "installerAcceptance": {
+    "version": "5.0.0",
+    "mode": "actual NSIS, isolated install path, read-only user-data hashes, process fixture for busy guard",
+    "result": "passed",
+    "checks": [
+      "Installed CPU runtime matches exact reviewed size/SHA and valid Microsoft Authenticode; ONNX Runtime and OCR notices match original licensed files.",
+      "Actual per-user silent installation at a Unicode/space path; full payload SHA-256 matches with only the verified Tauri UNK-to-NSS marker, plus version, publisher, icon and uninstall registration.",
+      "Actual installer and uninstaller refuse a running image at the installed executable path; process fixture remains alive and files/registration remain intact.",
+      "Actual PDF OpenWith candidate, quoted Unicode executable command and SupportedTypes registered; existing default/UserChoice preserved before and after ownership-scoped uninstall.",
+      "Actual default silent uninstall removes application files/registration, preserves an unrelated install-folder file and all pre-existing AppData file hashes. No production app was launched against user data.",
+      "Only newly created, verified test installer metadata was cleaned up; user data and evidence retained."
+    ],
+    "installerSha256": "4BC8CBAF2F486F219DFD0A1A0EDF3E3D4A61A652FAC9F278F6763A6A827F8FBC",
+    "signatureStatus": "NotSigned",
+    "userDataFilesHashed": 34
+  },
+  "userDataIntegrity": {
+    "changed": 0,
+    "files": 34,
+    "mode": "read-only default AppData hash comparison; WebView cache excluded; not a backup/restore feature",
+    "result": "PASS"
+  }
+}

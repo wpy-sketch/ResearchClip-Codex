@@ -1,10 +1,10 @@
 # Windows安装、升级与验收指南
 
-当前5.0.0是本地验收候选，**正式Release和安装包下载URL尚不存在**。用户已明确取消Catalog及Updater的密钥配置要求，改用内置固定组件清单和手动升级。请勿把本机安装包或测试签名当作公开稳定版。发布目标从origin核实为[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。
+当前5.0.0已上传[Release草稿](https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/untagged-f5601cf22562c6ed206e)，包含Windows安装包和真实组件；需要仓库权限，尚非公开稳定版。用户要求先上传源码及草稿，保留独立Windows验收；取消Catalog/Updater密钥配置，使用内置固定组件清单和手动升级。实际origin为[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。
 
 ## 1. 正式发布后如何安装
 
-1. 从该仓库实际Release页面取得`ResearchClip_5.0.0_x64-setup.exe`和SHA256SUMS；以正式报告中的实际URL为准。目前没有公开下载入口。
+1. 当前维护者可从草稿页取得`ResearchClip_5.0.0_x64-setup.exe`和SHA256SUMS；普通用户需等待正式公开发布。以[报告中的实际URL及SHA](../qa/FINAL_RELEASE_REPORT.md)核对，不把Draft视作匿名下载入口。
 2. 在PowerShell运行`Get-FileHash -LiteralPath '.\ResearchClip_5.0.0_x64-setup.exe' -Algorithm SHA256`，与同一Release校验清单核对。哈希只能核对文件一致性，不能代替发布者身份签名。
 3. 运行NSIS安装程序，选择当前用户安装目录。用户资料、截图、Markdown和模型保存在独立数据位置，不随程序安装目录移动。
 4. 从开始菜单或安装目录启动。用户不需要Rust、Node.js或Python开发环境；主程序携带可信原生OCR运行时，模型权重按需安装。WebView2按安装程序依赖机制处理。
@@ -28,4 +28,4 @@
 
 本轮已在独立中文/空格路径执行NSIS安装、运行中拒绝覆盖/卸载、PDF打开方式注册及卸载；34份原有资料文件逐一核对未改写。该验收运行于当前Windows机器，不能代替另一台干净Windows从GitHub下载后验收。截图高DPI的CDP模拟也不能替代物理混合DPI/HDR设备。
 
-安装器当前Windows Authenticode状态为NotSigned；这与Tauri Updater缺少独立更新签名是两个事项。候选内容变化后必须重新构建并验收新字节，不能沿用旧安装器哈希回执。当前Updater已停用，不应期待或伪造自动升级成功。
+最终安装器Windows Authenticode为NotSigned；这与Tauri Updater签名是两个事项。最终NSIS哈希和6组本机安装器验收已记录，但没有用生产程序启动真实资料，不替代另一台干净Windows安装/运行。候选内容变化后需重新构建并验收新字节，不能沿用旧回执。Updater已停用，不应期待或伪造自动升级成功。

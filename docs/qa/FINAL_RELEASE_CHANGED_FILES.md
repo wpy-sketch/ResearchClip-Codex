@@ -2,6 +2,8 @@
 
 相对于v5.0.0发布任务开始时只读源码哈希。包括既有功能整合、用户授权的免密钥交付和新增浏览器；此前未提交工作保留。本版无新增依赖，无新增迁移；不提交私钥或真实测试资料。
 
+构建后仅补充QA/发布回执：`docs/qa/evidence/v500-draft-delivery.json`，包含实际草稿URL、资产哈希及隔离安装结果，不改变Tag对应的应用字节。
+
 - `.github/workflows/release.yml`
 - `README.md`
 - `assets/app-icon.svg`
