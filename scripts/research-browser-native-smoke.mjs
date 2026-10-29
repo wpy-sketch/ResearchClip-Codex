@@ -11,7 +11,7 @@ const root=resolve('.'),run=process.argv[2];assert.match(run??'',/^[a-z0-9-]{1,4
 const out=join(root,'artifacts','research-browser-'+run),settings=join(out,'settings'),port=9446;
 await mkdir(out);await mkdir(settings);await mkdir(join(out,'native'));const exe=join(out,'researchclip-browser-test.exe');await copyFile(join(root,'src-tauri/target/debug/researchclip.exe'),exe,1);await copyFile(join(root,'src-tauri/resources/native/onnxruntime.dll'),join(out,'native/onnxruntime.dll'),1);
 await writeFile(join(settings,'settings.json'),JSON.stringify({schemaVersion:1,theme:'dark',viewMode:'grid',fontFamily:'system',fontSize:16,captureShortcut:'Ctrl+Alt+Shift+F7',fullscreenShortcut:'Ctrl+Alt+Shift+F8',saveDirectory:null,closeToTray:false}));
-const bookmarksTest=process.argv.includes('--bookmarks');
+const bookmarksTest=process.argv.includes('--bookmarks'),legacyVersion=process.argv.includes('--legacy-v501')?'501':'500';
 const report={mode:'actual Windows native parent_raw child window, isolated settings and WebView2 profiles; public example.com network test; no personal Chrome or Zotero',checks:[],errors:[]};let app,browser,page;
 async function until(fn,name,ms=30000){const start=Date.now();while(Date.now()-start<ms){const v=await fn();if(v)return v;await delay(150);}throw Error('Timed out: '+name);}
 const call=(name,args)=>page.evaluate(({name,args})=>window.__TAURI_INTERNALS__.invoke(name,args),{name,args});const request=request=>call('research_browser',{request});
@@ -20,12 +20,12 @@ async function launch(){ app=spawn(exe,[],{cwd:root,windowsHide:true,stdio:'igno
 }
 try{
  if(bookmarksTest){
-  const raw=await readFile(join(root,'src-tauri/resources/package-builtin-v500.json'),'utf8');const p=JSON.parse(raw).packages.find(p=>p.id==='model.ocr-line');const directory=`${p.id}-${p.version}-${p.files[0].sha256.slice(0,12)}`;const managed=join(settings,'packages-v1','installed',directory);await mkdir(managed,{recursive:true});
+  const raw=await readFile(join(root,`src-tauri/resources/package-builtin-v${legacyVersion}.json`),'utf8');const p=JSON.parse(raw).packages.find(p=>p.id==='model.ocr-line');const directory=`${p.id}-${p.version}-${p.files[0].sha256.slice(0,12)}`;const managed=join(settings,'packages-v1','installed',directory);await mkdir(managed,{recursive:true});
   for(const f of p.files){const bytes=await readFile(join(root,'artifacts/step2-20261028',f.path));assert.equal(createHash('sha256').update(bytes).digest('hex'),f.sha256);await writeFile(join(managed,f.path),bytes,{flag:'wx'});}
   await writeFile(join(settings,'packages-v1','registry.json'),JSON.stringify({schemaVersion:1,highestSequence:1,installed:[{package:p,catalogProof:{payload:raw,signature:'BUILTIN_MANIFEST_V1'},directory,enabled:true,readiness:'READY',installedAt:123}],retired:[]}));
  }
  await launch();
- if(bookmarksTest){const s=await call('package_center',{request:{operation:'status'}});assert.equal(s.registry.installed[0].readiness,'READY');assert.equal(s.registry.installed[0].package.appVersion,'='+JSON.parse(await readFile(join(root,'package.json'),'utf8')).version);report.checks.push('exact v5.0.0 compiled-model proof migrates on upgrade; unchanged real OCR weights pass actual CPU startup self-test');}
+ if(bookmarksTest){const s=await call('package_center',{request:{operation:'status'}});assert.equal(s.registry.installed[0].readiness,'READY');assert.equal(s.registry.installed[0].package.appVersion,'='+JSON.parse(await readFile(join(root,'package.json'),'utf8')).version);report.checks.push(`exact v${legacyVersion==='501'?'5.0.1':'5.0.0'} compiled-model proof migrates on upgrade; unchanged real OCR weights pass actual CPU startup self-test`);}
  assert.equal((await call('library_status')).schemaVersion,21);await page.getByRole('button',{name:'新建空白 Markdown',exact:true}).click();const text=page.getByRole('textbox',{name:'Markdown 源文',exact:true});await text.fill('浏览器切换：未保存草稿');
  await page.getByRole('button',{name:'Google浏览器',exact:true}).click();await until(async()=>(await request({operation:'status'})).visible,'native child visible');
  assert.equal((await call('library_status')).schemaVersion,21);assert.equal(await text.inputValue(),'浏览器切换：未保存草稿');report.checks.push('real child window creates while all main WebviewWindow IPC and Markdown draft remain usable');

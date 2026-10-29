@@ -28,4 +28,4 @@ DOMRect乘实际devicePixelRatio转换为物理像素，后端验证有限数、
 
 书签只包含title/url，URL作为本地条目去重键，不增加研究资源ID系统。既有Preferences增加serde默认的browserBookmarks，沿用SettingsService事务式暂存和原子替换；最多32项、名称80 UTF16单元、地址2048字节，完整设置保留64KiB读写上限。旧设置缺字段时默认空数组，不重写SQLite。非法网址、重复项或失败写入保留原文件。
 
-升级时，仅对编译钉住的5.0.0清单及完全匹配的旧组件元数据更新应用兼容声明；允许JSON行尾LF/CRLF差异，篡改或未知凭据不迁移。模型文件不改写，先标RECHECK_REQUIRED，随后既有ModelManager实际校验与CPU自检成功才恢复READY。该机制无需生产签名密钥，不接受任意本地/远端目录。
+升级时，仅对编译钉住的5.0.0/5.0.1清单及完全匹配的旧组件元数据更新应用兼容声明；允许JSON行尾LF/CRLF差异，篡改或未知凭据不迁移。模型文件不改写，先标RECHECK_REQUIRED，随后既有ModelManager实际校验与CPU自检成功才恢复READY。该机制无需生产签名密钥，不接受任意本地/远端目录。

@@ -1,4 +1,4 @@
-> **当前构建v5.0.1**：最左侧Google浏览器入口、应用内网页与本地一键书签；38章指南按章节显示，提供六条常用阅读路线。无新增依赖及SQLite迁移。5.0.0草稿保留，5.0.1实际发布状态、资产与未验收项见[最终报告](docs/qa/FINAL_RELEASE_REPORT.md)。仍使用固定编译组件清单和手动升级，无需配置Catalog/Updater密钥，不开发IDE。
+> **当前构建v5.0.2**：最左侧Google浏览器入口、应用内网页与本地一键书签；38章指南按章节显示，提供六条常用阅读路线。无新增依赖及SQLite迁移。5.0.0草稿保留，5.0.2实际发布状态、资产与未验收项见[最终报告](docs/qa/FINAL_RELEASE_REPORT.md)。仍使用固定编译组件清单和手动升级，无需配置Catalog/Updater密钥，不开发IDE。
 
 > **v4.2.7 · Zotero标准批注双向同步**：本地持久待处理、六种同步状态、条件写入、三方冲突比较与独立处理历史。自动刷新只读且默认关闭。指南33章。[本版说明](docs/RELEASE-NOTES-4.2.7.md) · [实际验收](docs/qa/RELEASE-4.2.7.md)。
 
@@ -13,7 +13,7 @@
 
 # 使用Codex进行构建
 
-面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v5.0.1 Windows；实际origin为ResearchClip-Codex，历史ResearchClip仓库的发布回执保留为历史记录。当前仓库的实际Tag、Release和下载结果以最终报告为准**。
+面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v5.0.2 Windows；实际origin为ResearchClip-Codex，历史ResearchClip仓库的发布回执保留为历史记录。当前仓库的实际Tag、Release和下载结果以最终报告为准**。
 
 [v4.2.0正式回执](docs/qa/PUBLICATION-4.2.0.md) · [v4.2.0变更](docs/RELEASE-NOTES-4.2.0.md) · [Step11验收](docs/qa/ZOTERO_PDF_STEP11.md) · [GitHub发布版本](https://github.com/wpy-sketch/ResearchClip/releases/latest) · [v4.1.9正式回执](docs/qa/PUBLICATION-4.1.9.md) · [v4.1.8正式回执](docs/qa/PUBLICATION-4.1.8.md) · [v4.1.8发布检查](docs/qa/RELEASE-4.1.8.md) · [v4.1.7正式回执](docs/qa/PUBLICATION-4.1.7.md) · [v4.1.7发布检查](docs/qa/RELEASE-4.1.7.md) · [v4.1.7配套与历史附件](docs/RELEASE-COMPONENTS.md) · [v3.1.2发布传输状态](docs/qa/DELIVERY-3.1.2.md) · [完整图文使用指南](docs/USER_GUIDE.md) · [网页剪藏安装](browser-extension/README.md) · [v1.0.2实际验收](docs/qa/RELEASE-1.0.2.md) · [v1.0.2发布回执](docs/qa/PUBLICATION-1.0.2.md)
 

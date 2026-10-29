@@ -1,8 +1,12 @@
-# ResearchClip5.0.1
+# ResearchClip5.0.2
 
 Windows x64手动安装版本；实际检查及验收范围见[最终报告](https://github.com/wpy-sketch/ResearchClip-Codex/blob/main/docs/qa/FINAL_RELEASE_REPORT.md)。实际仓库为[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)。旧5.0.0草稿和Tag保持原样。
 
 ## 新增与修复
+
+- 修正内置指南导言及插件发布状态的旧文案；继承5.0.1的左侧浏览器、书签和阅读路线。
+- 兼容5.0.0/5.0.1精确组件安装证明，保留模型和设置，重新校验后启用。
+- 固定插件打包源文件字节，避免Git换行转换破坏XPI可复现性。
 
 - Google浏览器移到最左侧主导航，直接在资料工作台内浏览公开网页；保留PDF与Markdown编辑会话。
 - 本地网页书签：保存当前网页、编辑名称与网址、上移/下移、确认移除、重启后保留，点击一键打开。
@@ -13,8 +17,8 @@ Windows x64手动安装版本；实际检查及验收范围见[最终报告](htt
 
 ## 兼容与边界
 
-应用5.0.1、SQLite21，新增设置字段有兼容默认值，无新增依赖。Connector仍1.0.1（Zotero10.0.6），OCR包装1.0.1，原始权重/字典不变。仅已验证OCR与Connector进入固定组件目录；不包含未验证的公式/语义模型。
+应用5.0.2、SQLite21，新增设置字段有兼容默认值，无新增依赖。Connector仍1.0.1（Zotero10.0.6），OCR包装1.0.1，原始权重/字典不变。仅已验证OCR与Connector进入固定组件目录；不包含未验证的公式/语义模型。
 
 内置网页为独立WebView2，不是完整Chrome；账号与Chrome书签同步由外部Chrome管理。本地书签不跨设备同步；自动更新继续停用，手动安装NSIS并核对SHA-256，无需密钥配置。Google可达性取决于网络。未新增Markdown→PDF或独立备份恢复功能。
 
-本机已通过819项前端测试、366项Rust测试（12忽略）、原生书签/网页、PDF摘录、真实Zotero读取、真实下载与离线CPU OCR。未在另一台干净Windows或物理混合DPI设备验收；当前版未重新运行原生Markdown保存对话框或Zotero写入CRUD，相同服务/插件的上一版真实结果保留在报告。安装包未做Windows代码签名。
+本机已通过819项前端测试、当前检查结果见最终报告；上一版366项Rust测试（12忽略）、原生书签/网页、PDF摘录、真实Zotero读取、真实下载与离线CPU OCR。未在另一台干净Windows或物理混合DPI设备验收；当前版未重新运行原生Markdown保存对话框或Zotero写入CRUD，相同服务/插件的上一版真实结果保留在报告。安装包未做Windows代码签名。

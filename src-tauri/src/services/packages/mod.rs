@@ -133,32 +133,36 @@ impl PackageManager {
         };
         // Only the exact previously compiled manifest may be rescaled to this app.
         // No model bytes are replaced; startup still runs the real load/self-test.
-        let legacy_payload = include_str!("../../../resources/package-builtin-v500.json");
-        let legacy: Catalog =
-            serde_json::from_str(legacy_payload).map_err(|_| "旧版内置组件清单无效。")?;
         let mut upgraded = state.registry.clone();
         let mut changed = false;
-        for entry in &mut upgraded.installed {
-            if !entry.catalog_proof.as_ref().is_some_and(|p| {
-                p.signature == "BUILTIN_MANIFEST_V1"
-                    && p.payload.replace("\r\n", "\n") == legacy_payload.replace("\r\n", "\n")
-            }) {
-                continue;
-            }
-            if !legacy.packages.iter().any(|p| p == &entry.package) {
-                continue;
-            }
-            if let Some(current) = catalog.packages.iter().find(|p| p.id == entry.package.id) {
-                let mut comparable = entry.package.clone();
-                comparable.app_version = current.app_version.clone();
-                for (old, new) in comparable.files.iter_mut().zip(&current.files) {
-                    old.url = new.url.clone();
+        for legacy_payload in [
+            include_str!("../../../resources/package-builtin-v500.json"),
+            include_str!("../../../resources/package-builtin-v501.json"),
+        ] {
+            let legacy: Catalog =
+                serde_json::from_str(legacy_payload).map_err(|_| "旧版内置组件清单无效。")?;
+            for entry in &mut upgraded.installed {
+                if !entry.catalog_proof.as_ref().is_some_and(|p| {
+                    p.signature == "BUILTIN_MANIFEST_V1"
+                        && p.payload.replace("\r\n", "\n") == legacy_payload.replace("\r\n", "\n")
+                }) {
+                    continue;
                 }
-                if &comparable == current && &entry.package != current {
-                    entry.package = current.clone();
-                    entry.catalog_proof = Some(proof.clone());
-                    entry.readiness = "RECHECK_REQUIRED".into();
-                    changed = true;
+                if !legacy.packages.iter().any(|p| p == &entry.package) {
+                    continue;
+                }
+                if let Some(current) = catalog.packages.iter().find(|p| p.id == entry.package.id) {
+                    let mut comparable = entry.package.clone();
+                    comparable.app_version = current.app_version.clone();
+                    for (old, new) in comparable.files.iter_mut().zip(&current.files) {
+                        old.url = new.url.clone();
+                    }
+                    if &comparable == current && &entry.package != current {
+                        entry.package = current.clone();
+                        entry.catalog_proof = Some(proof.clone());
+                        entry.readiness = "RECHECK_REQUIRED".into();
+                        changed = true;
+                    }
                 }
             }
         }

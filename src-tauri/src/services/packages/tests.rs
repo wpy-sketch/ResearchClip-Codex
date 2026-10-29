@@ -10,10 +10,16 @@ fn trust() -> Trust {
 }
 #[test]
 fn v500_compiled_installs_rescope_only_exact_reviewed_metadata_and_require_real_recheck() {
+    compiled_upgrade_case(include_str!("../../../resources/package-builtin-v500.json"));
+}
+#[test]
+fn v501_compiled_installs_rescope_only_exact_reviewed_metadata_and_require_real_recheck() {
+    compiled_upgrade_case(include_str!("../../../resources/package-builtin-v501.json"));
+}
+fn compiled_upgrade_case(legacy_payload: &str) {
     let t = tempfile::tempdir().unwrap();
     let root = t.path().join("packages");
     let service = PackageManager::production(root.clone()).unwrap();
-    let legacy_payload = include_str!("../../../resources/package-builtin-v500.json");
     let old: Catalog = serde_json::from_str(legacy_payload).unwrap();
     let p = old
         .packages
