@@ -8,3 +8,10 @@ docs/licenses/pdfjs-NOTICES.txt -whitespace
 
 # Exact fixture bytes are bound by reviewed signed catalog hashes.
 src-tauri/src/services/packages/fixtures/readme.md -text
+
+# Preserve the exact source bytes embedded in released Connector1.0.1.
+zotero-connector/manifest.json -text
+zotero-connector/bootstrap.js -text
+zotero-connector/connector.js -text
+zotero-connector/LICENSE -text
+zotero-connector/README.md -text
