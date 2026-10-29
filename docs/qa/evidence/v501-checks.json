@@ -1,0 +1,104 @@
+{
+  "version": "5.0.1",
+  "date": "2026-10-29",
+  "sourceBase": "90d83bdf937a66b0a8b6dec577568420de49da86",
+  "status": "TESTED_NOT_PUBLISHED",
+  "automated": {
+    "frontend": {
+      "files": 105,
+      "passed": 819
+    },
+    "rust": {
+      "passed": 366,
+      "ignored": 12
+    }
+  },
+  "checks": {
+    "browser": {
+      "result": "PASS",
+      "mode": "actual Windows native parent_raw child window, isolated settings and WebView2 profiles; public example.com network test; no personal Chrome or Zotero",
+      "checks": [
+        "exact v5.0.0 compiled-model proof migrates on upgrade; unchanged real OCR weights pass actual CPU startup self-test",
+        "real child window creates while all main WebviewWindow IPC and Markdown draft remain usable",
+        "native input validation rejects file/IPC/loopback/script targets and out-of-window rectangles",
+        "public HTTPS example.com actually renders inside the owned browser WebView2",
+        "remote webview cannot invoke privileged library_status (capability denied or no exposed IPC bridge)",
+        "two actual public pages support back/forward and synchronize the authoritative native address",
+        "browser toolbar/native bounds stay valid at CSS scales75–200% and browser zoom150%; not physical mixed-DPI verification",
+        "return hides native child and restores existing workbench, then reopens the same page without discarding history",
+        "real settings IPC atomically saves two bookmarks, orders and edits them without rebinding global shortcuts; native browser hides behind modal",
+        "duplicate/unsafe form input and direct malformed native settings updates preserve existing bookmarks exactly",
+        "Google entry is in the left primary navigation; choosing another section hides the native browser and restores usable settings",
+        "bookmark removal requires confirmation, cancellation keeps the entry, confirmed removal touches only the selected shortcut",
+        "real application restart keeps edited/reordered bookmarks in settings, opens no browser automatically, and saved one-click navigation still works"
+      ]
+    },
+    "guide": {
+      "result": "PASS",
+      "mode": "local isolated headless Edge renderer; no native capture, user database, credential or clipboard claims",
+      "checks": [
+        "38 chapters and nested subsections mount; absent Markdown document has no split",
+        "third-level step navigation scrolls and keyboard-focuses the actual matching H4, active location follows",
+        "collapse all removes children and active step falls back to visible parent",
+        "nested search retains ancestors, reports no results and clear restores navigation",
+        "287 examples across all 38 chapters, example-only search, actual heading jump and directory mode restoration",
+        "all 77 whitelisted offline guide images actually decode",
+        "whitelisted local guide image opens with Enter and closes with Escape",
+        "dark: guide and directory contained at seven widths 480–1440",
+        "light: guide and directory contained at seven widths 480–1440",
+        "guide navigation/unmount and remount preserves independent Markdown draft; cancel/discard closes split correctly",
+        "600px-high window keeps bottom help reachable and sidebar scroll reaches settings",
+        "both themes: selected base fonts 12/16/20 genuinely resize guide text; 480/760/1440 widths at 600px height retain contained directory/content",
+        "CSS content-scale simulation 75/100/125/150/200 percent remains contained at 1440px; this is not physical Windows DPI or OS magnifier verification",
+        "three dock panes remain inside viewport at CSS scales75–200%, pointer split drag works at125%, and independent Markdown undo survives scaling"
+      ]
+    },
+    "ocr": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2/Rust with compiled production manifest, real CPU OCR and isolated research data; no keys",
+      "checks": [
+        "production compiled manifest exposes only real OCR/Connector, requires no key files, disables auto-updater and rejects arbitrary IPC download URLs",
+        "explicit SHA-verified cache installs fixed OCR weights/dictionary through UI confirmation and native CPU inference; no signed catalog or key required",
+        "restart revalidates the exact compiled manifest and file hashes; installed OCR remains ready under a deliberately failing HTTP proxy",
+        "real OCR still runs offline, persists through existing SQLite/FTS and inserts recognized text into Markdown",
+        "enable/disable/uninstall preserve screenshots, OCR records and research database"
+      ]
+    },
+    "pdf": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2 PDF.js rendering and native SQLite/files, generated calibration PDF; CDP DPR/CSS are simulations, not physical DPI or screen-capture acceptance; render-only scope excludes native file picker and persisted Markdown reopening",
+      "checks": [
+        "local generated PDF opens in the real native viewer with no empty Markdown panel and unchanged source hash",
+        "actual local CitationChooser selects a stable literature ID; screenshot provenance and existing reference association persist without inventing DOI or verified metadata",
+        "actual PDF.js crops across multiple pages, zoom50/100/150/200%, rotations0/90/180/270, DPI144/216/288, CSS80/125% and emulatedDPR1/2 map canonical rectangles and match four independent source colors without capturing UI",
+        "malformed raw capture IPC is rejected without adding a native screenshot/provenance record",
+        "a real valid native PDF grant reads successfully, refuses a different attachment, and after close cannot save a correctly formed excerpt; no new image or pending intent appears",
+        "implemented PDF commands prepare only the persisted stable location and source notes contain a stable local-literature link",
+        "without an open Markdown, insertion asks explicitly before creating a source draft with image above editable note and stable PDF-location backlink",
+        "existing native image annotation tool edits and saves vectors on the excerpt while original cropped PNG bytes and PDF provenance remain immutable",
+        "two saved crops insert at the retained active Markdown caret in capture order; surrounding text stays intact and relative-image paragraphs include editable source notes",
+        "actual native pointer drag moves the entire image/note/backlink group; one-step undo and redo restore exact Markdown",
+        "closing an unsaved excerpt Markdown asks for confirmation and cancellation retains the complete draft"
+      ]
+    },
+    "zoteroLive": {
+      "mode": "actual current native app, real Zotero10.0.6 previously isolated profile at32132; read-only HTTP, no write grant or database/PDF modification",
+      "checks": [
+        "current app reads real isolated Zotero source and confirms library0/item9NVC56GE/attachmentPDPNDY9P using official local API",
+        "real existing standard note/highlight/ink load into current native viewer, including the original settled highlight, without duplicate creation",
+        "original Zotero PDF SHA-256 remains unchanged; no Zotero SQLite access and no write authorization requested"
+      ],
+      "errors": [],
+      "annotationCount": 4,
+      "result": "PASS"
+    }
+  },
+  "googleHomepage": "NOT_CONFIRMED_ON_CURRENT_NETWORK",
+  "independentWindows": "NOT_EXECUTED",
+  "nativePathRegression": {
+    "result": "PASS",
+    "cases": 21,
+    "ignored": 1,
+    "scope": "authorized local junction TEMP exercises original/canonical path spellings; no foreign path resolution; 8.3 creation unavailable on this volume, hosted runner will separately verify RUNNER~1"
+  }
+}

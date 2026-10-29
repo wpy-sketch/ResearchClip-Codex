@@ -3,18 +3,29 @@ import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {mkdir,copyFile,writeFile} from 'node:fs/promises';
 import {join,resolve} from 'node:path';
+import {readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import {setTimeout as delay} from 'node:timers/promises';
 import {chromium} from 'playwright-core';
 const root=resolve('.'),run=process.argv[2];assert.match(run??'',/^[a-z0-9-]{1,40}$/);
 const out=join(root,'artifacts','research-browser-'+run),settings=join(out,'settings'),port=9446;
 await mkdir(out);await mkdir(settings);await mkdir(join(out,'native'));const exe=join(out,'researchclip-browser-test.exe');await copyFile(join(root,'src-tauri/target/debug/researchclip.exe'),exe,1);await copyFile(join(root,'src-tauri/resources/native/onnxruntime.dll'),join(out,'native/onnxruntime.dll'),1);
 await writeFile(join(settings,'settings.json'),JSON.stringify({schemaVersion:1,theme:'dark',viewMode:'grid',fontFamily:'system',fontSize:16,captureShortcut:'Ctrl+Alt+Shift+F7',fullscreenShortcut:'Ctrl+Alt+Shift+F8',saveDirectory:null,closeToTray:false}));
+const bookmarksTest=process.argv.includes('--bookmarks');
 const report={mode:'actual Windows native parent_raw child window, isolated settings and WebView2 profiles; public example.com network test; no personal Chrome or Zotero',checks:[],errors:[]};let app,browser,page;
 async function until(fn,name,ms=30000){const start=Date.now();while(Date.now()-start<ms){const v=await fn();if(v)return v;await delay(150);}throw Error('Timed out: '+name);}
 const call=(name,args)=>page.evaluate(({name,args})=>window.__TAURI_INTERNALS__.invoke(name,args),{name,args});const request=request=>call('research_browser',{request});
-try{
- app=spawn(exe,[],{cwd:root,windowsHide:true,stdio:'ignore',env:{...process.env,RESEARCHCLIP_TEST_SETTINGS_DIR:settings,WEBVIEW2_USER_DATA_FOLDER:join(out,'webview'),WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS:`--remote-debugging-port=${port} --remote-debugging-address=127.0.0.1`}});
+async function launch(){ app=spawn(exe,[],{cwd:root,windowsHide:true,stdio:'ignore',env:{...process.env,RESEARCHCLIP_TEST_SETTINGS_DIR:settings,WEBVIEW2_USER_DATA_FOLDER:join(out,'webview'),WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS:`--remote-debugging-port=${port} --remote-debugging-address=127.0.0.1`}});
  await until(()=>fetch(`http://127.0.0.1:${port}/json/version`).then(r=>r.ok).catch(()=>false),'CDP');browser=await chromium.connectOverCDP(`http://127.0.0.1:${port}`);page=await until(()=>browser.contexts().flatMap(c=>c.pages()).find(p=>p.url().includes('tauri')),'main');page.on('pageerror',e=>report.errors.push(e.message));
+}
+try{
+ if(bookmarksTest){
+  const raw=await readFile(join(root,'src-tauri/resources/package-builtin-v500.json'),'utf8');const p=JSON.parse(raw).packages.find(p=>p.id==='model.ocr-line');const directory=`${p.id}-${p.version}-${p.files[0].sha256.slice(0,12)}`;const managed=join(settings,'packages-v1','installed',directory);await mkdir(managed,{recursive:true});
+  for(const f of p.files){const bytes=await readFile(join(root,'artifacts/step2-20261028',f.path));assert.equal(createHash('sha256').update(bytes).digest('hex'),f.sha256);await writeFile(join(managed,f.path),bytes,{flag:'wx'});}
+  await writeFile(join(settings,'packages-v1','registry.json'),JSON.stringify({schemaVersion:1,highestSequence:1,installed:[{package:p,catalogProof:{payload:raw,signature:'BUILTIN_MANIFEST_V1'},directory,enabled:true,readiness:'READY',installedAt:123}],retired:[]}));
+ }
+ await launch();
+ if(bookmarksTest){const s=await call('package_center',{request:{operation:'status'}});assert.equal(s.registry.installed[0].readiness,'READY');assert.equal(s.registry.installed[0].package.appVersion,'='+JSON.parse(await readFile(join(root,'package.json'),'utf8')).version);report.checks.push('exact v5.0.0 compiled-model proof migrates on upgrade; unchanged real OCR weights pass actual CPU startup self-test');}
  assert.equal((await call('library_status')).schemaVersion,21);await page.getByRole('button',{name:'新建空白 Markdown',exact:true}).click();const text=page.getByRole('textbox',{name:'Markdown 源文',exact:true});await text.fill('浏览器切换：未保存草稿');
  await page.getByRole('button',{name:'Google浏览器',exact:true}).click();await until(async()=>(await request({operation:'status'})).visible,'native child visible');
  assert.equal((await call('library_status')).schemaVersion,21);assert.equal(await text.inputValue(),'浏览器切换：未保存草稿');report.checks.push('real child window creates while all main WebviewWindow IPC and Markdown draft remain usable');
@@ -29,7 +40,14 @@ try{
  for(const zoom of [.75,1,1.25,1.5,2]){await page.evaluate(z=>{document.body.style.zoom=String(z);},zoom);await delay(650);const box=await page.locator('.research-browser-viewport').boundingBox();assert.ok(box&&box.width>32&&box.height>32);assert.equal((await request({operation:'status'})).visible,true);assert.equal(await page.getByRole('alert').count(),0);}
  await page.evaluate(()=>{document.body.style.zoom='';});report.checks.push('browser toolbar/native bounds stay valid at CSS scales75–200% and browser zoom150%; not physical mixed-DPI verification');
  await page.getByRole('button',{name:'返回资料工作台',exact:true}).first().click();await until(async()=>(await request({operation:'status'})).visible===false,'hidden child');assert.equal(await text.inputValue(),'浏览器切换：未保存草稿');await page.getByRole('button',{name:'Google浏览器',exact:true}).click();await until(async()=>(await request({operation:'status'})).visible,'restore child');assert.equal((await request({operation:'status'})).title,'Example Domain');report.checks.push('return hides native child and restores existing workbench, then reopens the same page without discarding history');
+ if(bookmarksTest){const {runBrowserBookmarks}=await import('./research-browser-bookmarks-cases.mjs');await runBrowserBookmarks({page,child,call,request,until,report});}
  await request({operation:'close'});assert.equal((await request({operation:'status'})).visible,false);await page.getByRole('button',{name:'返回资料工作台',exact:true}).first().click();await page.locator('[data-markdown-panel]').getByRole('button',{name:'关闭文档',exact:true}).click();await page.getByRole('button',{name:'放弃修改',exact:true}).click();
+ if(bookmarksTest){
+  await call('desktop_action',{action:'exit'});await until(()=>app.exitCode!==null,'first native exit');assert.equal(app.exitCode,0);await browser.close();await until(()=>fetch(`http://127.0.0.1:${port}/json/version`).then(()=>false).catch(()=>true),'old port closed');await launch();
+  const prefs=(await call('get_preferences')).preferences;assert.equal(prefs.browserBookmarks.length,1);assert.equal(prefs.browserBookmarks[0].title,'论文索引');assert.equal(await page.locator('.research-browser').count(),0);assert.equal((await request({operation:'status'})).visible,false);
+  await page.getByRole('navigation',{name:'主导航',exact:true}).getByRole('button',{name:'Google浏览器',exact:true}).click();await until(async()=>(await request({operation:'status'})).visible,'restarted browser');await page.getByRole('button',{name:'论文索引',exact:true}).click();await until(async()=>(await request({operation:'status'})).url.includes('researchclip=bookmark'),'persistent one-click address');report.checks.push('real application restart keeps edited/reordered bookmarks in settings, opens no browser automatically, and saved one-click navigation still works');
+  await page.getByRole('button',{name:'返回资料工作台',exact:true}).click();
+ }
  assert.deepEqual(report.errors,[]);report.result='PASS';
 }catch(e){report.result='FAIL';report.failure=e.stack;process.exitCode=1;if(page&&!page.isClosed())await page.screenshot({path:join(out,'failure.png')}).catch(()=>{});}
 finally{if(page&&!page.isClosed()){await request({operation:'close'}).catch(()=>{});await call('desktop_action',{action:'exit'}).catch(()=>{});await until(()=>app.exitCode!==null,'normal exit',10000).catch(e=>report.errors.push(String(e)));}await browser?.close().catch(()=>{});if(app&&app.exitCode===null)app.kill();if(report.errors.length){report.result='FAIL';process.exitCode=1;}await writeFile(join(out,'report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));}

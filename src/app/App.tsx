@@ -50,6 +50,7 @@ export function App() {
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if(event.defaultPrevented||event.isComposing||event.keyCode===229||(event.target instanceof Element&&event.target.closest('[data-markdown-panel]')))return;
+      if(event.target instanceof Element&&event.target.closest('.research-browser,.browser-bookmark-dialog'))return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         useUiStore.getState().openSearch();

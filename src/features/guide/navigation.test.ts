@@ -1,8 +1,9 @@
 import {describe,it,expect} from 'vitest';
-import {guideTopicGroups,guideSections,searchGuide,guideOffsets,visibleGuideLocation,guideExamples} from './navigation';
+import {guideReadingRoutes,guideTopicGroups,guideSections,searchGuide,guideOffsets,visibleGuideLocation,guideExamples} from './navigation';
 import guide from '../../../docs/USER_GUIDE.md?raw';
 const text='# Manual\n\n## 1. 入门\n正文\n### 保存\n安全写入\n#### 失败处理\n保留草稿\n### 导出\nPNG\n```md\n## 9. 假标题\n```\n## 2. 设置\n### 主题\nLight Dark\n';
 describe('hierarchical guide navigation',()=>{
+ it('offers six concise routes in chapter order including browser bookmarks without renumbering help targets',()=>{expect(guideReadingRoutes.map(r=>r.section)).toEqual([1,10,19,27,33,38]);expect(guideReadingRoutes.at(-1)?.title).toContain('书签');});
  it('keeps visible topic groups in physical chapter order',()=>{expect(guideTopicGroups.flatMap(g=>g.sections)).toEqual(Array.from({length:38},(_,i)=>i+1));});
  it('numbers physical chapters and every subsection in top-to-bottom reading order',()=>{const roots=guideSections(guide);expect(roots.map(s=>s.chapter)).toEqual(Array.from({length:38},(_,i)=>i+1));for(const root of roots)root.children.forEach((section,i)=>{expect(section.heading.text.startsWith(`${root.chapter}.${i+1} `)).toBe(true);section.children.forEach((step,j)=>expect(step.heading.text.startsWith(`${root.chapter}.${i+1}.${j+1} `)).toBe(true));});});
  it('filters examples without losing parents or changing the source tree',()=>{const source=guideSections('## 1. 入门\n### 1.1 操作\n不应匹配\n### 1.2 功能示例\n#### 1.2.1 采集\n输出原图\n## 2. 设置\n### 2.1 操作\n主题\n');const examples=guideExamples(source);expect(examples).toHaveLength(1);expect(examples[0].children.map(s=>s.heading.text)).toEqual(['1.2 功能示例']);expect(examples[0].body).toBe('');expect(searchGuide(examples,'原图')[0].children[0].children[0].heading.text).toBe('1.2.1 采集');expect(searchGuide(examples,'不应匹配')).toEqual([]);expect(source[0].children).toHaveLength(2);expect(guideExamples([])).toEqual([]);});

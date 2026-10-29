@@ -929,7 +929,12 @@ pub fn same_authorized_file_url(source: &Path, uri: &str) -> bool {
         let value = path.to_string_lossy().replace('/', "\\");
         value.strip_prefix("\\\\?\\").unwrap_or(&value).to_owned()
     };
-    normalize(&from_api).eq_ignore_ascii_case(&normalize(&authorized))
+    let reported = normalize(&from_api);
+    reported.eq_ignore_ascii_case(&normalize(&authorized))
+        // Windows TEMP may use an authorized 8.3 parent (RUNNER~1) while
+        // canonicalize expands it. Trust only the two spellings of our input;
+        // never resolve or open a path supplied by the remote API.
+        || (source.is_absolute() && reported.eq_ignore_ascii_case(&normalize(source)))
 }
 #[cfg(test)]
 #[path = "zotero_annotations_http_tests.rs"]
@@ -1001,6 +1006,12 @@ mod tests {
         std::fs::write(&source, b"%PDF").unwrap();
         let uri = Url::from_file_path(&source).unwrap();
         assert!(same_authorized_file_url(&source, uri.as_str()));
+        assert!(same_authorized_file_url(
+            &source,
+            Url::from_file_path(source.canonicalize().unwrap())
+                .unwrap()
+                .as_str()
+        ));
         let wrong = dir.path().join("other.pdf");
         assert!(!same_authorized_file_url(
             &source,

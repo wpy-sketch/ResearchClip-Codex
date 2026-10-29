@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {ArrowLeft,ArrowRight,RotateCw,House,ExternalLink,X,Globe,Search} from 'lucide-react';
 import {browserAddress,browserBounds,browserRequest,type BrowserSnapshot} from './browser';
+import {BrowserBookmarks} from './BrowserBookmarks';
 const initial:BrowserSnapshot={url:'',title:'Google',loading:false,notice:'',visible:false};
 export function ResearchBrowser({openExternal,back}:{openExternal:()=>Promise<void>;back:()=>void}){
  const host=useRef<HTMLDivElement>(null),[snapshot,setSnapshot]=useState(initial),[address,setAddress]=useState('https://www.google.com/'),[error,setError]=useState(''),[busy,setBusy]=useState(false),[zoom,setZoom]=useState(1),[reloadKey,setReloadKey]=useState(0);
@@ -28,6 +29,7 @@ export function ResearchBrowser({openExternal,back}:{openExternal:()=>Promise<vo
    <label className="research-browser-zoom"><span>网页</span><select aria-label="网页缩放" value={zoom} onChange={e=>{const value=Number(e.target.value);setZoom(value);void action({operation:'zoom',factor:value});}}>{[.5,.75,1,1.25,1.5,2].map(n=><option key={n} value={n}>{n*100}%</option>)}</select></label>
    <button type="button" className="icon-button" title="使用真正Chrome打开Google（账号与书签由Chrome管理）" aria-label="使用Chrome打开Google" disabled={busy} onClick={()=>{setBusy(true);setError('');void openExternal().catch(e=>setError(e instanceof Error?e.message:typeof e==='object'&&e&&'message'in e?String(e.message):'无法启动Chrome。')).finally(()=>setBusy(false));}}><ExternalLink size={16}/></button>
   </form>
+  <BrowserBookmarks url={snapshot.url||'https://www.google.com/'} title={snapshot.title} open={url=>{editing.current=false;setAddress(url);void action({operation:'navigate',url});}}/>
   {(error||snapshot.notice)&&<p role="alert" className="research-browser-message">{error||snapshot.notice}<button onClick={()=>{setError('');setReloadKey(n=>n+1);}}>重试区域</button></p>}
   <div className="research-browser-status" role="status">{snapshot.loading?'正在加载网页，可停止或更换地址。':'独立WebView2浏览区域 · 返回工作台保留PDF与Markdown。'}</div>
   <div ref={host} className="research-browser-viewport" aria-label="原生网页显示区域"><p>正在准备应用内网页区域…</p></div>

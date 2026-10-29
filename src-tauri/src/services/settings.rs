@@ -33,6 +33,34 @@ pub struct Preferences {
     pub markdown_split_percent: u8,
     #[serde(default)]
     pub workflows: Vec<WorkflowConfig>,
+    #[serde(default)]
+    pub browser_bookmarks: Vec<BrowserBookmark>,
+}
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct BrowserBookmark {
+    pub title: String,
+    pub url: String,
+}
+fn validate_bookmarks(values: &[BrowserBookmark]) -> Result<(), CaptureError> {
+    if values.len() > 32 {
+        return Err(invalid());
+    }
+    let mut urls = std::collections::BTreeSet::new();
+    for b in values {
+        if b.title.trim().is_empty()
+            || b.title.encode_utf16().count() > 80
+            || b.title.chars().any(char::is_control)
+            || b.url.len() > 2048
+        {
+            return Err(invalid());
+        }
+        let url = super::browser_links::public_url(&b.url).map_err(|_| invalid())?;
+        if !urls.insert(url.to_string()) {
+            return Err(invalid());
+        }
+    }
+    Ok(())
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -114,6 +142,7 @@ impl Default for Preferences {
             close_to_tray: false,
             markdown_split_percent: default_markdown_split_percent(),
             workflows: vec![],
+            browser_bookmarks: vec![],
         }
     }
 }
@@ -131,6 +160,7 @@ pub struct PreferencesPatch {
     pub close_to_tray: Option<bool>,
     pub markdown_split_percent: Option<u8>,
     pub workflows: Option<Vec<WorkflowConfig>>,
+    pub browser_bookmarks: Option<Vec<BrowserBookmark>>,
     // Paths can only be changed by the Rust folder-dialog command.
 }
 #[derive(Clone, Debug, Serialize)]
@@ -189,6 +219,7 @@ pub fn shortcut(value: &str) -> Result<Shortcut, CaptureError> {
 }
 fn validate(value: &Preferences) -> Result<(), CaptureError> {
     validate_workflows(&value.workflows)?;
+    validate_bookmarks(&value.browser_bookmarks)?;
     if value.schema_version != 1
         || !["dark", "light", "system"].contains(&value.theme.as_str())
         || !["grid", "list"].contains(&value.view_mode.as_str())
@@ -246,6 +277,9 @@ fn write_preferences(path: &Path, value: &Preferences) -> Result<(), CaptureErro
     let parent = path.parent().ok_or_else(unavailable)?;
     fs::create_dir_all(parent).map_err(|_| unavailable())?;
     let bytes = serde_json::to_vec_pretty(value).map_err(|_| unavailable())?;
+    if bytes.len() > 65536 {
+        return Err(invalid());
+    }
     let mut stage = tempfile::NamedTempFile::new_in(parent).map_err(|_| unavailable())?;
     stage
         .write_all(&bytes)
@@ -439,6 +473,16 @@ impl SettingsService {
         if let Some(v) = patch.workflows {
             next.workflows = v;
         }
+        if let Some(mut v) = patch.browser_bookmarks {
+            for b in &mut v {
+                b.title = b.title.trim().to_string();
+                b.url = super::browser_links::public_url(b.url.trim())
+                    .map_err(|_| invalid())?
+                    .to_string();
+            }
+            validate_bookmarks(&v)?;
+            next.browser_bookmarks = v;
+        }
         if (edit_region && palette_key(&next.capture_shortcut))
             || (edit_full && palette_key(&next.fullscreen_shortcut))
         {
@@ -522,6 +566,165 @@ impl SettingsService {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn browser_bookmarks_are_additive_persisted_and_reordered_without_touching_other_preferences() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.json");
+        let mut old = serde_json::to_value(Preferences::default()).unwrap();
+        old.as_object_mut().unwrap().remove("browserBookmarks");
+        fs::write(&path, serde_json::to_vec(&old).unwrap()).unwrap();
+        let service = registered_service(path.clone());
+        assert!(
+            service
+                .snapshot()
+                .unwrap()
+                .preferences
+                .browser_bookmarks
+                .is_empty()
+        );
+        let bookmarks = vec![
+            BrowserBookmark {
+                title: " 文献 ".into(),
+                url: "https://EXAMPLE.com".into(),
+            },
+            BrowserBookmark {
+                title: "检索".into(),
+                url: "https://example.org/".into(),
+            },
+        ];
+        service
+            .update(
+                PreferencesPatch {
+                    browser_bookmarks: Some(bookmarks),
+                    ..Default::default()
+                },
+                None,
+                |_, _| panic!("bookmark changes must not rebind shortcuts"),
+            )
+            .unwrap();
+        let mut loaded = read_preferences(&path).unwrap();
+        assert_eq!(loaded.browser_bookmarks[0].title, "文献");
+        assert_eq!(loaded.browser_bookmarks[0].url, "https://example.com/");
+        assert_eq!(
+            loaded.capture_shortcut,
+            Preferences::default().capture_shortcut
+        );
+        loaded.browser_bookmarks.reverse();
+        loaded.browser_bookmarks[0].title = "新名称".into();
+        service
+            .update(
+                PreferencesPatch {
+                    browser_bookmarks: Some(loaded.browser_bookmarks),
+                    ..Default::default()
+                },
+                None,
+                |_, _| Ok(()),
+            )
+            .unwrap();
+        let reopened = SettingsService::load(path.clone()).snapshot().unwrap();
+        assert_eq!(reopened.preferences.browser_bookmarks[0].title, "新名称");
+        service
+            .update(
+                PreferencesPatch {
+                    browser_bookmarks: Some(vec![]),
+                    ..Default::default()
+                },
+                None,
+                |_, _| Ok(()),
+            )
+            .unwrap();
+        assert!(
+            read_preferences(&path)
+                .unwrap()
+                .browser_bookmarks
+                .is_empty()
+        );
+    }
+    #[test]
+    fn invalid_bookmark_updates_keep_the_previous_file_exactly() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.json");
+        let service = registered_service(path.clone());
+        service
+            .update(
+                PreferencesPatch {
+                    browser_bookmarks: Some(vec![BrowserBookmark {
+                        title: "正常".into(),
+                        url: "https://example.com/".into(),
+                    }]),
+                    ..Default::default()
+                },
+                None,
+                |_, _| Ok(()),
+            )
+            .unwrap();
+        let before = fs::read(&path).unwrap();
+        for url in [
+            "file:///C:/x",
+            "http://127.0.0.1/",
+            "javascript:alert(1)",
+            "https://user:password@example.com/",
+        ] {
+            assert!(
+                service
+                    .update(
+                        PreferencesPatch {
+                            browser_bookmarks: Some(vec![BrowserBookmark {
+                                title: "x".into(),
+                                url: url.into()
+                            }]),
+                            ..Default::default()
+                        },
+                        None,
+                        |_, _| Ok(())
+                    )
+                    .is_err()
+            );
+            assert_eq!(fs::read(&path).unwrap(), before);
+        }
+        let duplicate = vec![
+            BrowserBookmark {
+                title: "a".into(),
+                url: "https://EXAMPLE.com".into(),
+            },
+            BrowserBookmark {
+                title: "b".into(),
+                url: "https://example.com/".into(),
+            },
+        ];
+        assert!(
+            service
+                .update(
+                    PreferencesPatch {
+                        browser_bookmarks: Some(duplicate),
+                        ..Default::default()
+                    },
+                    None,
+                    |_, _| Ok(())
+                )
+                .is_err()
+        );
+        assert_eq!(fs::read(&path).unwrap(), before);
+    }
+    #[test]
+    fn serialized_preferences_cannot_exceed_the_existing_read_limit() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.json");
+        write_preferences(&path, &Preferences::default()).unwrap();
+        let before = fs::read(&path).unwrap();
+        let value = Preferences {
+            browser_bookmarks: (0..32)
+                .map(|i| BrowserBookmark {
+                    title: "文".repeat(80),
+                    url: format!("https://example.com/{i}/{}", "a".repeat(1980)),
+                })
+                .collect(),
+            ..Default::default()
+        };
+        validate_bookmarks(&value.browser_bookmarks).unwrap();
+        assert!(write_preferences(&path, &value).is_err());
+        assert_eq!(fs::read(&path).unwrap(), before);
+    }
     fn workflow(actions: &[&str]) -> WorkflowConfig {
         WorkflowConfig {
             id: format!("custom-{}", "a".repeat(32)),

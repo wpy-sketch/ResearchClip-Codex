@@ -33,3 +33,5 @@ describe('workspace UI session state', () => {
 });
 
 it('targets a guide chapter explicitly and clears the target when opened from the sidebar',()=>{useUiStore.getState().openGuide(28);expect(useUiStore.getState()).toMatchObject({activeView:'guide',guideChapter:28});useUiStore.getState().openGuide();expect(useUiStore.getState().guideChapter).toBeNull();});
+
+it('opens the browser from left navigation and returns to the previous workbench view',()=>{useUiStore.getState().navigate('settings');useUiStore.getState().navigate('browser');expect(useUiStore.getState()).toMatchObject({activeView:'browser',browserReturnView:'settings'});useUiStore.getState().navigate('browser');useUiStore.getState().closeBrowser();expect(useUiStore.getState().activeView).toBe('settings');useUiStore.getState().navigate('browser');useUiStore.getState().navigate('screenshots');expect(useUiStore.getState().activeView).toBe('screenshots');});

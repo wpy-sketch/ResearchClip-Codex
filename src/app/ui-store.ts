@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type NavigationView = 'screenshots' | 'favorites' | 'tags' | 'settings' | 'editor' | 'card' | 'compare' | 'guide' | 'graph' | 'packages';
+export type NavigationView = 'screenshots' | 'favorites' | 'tags' | 'settings' | 'editor' | 'card' | 'compare' | 'guide' | 'graph' | 'packages' | 'browser';
 export type Theme = 'dark' | 'light';
 export type ViewMode = 'grid' | 'list';
 
@@ -8,6 +8,8 @@ export type ViewMode = 'grid' | 'list';
 interface UiState {
   activeView: NavigationView;
   navigationSerial:number;
+  browserReturnView:NavigationView;
+  closeBrowser:()=>void;
   theme: Theme;
   viewMode: ViewMode;
   fontFamily: 'system' | 'sans' | 'serif';
@@ -31,9 +33,9 @@ interface UiState {
 }
 
 export const useUiStore = create<UiState>((set) => ({
-  guideChapter:null,navigationSerial:0,activeView: 'screenshots', theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, showWelcome: true,
+  guideChapter:null,navigationSerial:0,browserReturnView:'screenshots',closeBrowser:()=>set(state=>({activeView:state.browserReturnView==='browser'?'screenshots':state.browserReturnView,navigationSerial:state.navigationSerial+1})),activeView: 'screenshots', theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, showWelcome: true,
   overlay: null, searchQuery: '', windowThemeError: null,
-  navigate: (activeView) => set(state=>({ activeView, overlay: null,navigationSerial:state.navigationSerial+1 })),
+  navigate: (activeView) => set(state=>({ activeView, browserReturnView:activeView==='browser'&&state.activeView!=='browser'?state.activeView:state.browserReturnView,overlay: null,navigationSerial:state.navigationSerial+1 })),
   setTheme: (theme) => set({ theme }),
   toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
   setViewMode: (viewMode) => set({ viewMode }),

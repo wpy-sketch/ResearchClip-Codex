@@ -1,9 +1,10 @@
 import { invoke } from '@tauri-apps/api/core';
 import {parseWorkflows,type WorkflowConfig} from '../../features/commands/model';
-export interface Preferences { schemaVersion: 1; theme: 'dark' | 'light'|'system'; viewMode: 'grid' | 'list'; fontFamily: 'system' | 'sans' | 'serif'; fontSize: number; captureShortcut: string; fullscreenShortcut: string; saveDirectory: string | null; annotationColor:string;annotationWidth:number;closeToTray:boolean;markdownSplitPercent:number;workflows:WorkflowConfig[] }
+import {parseBookmarks,type BrowserBookmark} from '../../features/workspace/bookmarks';
+export interface Preferences { schemaVersion: 1; theme: 'dark' | 'light'|'system'; viewMode: 'grid' | 'list'; fontFamily: 'system' | 'sans' | 'serif'; fontSize: number; captureShortcut: string; fullscreenShortcut: string; saveDirectory: string | null; annotationColor:string;annotationWidth:number;closeToTray:boolean;markdownSplitPercent:number;workflows:WorkflowConfig[];browserBookmarks:BrowserBookmark[] }
 export interface SettingsSnapshot { preferences: Preferences; registeredShortcut: string | null; shortcutError: string | null; registeredFullscreenShortcut: string | null; fullscreenShortcutError: string | null; storageError: string | null;directoryError:string|null }
-export type PreferencesPatch = Partial<Pick<Preferences, 'theme' | 'viewMode' | 'fontFamily' | 'fontSize' | 'captureShortcut' | 'fullscreenShortcut'|'annotationColor'|'annotationWidth'|'closeToTray'|'markdownSplitPercent'|'workflows'>>;
-export const defaults: Preferences = { schemaVersion: 1, theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, captureShortcut: 'Ctrl+Shift+2', fullscreenShortcut: 'Ctrl+Shift+1', saveDirectory: null,annotationColor:'#ef6262',annotationWidth:3,closeToTray:false,markdownSplitPercent:50,workflows:[] };
+export type PreferencesPatch = Partial<Pick<Preferences, 'theme' | 'viewMode' | 'fontFamily' | 'fontSize' | 'captureShortcut' | 'fullscreenShortcut'|'annotationColor'|'annotationWidth'|'closeToTray'|'markdownSplitPercent'|'workflows'|'browserBookmarks'>>;
+export const defaults: Preferences = { schemaVersion: 1, theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, captureShortcut: 'Ctrl+Shift+2', fullscreenShortcut: 'Ctrl+Shift+1', saveDirectory: null,annotationColor:'#ef6262',annotationWidth:3,closeToTray:false,markdownSplitPercent:50,workflows:[],browserBookmarks:[] };
 export function parseSettings(value: unknown): SettingsSnapshot {
   if (!value || typeof value !== 'object') throw new Error('设置响应无效。');
   const s = value as Record<string, unknown>; const p = s.preferences as Record<string, unknown> | undefined;
@@ -14,6 +15,7 @@ export function parseSettings(value: unknown): SettingsSnapshot {
     || !nullable(s.registeredShortcut) || !nullable(s.shortcutError) || !nullable(s.registeredFullscreenShortcut) || !nullable(s.fullscreenShortcutError) || !nullable(s.storageError)||!nullable(s.directoryError)) throw new Error('设置协议或版本不兼容，已有配置未修改。');
   if(p.markdownSplitPercent===undefined)p.markdownSplitPercent=50;
   p.workflows=parseWorkflows(p.workflows??[]);
+  p.browserBookmarks=parseBookmarks(p.browserBookmarks??[]);
   if(typeof p.markdownSplitPercent!=='number'||!Number.isInteger(p.markdownSplitPercent)||p.markdownSplitPercent<20||p.markdownSplitPercent>80)throw new Error('分栏比例无效。');
   return value as SettingsSnapshot;
 }

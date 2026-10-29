@@ -57,11 +57,14 @@ def publish(assets,receipt,notes):
     for name in ('release-build.json','SHA256SUMS'):
         p=assets/name;expected[name]={'name':name,'size':p.stat().st_size,'sha256':sha(p)}
     if set(p.name for p in assets.iterdir())!=set(expected):raise ValueError('Unexpected staging files; refusing upload')
-    gh('release','create',tag,'--repo',repo,'--verify-tag','--draft','--title','ResearchClip '+tag,'--notes-file',str(notes))
+    gh('release','create',tag,'--repo',repo,'--verify-tag','--target',commit,'--draft','--title','ResearchClip '+tag,'--notes-file',str(notes))
+    created=json.loads(gh('release','view',tag,'--repo',repo,'--json','databaseId,isDraft,tagName,targetCommitish').stdout)
+    if created.get('isDraft') is not True or created.get('tagName')!=tag or created.get('targetCommitish')!=commit or type(created.get('databaseId')) is not int:raise ValueError('The just-created draft identity could not be verified; inspect without overwriting')
+    release_id=created['databaseId']
     # Only the just-created draft is touched. A retry must inspect the existing draft;
     # it never silently skips, overwrites assets or creates a second release.
     for name in expected:gh('release','upload',tag,str(assets/name),'--repo',repo)
-    release=api('repos/'+repo+'/releases/tags/'+tag)
+    release=api('repos/'+repo+'/releases/'+str(release_id))
     remote={a['name']:a for a in release['assets']}
     if set(remote)!=set(expected):raise ValueError('Draft asset set differs from verified staging; draft retained')
     with tempfile.TemporaryDirectory(prefix='researchclip-release-readback-') as tmp:
@@ -72,8 +75,12 @@ def publish(assets,receipt,notes):
         if not manual:subprocess.run(['node',str(ROOT/'scripts/with-rust.mjs'),'cargo','run','--manifest-path','src-tauri/Cargo.toml','--locked','--example','verify_release_signatures','--',tmp],cwd=ROOT,check=True)
     gh('release','edit',tag,'--repo',repo,'--draft=false','--latest')
     try:
-        release=api('repos/'+repo+'/releases/tags/'+tag)
+        release=api('repos/'+repo+'/releases/'+str(release_id))
         if release['draft'] or release['prerelease'] or release['tag_name']!=tag:raise ValueError('Release did not enter expected stable state')
+        # Draft URLs use an ephemeral untagged-* slug; publication changes them.
+        published={a['name']:a for a in release['assets']}
+        if set(published)!=set(remote) or any(published[n]['id']!=a['id'] or published[n]['size']!=expected[n]['size'] for n,a in remote.items()):raise ValueError('Published assets differ from the verified draft')
+        remote=published
         for name,item in expected.items():public_hash(remote[name]['browser_download_url'],item)
         if not manual:
             trust=json.loads((ROOT/'src-tauri/resources/package-trust.json').read_text(encoding='utf-8'))

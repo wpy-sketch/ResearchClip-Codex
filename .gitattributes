@@ -5,3 +5,6 @@
 
 # Preserve verbatim upstream license whitespace.
 docs/licenses/pdfjs-NOTICES.txt -whitespace
+
+# Exact fixture bytes are bound by reviewed signed catalog hashes.
+src-tauri/src/services/packages/fixtures/readme.md -text

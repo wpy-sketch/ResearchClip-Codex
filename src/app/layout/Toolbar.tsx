@@ -8,7 +8,7 @@ import { useSettingsStore } from '../../features/settings/store';
 import {useDocumentStore} from '../../features/document/store';
 import {CommandButton} from '../../features/commands/CommandCenter';
 
-const titles = { screenshots: '截图素材', favorites: '收藏', tags: '标签', settings: '设置', editor: '图片编辑器',card:'科研知识卡片',compare:'图片对比',guide:'使用指南',graph:'知识图谱',packages:'扩展与模型中心' };
+const titles = { screenshots: '截图素材', browser:'Google浏览器', favorites: '收藏', tags: '标签', settings: '设置', editor: '图片编辑器',card:'科研知识卡片',compare:'图片对比',guide:'使用指南',graph:'知识图谱',packages:'扩展与模型中心' };
 
 export function Toolbar() {
   const { activeView, theme, viewMode } = useUiStore();

@@ -1,5 +1,6 @@
 import appIcon from '../../../assets/app-icon.svg';
-import { Boxes, Network, BookOpen, BookMarked, ScanSearch, Columns2, HardDrive, Images, Plus, Settings2, Star, Tags } from 'lucide-react';
+import { Globe, Boxes, Network, BookOpen, BookMarked, ScanSearch, Columns2, HardDrive, Images, Plus, Settings2, Star, Tags } from 'lucide-react';
+import {workspaceManager} from '../../features/workspace/manager';
 import {useSimilarityStore} from '../../features/similarity/store';
 import {useReferenceStore} from '../../features/references/store';
 import { useUiStore } from '../ui-store';
@@ -9,6 +10,7 @@ import {ProjectNavigation} from '../../features/projects/ProjectNavigation';
 
 const items = [
   { id: 'screenshots', label: '截图素材', icon: Images },
+  { id: 'browser', label: 'Google浏览器', icon: Globe },
   { id: 'favorites', label: '收藏', icon: Star },
   { id: 'tags', label: '标签', icon: Tags },
   { id: 'compare', label: '图片对比', icon: Columns2 },
@@ -35,7 +37,7 @@ export function Sidebar() {
       <div className="workspace-label"><HardDrive size={14}/><span className="sidebar-label">本地工作区</span></div>
       <p className="sidebar-section-label">素材管理</p>
       <nav aria-label="主导航" className="space-y-1">
-        {items.map(({ id, label, icon: Icon }) => <div key={id} className={id==='settings'?'sidebar-settings-entry':undefined}><button className={`nav-button ${activeView === id ? 'is-active' : ''}`} aria-label={id==='similarity'?'相似图片与重复组':id==='references'?'文献引用库':label} aria-current={activeView === id ? 'page' : undefined} title={label} onClick={() => {if(id==='similarity'){useSimilarityStore.getState().show();return;}if(id==='references'){useReferenceStore.getState().show();return;}if(id==='compare'&&activeView!=='compare')useCompareStore.getState().enter(activeView);navigate(id);}}><Icon size={20} strokeWidth={1.7} /><span className="sidebar-label">{label}</span></button>{id==='screenshots'&&<ProjectNavigation/>}</div>)}
+        {items.map(({ id, label, icon: Icon }) => <div key={id} className={id==='settings'?'sidebar-settings-entry':undefined}><button className={`nav-button ${activeView === id ? 'is-active' : ''}`} aria-label={id==='similarity'?'相似图片与重复组':id==='references'?'文献引用库':label} aria-current={activeView === id ? 'page' : undefined} title={label} onClick={() => {if(id==='browser')workspaceManager.focus('workbench');if(id==='similarity'){useSimilarityStore.getState().show();return;}if(id==='references'){useReferenceStore.getState().show();return;}if(id==='compare'&&activeView!=='compare')useCompareStore.getState().enter(activeView);navigate(id);}}><Icon size={20} strokeWidth={1.7} /><span className="sidebar-label">{label}</span></button>{id==='screenshots'&&<ProjectNavigation/>}</div>)}
       </nav>
       <div className="sidebar-bottom">
         <button className={`nav-button ${activeView === 'guide' ? 'is-active' : ''}`} aria-current={activeView === 'guide' ? 'page' : undefined} aria-label="使用指南" title="使用指南" onClick={()=>openGuide()}><BookOpen size={17} strokeWidth={1.7} /><span className="sidebar-label">使用指南</span></button>

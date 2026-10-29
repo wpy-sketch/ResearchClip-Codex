@@ -47,8 +47,10 @@ def trust_ready(value,repo):
 def validate_receipt(receipt,source_digest,installer_hash,xpi_hash,delivery_mode=None):
     if receipt.get('result')!='PASS' or receipt.get('applicationDigest')!=source_digest or receipt.get('installerSha256')!=installer_hash or receipt.get('zoteroXpiSha256')!=xpi_hash:
         raise ValueError('Actual acceptance receipt does not match these exact source/installer/XPI bytes')
-    if receipt.get('mode')!='actual-independent-windows-and-zotero' or receipt.get('isolatedProfile') is not True or receipt.get('zoteroVersion')!='10.0.6':
-        raise ValueError('Mock/browser-only checks cannot substitute for independent Windows and Zotero acceptance')
+    independent=receipt.get('mode')=='actual-independent-windows-and-zotero'
+    disclosed_local=(receipt.get('mode')=='actual-local-windows-and-zotero' and receipt.get('independentWindows') is False and receipt.get('manualAcceptanceScope')=='user-confirmed-local-only' and isinstance(receipt.get('manualOutstanding'),list) and 'independentWindows' in receipt['manualOutstanding'])
+    if not (independent or disclosed_local) or receipt.get('isolatedProfile') is not True or receipt.get('zoteroVersion')!='10.0.6':
+        raise ValueError('Mock/browser-only checks cannot substitute for actual isolated Windows/Zotero acceptance; local-only scope requires explicit confirmation')
     required=MANUAL_REQUIRED_TESTS if delivery_mode==MANUAL_MODE else REQUIRED_TESTS
     if any(receipt.get('checks',{}).get(name) is not True for name in required):raise ValueError('Required release acceptance is incomplete')
     if receipt.get('unresolvedP0')!=0 or receipt.get('unresolvedP1')!=0:raise ValueError('P0/P1 issues block stable publication')

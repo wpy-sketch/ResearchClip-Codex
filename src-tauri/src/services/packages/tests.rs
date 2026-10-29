@@ -9,6 +9,79 @@ fn trust() -> Trust {
     }
 }
 #[test]
+fn v500_compiled_installs_rescope_only_exact_reviewed_metadata_and_require_real_recheck() {
+    let t = tempfile::tempdir().unwrap();
+    let root = t.path().join("packages");
+    let service = PackageManager::production(root.clone()).unwrap();
+    let legacy_payload = include_str!("../../../resources/package-builtin-v500.json");
+    let old: Catalog = serde_json::from_str(legacy_payload).unwrap();
+    let p = old
+        .packages
+        .iter()
+        .find(|p| p.id == "model.ocr-line")
+        .unwrap()
+        .clone();
+    let directory = format!("{}-{}-{}", p.id, p.version, &p.files[0].sha256[..12]);
+    let record = Installed {
+        package: p,
+        catalog_proof: Some(Envelope {
+            payload: legacy_payload.into(),
+            signature: "BUILTIN_MANIFEST_V1".into(),
+        }),
+        directory: directory.clone(),
+        enabled: true,
+        readiness: "READY".into(),
+        installed_at: 123,
+    };
+    let managed = root.join("installed").join(&directory);
+    std::fs::create_dir(&managed).unwrap();
+    std::fs::write(managed.join("preserve.txt"), b"owned migration marker").unwrap();
+    for variant in 0..4 {
+        let mut entry = record.clone();
+        entry.catalog_proof.as_mut().unwrap().payload = legacy_payload.replace("\r\n", "\n");
+        if variant == 1 {
+            entry.catalog_proof.as_mut().unwrap().payload =
+                legacy_payload.replace("\r\n", "\n").replace('\n', "\r\n");
+        }
+        if variant == 2 {
+            entry.package.files[0].url = "https://github.com/evil/unreviewed".into();
+        }
+        if variant == 3 {
+            entry.catalog_proof.as_mut().unwrap().payload.push(' ');
+        }
+        save(
+            &root,
+            "registry.json",
+            &PackageRegistry {
+                installed: vec![entry.clone()],
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let reopened = PackageManager::production(root.clone()).unwrap();
+        let s = reopened.snapshot().unwrap();
+        let actual = &s.registry.installed[0];
+        if variant >= 2 {
+            assert!(actual.package == entry.package);
+            assert!(reopened.authenticated(actual).is_err());
+        } else {
+            assert_eq!(
+                actual.package.app_version,
+                format!("={}", env!("CARGO_PKG_VERSION"))
+            );
+            assert_eq!(actual.readiness, "RECHECK_REQUIRED");
+            assert!(reopened.authenticated(actual).is_ok());
+            assert_eq!(actual.installed_at, 123);
+            assert!(actual.enabled);
+        }
+        assert_eq!(
+            std::fs::read(managed.join("preserve.txt")).unwrap(),
+            b"owned migration marker"
+        );
+    }
+    drop(service);
+}
+#[test]
 fn paths_and_code_payloads_are_rejected() {
     for s in ["../escape", "a/b", "a\\b", "a:ads", "CON", "a.", ".."] {
         assert!(!safe_name(s), "{s}");

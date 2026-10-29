@@ -1,0 +1,8 @@
+import {describe,it,expect} from 'vitest';
+import {normalizeBookmark,parseBookmarks} from './bookmarks';
+describe('local browser bookmarks',()=>{
+ it('normalizes readable titles and canonical public addresses without creating resource IDs',()=>{expect(normalizeBookmark('  文献检索  ','EXAMPLE.com/papers')).toEqual({title:'文献检索',url:'https://example.com/papers'});});
+ it('rejects unsafe protocols, credentials, direct internal hosts and invalid lengths',()=>{for(const url of ['file:///C:/a','javascript:alert(1)','data:text/html,x','http://localhost/','http://127.1/','http://[::1]/','http://192.168.2.1/','https://u:p@example.com/','https://paper.internal/'])expect(()=>normalizeBookmark('x',url),url).toThrow();expect(()=>normalizeBookmark('','https://example.com')).toThrow();expect(()=>normalizeBookmark('x'.repeat(81),'https://example.com')).toThrow();expect(()=>normalizeBookmark('x','https://example.com/'+ 'a'.repeat(2048))).toThrow();});
+ it('rejects canonical duplicates, unknown fields and over32 entries',()=>{expect(()=>parseBookmarks([{title:'a',url:'https://EXAMPLE.COM'},{title:'b',url:'https://example.com/'}])).toThrow('已在');expect(()=>parseBookmarks([{title:'a',url:'https://example.com',script:'x'}])).toThrow();expect(()=>parseBookmarks(Array.from({length:33},(_,i)=>({title:String(i),url:'https://example.com/'+i})))).toThrow('32');});
+ it('preserves user order and isolates parsed records from caller mutations',()=>{const raw=[{title:'乙',url:'https://example.org/'},{title:'甲',url:'https://example.com/'}],parsed=parseBookmarks(raw);raw[0].title='改动';expect(parsed.map(v=>v.title)).toEqual(['乙','甲']);expect(parseBookmarks([])).toEqual([]);});
+});

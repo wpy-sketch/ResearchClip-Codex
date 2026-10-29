@@ -7,6 +7,11 @@ import build_manual_release as builder
 from zotero_connector_release import update_manifest
 
 class ManualReleaseTests(unittest.TestCase):
+    def test_local_scope_requires_explicit_confirmation_and_disclosure_and_keeps_core_tests(self):
+        receipt={'result':'PASS','applicationDigest':'source','installerSha256':'exe','zoteroXpiSha256':'xpi','mode':'actual-local-windows-and-zotero','isolatedProfile':True,'zoteroVersion':'10.0.6','unresolvedP0':0,'unresolvedP1':0,'checks':{k:True for k in gate.MANUAL_REQUIRED_TESTS},'independentWindows':False,'manualAcceptanceScope':'user-confirmed-local-only','manualOutstanding':['independentWindows']}
+        gate.validate_receipt(receipt,'source','exe','xpi',gate.MANUAL_MODE)
+        for patch in [{'manualAcceptanceScope':'pending'},{'manualOutstanding':[]},{'isolatedProfile':False},{'unresolvedP1':1},{'checks':{**receipt['checks'],'ocrInference':False}}]:
+            with self.subTest(patch=patch),self.assertRaises(ValueError):gate.validate_receipt({**receipt,**patch},'source','exe','xpi',gate.MANUAL_MODE)
     def test_manual_receipt_drops_only_signing_requirement_and_keeps_every_core_gate(self):
         receipt={'result':'PASS','applicationDigest':'source','installerSha256':'exe','zoteroXpiSha256':'xpi','mode':'actual-independent-windows-and-zotero','isolatedProfile':True,'zoteroVersion':'10.0.6','unresolvedP0':0,'unresolvedP1':0,'checks':{k:True for k in gate.MANUAL_REQUIRED_TESTS}}
         gate.validate_receipt(receipt,'source','exe','xpi',gate.MANUAL_MODE)
@@ -16,7 +21,7 @@ class ManualReleaseTests(unittest.TestCase):
 
     def test_compiled_catalog_exact_assets_and_no_fake_updater(self):
         compiled=gate.ROOT/'src-tauri/resources/package-builtin.json';catalog=json.loads(compiled.read_text(encoding='utf-8'))
-        repo='wpy-sketch/ResearchClip-Codex';v='5.0.0';tag='v'+v
+        repo='wpy-sketch/ResearchClip-Codex';v=gate.version();tag='v'+v
         with tempfile.TemporaryDirectory() as temp:
             out=Path(temp);(out/'catalog.json').write_bytes(compiled.read_bytes());files={}
             for p in catalog['packages']:

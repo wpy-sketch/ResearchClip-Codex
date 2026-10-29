@@ -37,3 +37,5 @@ export function visibleGuideLocation(sections:GuideSection[],offset:number|null,
 }
 
 export const guideTopicGroups=[{name:'开始与采集',sections:[1,2,3]},{name:'资料与项目',sections:[4,5,6]},{name:'图片工具',sections:[7,8,9]},{name:'Markdown与文献基础',sections:[10,11,12,13,14,15]},{name:'命令、设置与安全',sections:[16,17,18]},{name:'科研工作台',sections:[19,20]},{name:'Markdown进阶与引用',sections:[21,22,23,24,25,26]},{name:'PDF与Zotero',sections:[27,28,29,30,31,32,33,34,35]},{name:'组件与模型',sections:[36]},{name:'批注与浏览器',sections:[37,38]}];
+
+export const guideReadingRoutes=[{section:1,title:"开始使用",text:"工作区与安全保存"},{section:10,title:"编写图文笔记",text:"Markdown与公式"},{section:19,title:"安排编辑面板",text:"分栏、标签和布局恢复"},{section:27,title:"阅读PDF",text:"目录、搜索和阅读位置"},{section:33,title:"同步Zotero批注",text:"本机复读、冲突与来源"},{section:38,title:"浏览网页与书签",text:"左侧浏览器、快捷网页"}] as const;

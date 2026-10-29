@@ -1,4 +1,4 @@
-> **v5.0.0 草稿准备，尚未公开发布**：工作台内嵌网页浏览器、当前PDF30,000条Zotero标准批注、六类原生显示、Connector与可调布局。按用户要求本轮上传源码及Release草稿，保留独立Windows验收。使用内置固定组件清单与手动升级，无需Catalog/Updater密钥；不再开发IDE。见[最终验收](docs/qa/FINAL_RELEASE_REPORT.md)、[浏览器与功能审查](docs/qa/BROWSER_WORKSPACE_500.md)和[候选说明](docs/release/RELEASE_NOTES.md)。
+> **当前构建v5.0.1**：最左侧Google浏览器入口、应用内网页与本地一键书签；38章指南按章节显示，提供六条常用阅读路线。无新增依赖及SQLite迁移。5.0.0草稿保留，5.0.1实际发布状态、资产与未验收项见[最终报告](docs/qa/FINAL_RELEASE_REPORT.md)。仍使用固定编译组件清单和手动升级，无需配置Catalog/Updater密钥，不开发IDE。
 
 > **v4.2.7 · Zotero标准批注双向同步**：本地持久待处理、六种同步状态、条件写入、三方冲突比较与独立处理历史。自动刷新只读且默认关闭。指南33章。[本版说明](docs/RELEASE-NOTES-4.2.7.md) · [实际验收](docs/qa/RELEASE-4.2.7.md)。
 
@@ -13,7 +13,7 @@
 
 # 使用Codex进行构建
 
-面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v5.0.0 Windows；实际origin为ResearchClip-Codex，历史ResearchClip仓库的发布回执保留为历史记录。当前仓库的实际Tag、Release和下载结果以最终报告为准**。
+面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v5.0.1 Windows；实际origin为ResearchClip-Codex，历史ResearchClip仓库的发布回执保留为历史记录。当前仓库的实际Tag、Release和下载结果以最终报告为准**。
 
 [v4.2.0正式回执](docs/qa/PUBLICATION-4.2.0.md) · [v4.2.0变更](docs/RELEASE-NOTES-4.2.0.md) · [Step11验收](docs/qa/ZOTERO_PDF_STEP11.md) · [GitHub发布版本](https://github.com/wpy-sketch/ResearchClip/releases/latest) · [v4.1.9正式回执](docs/qa/PUBLICATION-4.1.9.md) · [v4.1.8正式回执](docs/qa/PUBLICATION-4.1.8.md) · [v4.1.8发布检查](docs/qa/RELEASE-4.1.8.md) · [v4.1.7正式回执](docs/qa/PUBLICATION-4.1.7.md) · [v4.1.7发布检查](docs/qa/RELEASE-4.1.7.md) · [v4.1.7配套与历史附件](docs/RELEASE-COMPONENTS.md) · [v3.1.2发布传输状态](docs/qa/DELIVERY-3.1.2.md) · [完整图文使用指南](docs/USER_GUIDE.md) · [网页剪藏安装](browser-extension/README.md) · [v1.0.2实际验收](docs/qa/RELEASE-1.0.2.md) · [v1.0.2发布回执](docs/qa/PUBLICATION-1.0.2.md)
 
@@ -40,7 +40,7 @@ v3.0.1 新增 **窗口截图**：鼠标高亮选择、Tab/Shift+Tab切换、Esc�
 - **整理**：SQLite素材库、网格/列表、科研知识卡片、笔记自动保存、跨项目标签、组合搜索、批量操作与双图对比。
 - **写作**：动态Markdown分栏、标注合成图插入、模板、大纲、离线LaTeX预览和系统其他应用打开。
 - **浏览**：资料工作台内嵌独立WebView2网页、导航与缩放；不授予网页科研资料权限，真正Chrome入口保留。
-- **帮助**：38章任务式说明、286项功能示例、分层目录与正文搜索、76幅离线图示和原尺寸放大查看。
+- **帮助**：38章任务式说明、287项功能示例、分层目录与正文搜索、77幅离线图示和原尺寸放大查看。
 
 v1.0.5 新增非破坏性标注版本历史：显式保存去重、版本说明、只读预览/对比、恢复追加新版本；schema5升级前备份，原图不重复保存。[本轮验收](docs/qa/RELEASE-1.0.5.md) · [发布核验](docs/qa/PUBLICATION-1.0.5.md)。Release继续附带兼容的 v1.0.2 浏览器插件包，不删除既有发布。
 

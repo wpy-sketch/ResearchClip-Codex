@@ -13,7 +13,7 @@ on:
         description: Required for publish; run that produced windows-manual-assets
         type: string
       receipt_path:
-        description: Committed actual independent Windows/Zotero acceptance receipt
+        description: Committed actual Windows/Zotero receipt with any explicitly confirmed local-only scope
         type: string
         default: docs/qa/evidence/final-release-ready.json
 permissions:
@@ -55,7 +55,9 @@ jobs:
       - run: npm run check:rust
       - run: npm run check:docs
       - name: Test release gate failures
-        run: python -m unittest discover -s scripts -p test_release_gate.py
+        env:
+          PYTHONPATH: scripts
+        run: python -m unittest test_release_gate test_manual_release test_verified_publication
   build:
     needs: validate
     if: github.event_name != 'workflow_dispatch' || inputs.mode == 'build'
