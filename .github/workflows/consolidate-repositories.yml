@@ -1,0 +1,96 @@
+name: Consolidate verified ResearchClip history
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: researchclip-history-consolidation
+  cancel-in-progress: false
+env:
+  GH_TOKEN: ${{ github.token }}
+  PYTHONPATH: scripts
+jobs:
+  prepare:
+    if: github.repository == 'wpy-sketch/ResearchClip-Codex'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - run: python -m unittest test_consolidate_repositories
+      - run: python scripts/consolidate_repositories.py audit
+      - name: Preserve original Git objects without replaying old workflows
+        run: python scripts/consolidate_repositories.py refs
+      - run: python scripts/consolidate_repositories.py prepare
+  copy:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - run: python scripts/consolidate_repositories.py copy --shard ${{ matrix.shard }} --output copy-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: consolidation-copy-${{ matrix.shard }}
+          path: copy-${{ matrix.shard }}.json
+          if-no-files-found: error
+  publish_archive:
+    needs: copy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - run: python scripts/consolidate_repositories.py publish-archive
+  verify:
+    needs: publish_archive
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - name: Anonymous download and every original member SHA-256
+        run: python scripts/consolidate_repositories.py verify --shard ${{ matrix.shard }} --output verify-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: consolidation-verification-${{ matrix.shard }}
+          path: verify-${{ matrix.shard }}.json
+          if-no-files-found: error
+  finalize:
+    needs: verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: consolidation-verification-*
+          path: receipts
+      - name: Preserve per-version notes after complete public verification
+        run: python scripts/consolidate_repositories.py finalize --receipts receipts --output consolidation-complete.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: consolidation-complete
+          path: consolidation-complete.json
+          if-no-files-found: error
