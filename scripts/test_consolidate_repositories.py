@@ -75,6 +75,12 @@ class ArchiveTests(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 m.upload(None, {'draft': False}, path, {})
 
+    def test_pinned_github_generated_tag_is_preserved_without_accepting_arbitrary_refs(self):
+        self.assertTrue(m.ref_name_ok('refs/tags/untagged-e095ea8690b41054e2e5'))
+        self.assertTrue(m.ref_name_ok('refs/tags/v4.2.7'))
+        for value in ['refs/heads/other', 'refs/tags/../../main', 'refs/tags/untagged-user-input', 'refs/tags/v4.2.7;command']:
+            self.assertFalse(m.ref_name_ok(value))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -40,11 +40,16 @@ def name_ok(value):
     return isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_.-]{1,200}', value) and value not in ('.', '..')
 
 
+def ref_name_ok(value):
+    return value == 'refs/heads/main' or isinstance(value, str) and re.fullmatch(r'refs/tags/(?:v[0-9]+(?:\.[0-9]+){2}(?:[-.a-zA-Z0-9]*)?|untagged-[a-f0-9]{20,40})', value)
+
+
 def load_plan(path):
     plan = json.loads(path.read_text(encoding='utf-8'))
     assert plan['schemaVersion'] == 1 and plan['source'] == SOURCE and plan['target'] == TARGET
     assert plan['archiveTag'] == 'researchclip-history-20261030'
     assert re.fullmatch('[a-f0-9]{40}', plan['sourceMain'])
+    assert all(ref_name_ok(r['name']) and re.fullmatch('[a-f0-9]{40}', r['sha']) for r in plan['sourceRefs'])
     unique = plan['uniqueAssets']
     assert 0 < len(unique) <= 1000 and len({a['sha256'] for a in unique}) == len(unique)
     for a in unique:
@@ -236,7 +241,7 @@ def refs(plan):
     push = []
     for ref in plan['sourceRefs']:
         name = ref['name']
-        assert name == 'refs/heads/main' or re.fullmatch(r'refs/tags/v[0-9]+(?:\.[0-9]+){2}(?:[-.a-zA-Z0-9]*)?', name)
+        assert ref_name_ok(name)
         local = 'refs/consolidation-source/main' if name == 'refs/heads/main' else 'refs/consolidation-source/tags/' + name.removeprefix('refs/tags/')
         assert subprocess.check_output(['git', 'rev-parse', local], cwd=ROOT, text=True).strip() == ref['sha']
         dest = 'refs/heads/archive/researchclip-main-20261030' if name == 'refs/heads/main' else name
