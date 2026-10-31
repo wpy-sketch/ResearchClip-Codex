@@ -168,6 +168,36 @@
         "observation": "User confirmed Bing page and search box visible in the explicitly selected optimized QA window",
         "questionItemId": "call_12d2b7e5b7ac49e99531bec307743af9"
       }
+    },
+    "zoteroAllTypes": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+      "checks": [
+        "source confirmation and navigation in the same JS turn refresh the PDF owner after source-pane unmount; no bridge mocking, manual reload or PDF restart",
+        "actual native Rust read/cache and WebView2 six-type filtering, ink paths projected to a native canvas; stable Zotero identities retained, invalid position remains diagnostic",
+        "right PDF navigation resizes with keyboard limits; full Chinese PDF name remains present and wraps",
+        "clicking PDF highlight navigates to the corresponding annotation row without changing document content",
+        "native PDF text selection displays floating five-type toolbar and configurable shortcuts while retaining selected text; external translation/clipboard need desktop acceptance",
+        "rightmost embedded Google browser keeps PDF sessions; return restores the workbench; account/bookmark sync not claimed",
+        "30,000 real fixture records cross native HTTP/SQLite/UI with301 children requests including overflow probe; last record reachable and list mounts only50 rows",
+        "native responsive panels contained at480/760/1440px and CSS75–200%; physical high-DPI and multiple monitors still require manual validation"
+      ],
+      "rawReport": "artifacts/zotero-alltypes-native-integration510-final-r2/report.json",
+      "rawReportSha256": "a31fa9a504579b3723429bb9a8bcaf0aae8bc6247c317009cb0b67adf6f67757"
+    },
+    "installer": {
+      "result": "PASS",
+      "mode": "actual NSIS, isolated install path, read-only user-data hashes, process fixture for busy guard",
+      "checks": [
+        "Installed CPU runtime matches exact reviewed size/SHA and valid Microsoft Authenticode; ONNX Runtime and OCR notices match original licensed files.",
+        "Actual per-user silent installation at a Unicode/space path; full payload SHA-256 matches with only the verified Tauri UNK-to-NSS marker, plus version, publisher, icon and uninstall registration.",
+        "Actual installer and uninstaller refuse a running image at the installed executable path; process fixture remains alive and files/registration remain intact.",
+        "Actual PDF OpenWith candidate, quoted Unicode executable command and SupportedTypes registered; existing default/UserChoice preserved before and after ownership-scoped uninstall.",
+        "Actual default silent uninstall removes application files/registration, preserves an unrelated install-folder file and all pre-existing AppData file hashes. No production app was launched against user data.",
+        "Only newly created, verified test installer metadata was cleaned up; user data and evidence retained."
+      ],
+      "rawReport": "artifacts/installer-v510-r1/report.json",
+      "rawReportSha256": "eebd546d2feb2054c8ca8a5c65309979b3e95a8c8ee1a0fb745fc5fbcd41c0fb"
     }
   }
 }
