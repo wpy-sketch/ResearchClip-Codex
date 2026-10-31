@@ -1,0 +1,37 @@
+{
+  "id": 41186713225,
+  "head_sha": "5acb2768dad2750fe37ae8549577e1e63f7bbcdb",
+  "status": "completed",
+  "conclusion": "success",
+  "html_url": "https://github.com/wpy-sketch/ResearchClip-Codex/actions/runs/41186713225",
+  "jobs": [
+    {
+      "name": "validate",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "build",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "publish",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "rawLogSha256": "d69c29aae01b1a4f659663776dc2008ae7f4f497c37f67e622e2f63ca2ca4881",
+  "originalTagRun": {
+    "id": 41164223818,
+    "conclusion": "failure",
+    "detail": "validate succeeded; alternate compressed XPI failed strict hash before NSIS"
+  },
+  "modelTransferRun": {
+    "id": 41187263608,
+    "conclusion": "success"
+  },
+  "localReleaseContracts": "23 tests passed; fixed byte/source validation, corruption and transfer permissions",
+  "finalLocalContracts": "30 passed, exit0: release, XPI byte/source validation, transfer permissions and repository migration",
+  "documentationCheck": "248 documents,1301 local links; schema21 and IPC permissions consistent"
+}

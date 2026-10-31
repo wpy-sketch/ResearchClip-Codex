@@ -1,0 +1,14 @@
+{
+  "result": "PASS",
+  "releasePageHttpStatus": 200,
+  "latestStable": "v5.1.0",
+  "tagCommit": "0bd5429c37fad8a3d99f69f3da562f397cfb5d8b",
+  "assetCount": 34,
+  "allAssetHashes": "artifacts/final-publication.json",
+  "oldRepositoryArchived": true,
+  "nativePublicComponents": [
+    "artifacts/connector-public-v510-r1/report.json",
+    "artifacts/managed-components-integration510-public-r1/report.json"
+  ],
+  "archivedSourceOriginalAssetDownload": "PASS; fixed legacy clipper541479B SHA-256 matched after repository archival"
+}

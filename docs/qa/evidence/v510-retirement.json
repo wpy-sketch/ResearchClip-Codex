@@ -1,0 +1,15 @@
+{
+  "result": "PASS",
+  "source": "wpy-sketch/ResearchClip",
+  "target": "wpy-sketch/ResearchClip-Codex",
+  "oldRepositoryArchived": true,
+  "sourceMainBeforeRetirement": "ec867a9d8004625380e3ac48cee0328f8b19f306",
+  "retirementCommit": "4018898aedbc120f13d79e7634f5160914101b31",
+  "preservedRetirementBranch": "archive/researchclip-retirement-20261031",
+  "originalReadmeSha256": "6e737340e48c1c64f3e98433e20de531f48f882f498fd9823d4743fc6669d24f",
+  "oldContentPreserved": true,
+  "deletedRepositories": false,
+  "releaseUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v5.1.0",
+  "sourceReferencesVerified": 49,
+  "historicalReleases": 47
+}

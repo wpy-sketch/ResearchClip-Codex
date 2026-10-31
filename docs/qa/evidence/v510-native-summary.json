@@ -198,6 +198,31 @@
       ],
       "rawReport": "artifacts/installer-v510-r1/report.json",
       "rawReportSha256": "eebd546d2feb2054c8ca8a5c65309979b3e95a8c8ee1a0fb745fc5fbcd41c0fb"
+    },
+    "publicManagedComponents": {
+      "result": "PASS",
+      "mode": "actual isolated Windows Tauri/WebView2, compiled production catalog, real HTTPS semantic model download, CPU image/text inference; offline uses failing process proxies; plugin download is separate from host installation",
+      "checks": [
+        "real upstream HTTPS transfer of all 8 fixed semantic files, exact hash verification and actual CPU text/image self-test yield READY without Python",
+        "configuration card focuses the existing settings module; actual native image encoder indexes the isolated PNG in SQLite",
+        "restart revalidates installed model; Chinese/English text query and image-vector retrieval succeed with network proxies deliberately unavailable",
+        "disable/enable changes actual native availability without deleting the screenshot or index",
+        "actual public GitHub HTTPS download installs only an opaque clipper ZIP; host remains uninstalled/disabled and cannot be enabled as Tauri code",
+        "center displays native service probes and routes the browser plugin directly to its actual installation/connection settings",
+        "uninstall removes only exact managed files; screenshot and vector index survive"
+      ],
+      "rawReport": "artifacts/managed-components-integration510-public-r1/report.json",
+      "rawReportSha256": "acfd3ca68a491487cf1e4bb71b71185cb9c878d13475dc1691a4ab49cb904ae4"
+    },
+    "publicConnector": {
+      "result": "PASS",
+      "mode": "actual current native Windows client, actual anonymous GitHub v5.1.0 XPI download, isolated package registry; no Zotero host install or grant automation",
+      "checks": [
+        "compiled exact v5.1.0 URL downloads actual public XPI via native HTTPS, validates size/SHA and commits isolated package registry",
+        "download completion is DOWNLOADED_HOST_INSTALL_REQUIRED, never a false Zotero installed/connected or AI READY claim"
+      ],
+      "rawReport": "artifacts/connector-public-v510-r1/report.json",
+      "rawReportSha256": "331b4c5ac5102bb4a2fc67ee4b66d4950aad945f469d52ee52fb300e9ce97b1b"
     }
   }
 }

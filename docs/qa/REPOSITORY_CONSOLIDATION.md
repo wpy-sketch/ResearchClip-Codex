@@ -27,3 +27,7 @@
 - Actions内置令牌在部分历史工作流对象的引用导入/Release创建受到GitHub403限制；核对历史工作流仅手动触发后，使用已有授权官方Git/CLI/API补齐，未新增Secret或放宽权限。CI本身最终任务显示失败，不能称全部CI绿色；实际本地最终回执PASS。
 - [历史归档](https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/researchclip-history-20261030)与原文件映射可公开获取。
 - 原仓库尚未归档；旧下载入口继续保留。GitHub星标、关注及社会关系不属于可合并的Git历史，保留在原仓库，不虚构已转移。
+
+## 2026-10-31最终状态
+
+v5.1.0正式公开且34附件匿名SHA与客户端公开下载复验通过后，旧ResearchClip已归档只读，原README内容在迁移横幅之后原样保留。归档前再次核验原49引用、47版说明/资产元数据及空问题/PR列表。迁移入口提交另存目标仓库`archive/researchclip-retirement-20261031`。见[归档回执](evidence/v510-retirement.json)与[实际发布](evidence/v510-publication.json)。初始plan与complete快照保留其当时未归档状态，后续状态由新回执补充，未改写历史证据。

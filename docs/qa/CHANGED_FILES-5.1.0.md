@@ -1,8 +1,9 @@
 # v5.1.0 修改文件
 
-本轮修复浏览器原生生命周期及地址草稿，复用设置、组件服务，交付四项真实组件并整合历史发布；SQLite仍为21，无新增迁移。详细架构、实际测试和人工范围见[最终报告](FINAL_RELEASE_REPORT.md)。
+本轮修复浏览器原生生命周期及地址草稿，复用设置和组件服务，交付四项真实组件，整合历史发布。SQLite仍21，无新增迁移。发布工程另补固定XPI字节复用、源文件严格校验与仅两项模型的受限CI传输；安装器与应用源码指纹不变。详细架构、测试及人工范围见[最终报告](FINAL_RELEASE_REPORT.md)。
 
 - `.gitattributes`
+- `.github/workflows/release.yml`
 - `README.md`
 - `browser-extension/LICENSE`
 - `browser-extension/README.md`
@@ -17,9 +18,11 @@
 - `docs/images/v510-bing-native.png`
 - `docs/images/v510-component-install.svg`
 - `docs/licenses/webview2-com-MIT.txt`
+- `docs/qa/CHANGED_FILES-5.1.0.md`
 - `docs/qa/FINAL_RELEASE_REPORT-5.0.2-CANDIDATE.md`
 - `docs/qa/FINAL_RELEASE_REPORT.md`
 - `docs/qa/REPOSITORY_CONSOLIDATION.md`
+- `docs/qa/XPI_REPRODUCIBILITY.md`
 - `docs/qa/evidence/consolidation-20261030/complete.json`
 - `docs/qa/evidence/consolidation-20261030/git-refs.json`
 - `docs/qa/evidence/consolidation-20261030/verify-0.json`
@@ -30,7 +33,12 @@
 - `docs/qa/evidence/consolidation-20261030/verify-5.json`
 - `docs/qa/evidence/consolidation-20261030/verify-6.json`
 - `docs/qa/evidence/consolidation-20261030/verify-7.json`
+- `docs/qa/evidence/v510-ci.json`
 - `docs/qa/evidence/v510-native-summary.json`
+- `docs/qa/evidence/v510-publication.json`
+- `docs/qa/evidence/v510-release-ready.json`
+- `docs/qa/evidence/v510-retirement.json`
+- `docs/qa/evidence/v510-web-check.json`
 - `docs/release/EXTENSION_GUIDE.md`
 - `docs/release/FEATURE_MATRIX.md`
 - `docs/release/INSTALLATION_GUIDE.md`
@@ -40,6 +48,7 @@
 - `package.json`
 - `scripts/browser-network-native-smoke.mjs`
 - `scripts/browser-production-profile-smoke.mjs`
+- `scripts/build-zotero-connector.py`
 - `scripts/build_clipper_component.py`
 - `scripts/build_manual_release.py`
 - `scripts/builtin-packages-native-smoke.mjs`
@@ -50,6 +59,10 @@
 - `scripts/release_gate.py`
 - `scripts/research-browser-native-smoke.mjs`
 - `scripts/test_manual_release.py`
+- `scripts/test_transfer_release_models.py`
+- `scripts/test_zotero_xpi_bytes.py`
+- `scripts/transfer_release_models.py`
+- `scripts/zotero_xpi_bytes.py`
 - `src-tauri/Cargo.lock`
 - `src-tauri/Cargo.toml`
 - `src-tauri/resources/package-builtin-v502.json`
