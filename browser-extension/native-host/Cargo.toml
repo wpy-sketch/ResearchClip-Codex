@@ -3,6 +3,7 @@ name = "researchclip-native-host"
 version = "1.0.2"
 edition = "2024"
 publish = false
+license = "MIT"
 [dependencies]
 researchclip-clipper-protocol = { path = "../protocol" }
 serde_json = "1"

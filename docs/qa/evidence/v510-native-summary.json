@@ -1,0 +1,173 @@
+{
+  "result": "PASS",
+  "scope": "actual local isolated Windows; UI foreground confirmation by user is identified separately; not independent-machine acceptance",
+  "suites": {
+    "bing": {
+      "result": "PASS",
+      "mode": "owned actual Windows ResearchClip native WebView2; isolated settings and browser profile, default TLS and no web-security bypass",
+      "checks": [
+        "typed Bing URL survives Tab, blur and native polling",
+        "configured default Bing homepage and typed search actually render; native redirect completes",
+        "real native DNS failure is visible, loading ends and requested address remains available for retry",
+        "homepage recovers after native navigation failure",
+        "homepage and search settings save through UI and affect the actual native browser"
+      ],
+      "rawReport": "artifacts/browser-network-integration510-r3/report.json",
+      "rawReportSha256": "4862ae491e62b577644e5e3c63a62249b15345590acb0121a00b145c10368ad1"
+    },
+    "browserBookmarks": {
+      "result": "PASS",
+      "mode": "actual Windows native parent_raw child window, isolated settings and WebView2 profiles; public example.com network test; no personal Chrome or Zotero",
+      "checks": [
+        "exact v5.0.1 compiled-model proof migrates on upgrade; unchanged real OCR weights pass actual CPU startup self-test",
+        "real child window creates while all main WebviewWindow IPC and Markdown draft remain usable",
+        "native input validation rejects file/IPC/loopback/script targets and out-of-window rectangles",
+        "public HTTPS example.com actually renders inside the owned browser WebView2",
+        "remote webview cannot invoke privileged library_status (capability denied or no exposed IPC bridge)",
+        "two actual public pages support back/forward and synchronize the authoritative native address",
+        "browser toolbar/native bounds stay valid at CSS scales75–200% and browser zoom150%; not physical mixed-DPI verification",
+        "return hides native child and restores existing workbench, then reopens the same page without discarding history",
+        "real settings IPC atomically saves two bookmarks, orders and edits them without rebinding global shortcuts; native browser hides behind modal",
+        "duplicate/unsafe form input and direct malformed native settings updates preserve existing bookmarks exactly",
+        "Google entry is in the left primary navigation; choosing another section hides the native browser and restores usable settings",
+        "bookmark removal requires confirmation, cancellation keeps the entry, confirmed removal touches only the selected shortcut",
+        "real application restart keeps edited/reordered bookmarks in settings, opens no browser automatically, and saved one-click navigation still works"
+      ],
+      "rawReport": "artifacts/research-browser-integration510-r1/report.json",
+      "rawReportSha256": "47e9e1730f1657243feb359ccd8eff44c38ec9c4ef6f5aad674aa6fff441819d"
+    },
+    "managedComponents": {
+      "result": "PASS",
+      "mode": "actual isolated Windows Tauri/WebView2, compiled production catalog, real HTTPS semantic model download, CPU image/text inference; offline uses failing process proxies; plugin download is separate from host installation",
+      "checks": [
+        "real upstream HTTPS transfer of all 8 fixed semantic files, exact hash verification and actual CPU text/image self-test yield READY without Python",
+        "configuration card focuses the existing settings module; actual native image encoder indexes the isolated PNG in SQLite",
+        "restart revalidates installed model; Chinese/English text query and image-vector retrieval succeed with network proxies deliberately unavailable",
+        "disable/enable changes actual native availability without deleting the screenshot or index",
+        "explicit exact-SHA prepared package cache installs only an opaque clipper ZIP; host remains uninstalled/disabled and cannot be enabled as Tauri code",
+        "center displays native service probes and routes the browser plugin directly to its actual installation/connection settings",
+        "uninstall removes only exact managed files; screenshot and vector index survive"
+      ],
+      "rawReport": "artifacts/managed-components-integration510-r2/report.json",
+      "rawReportSha256": "1a4c4e8379f6f4dc03ae99218c83844dc4606c06b94f9ae2125d320d2f1ec66f"
+    },
+    "ocr": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2/Rust with compiled production manifest, real CPU OCR and isolated research data; no keys",
+      "checks": [
+        "production compiled manifest exposes reviewed OCR/semantic/clipper/Connector, requires no key files, disables auto-updater and rejects arbitrary IPC download URLs",
+        "actual upstream HTTPS transfer installs fixed OCR weights/dictionary through UI confirmation and native CPU inference; no signed catalog or key required",
+        "restart revalidates the exact compiled manifest and file hashes; installed OCR remains ready under a deliberately failing HTTP proxy",
+        "real OCR still runs offline, persists through existing SQLite/FTS and inserts recognized text into Markdown",
+        "enable/disable/uninstall preserve screenshots, OCR records and research database"
+      ],
+      "rawReport": "artifacts/builtin-packages-native-integration510-r1/report.json",
+      "rawReportSha256": "f7ec54006ad4a084fa2593552cfd9ce3dd873a0b8c74074beb21f30721efad15"
+    },
+    "markdown": {
+      "result": "PASS",
+      "mode": "actual Windows WebView2; new isolated v11 database; generated PNG, not physical screenshot; no Zotero/Agent access",
+      "checks": [
+        "native table editor changes one cell/alignment and saves exact surrounding CRLF mixed document; undo/save restores original byte-for-byte",
+        "native Ctrl+Shift+T grid insertion, cell Tab and escaped pipe save as ordinary GFM with original document prefix unchanged",
+        "native image alt/title and whole-group copy/move/delete keep relative URL and both captions; scoped undo restores each operation",
+        "native language selection changes only fence info; real highlighted code, view-only line numbers/folding and actual system clipboard hash match source without executing HTML",
+        "controlled WebView File drop reaches actual Rust decode/SQLite/import/render/save and creates a persistent relative PNG plus editable annotation area; switching the active owned tab during import keeps the second document unchanged and releases the first; OS OLE drop is a separate locked-desktop blocker",
+        "legacy alt and visible title preserve private version1; copied image/caption has a unique managed name, same screenshot association, exact PNG bytes and existing undo/redo",
+        "actual process restart restores source/table/code and legacy image data; source PNG hashes and dynamic no-document layout remain intact"
+      ],
+      "rawReport": "artifacts/markdown-content-native-integration510-r1/report.json",
+      "rawReportSha256": "8e485e365642600f5fe8514bfca414803f30a680e31eefb4c5e20bcaf61b4894"
+    },
+    "pdfExcerpt": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2 PDF.js rendering and native SQLite/files, generated calibration PDF; CDP DPR/CSS are simulations, not physical DPI or screen-capture acceptance; render-only scope excludes native file picker and persisted Markdown reopening",
+      "checks": [
+        "local generated PDF opens in the real native viewer with no empty Markdown panel and unchanged source hash",
+        "actual local CitationChooser selects a stable literature ID; screenshot provenance and existing reference association persist without inventing DOI or verified metadata",
+        "actual PDF.js crops across multiple pages, zoom50/100/150/200%, rotations0/90/180/270, DPI144/216/288, CSS80/125% and emulatedDPR1/2 map canonical rectangles and match four independent source colors without capturing UI",
+        "malformed raw capture IPC is rejected without adding a native screenshot/provenance record",
+        "a real valid native PDF grant reads successfully, refuses a different attachment, and after close cannot save a correctly formed excerpt; no new image or pending intent appears",
+        "implemented PDF commands prepare only the persisted stable location and source notes contain a stable local-literature link",
+        "without an open Markdown, insertion asks explicitly before creating a source draft with image above editable note and stable PDF-location backlink",
+        "existing native image annotation tool edits and saves vectors on the excerpt while original cropped PNG bytes and PDF provenance remain immutable",
+        "two saved crops insert at the retained active Markdown caret in capture order; surrounding text stays intact and relative-image paragraphs include editable source notes",
+        "actual native pointer drag moves the entire image/note/backlink group; one-step undo and redo restore exact Markdown",
+        "closing an unsaved excerpt Markdown asks for confirmation and cancellation retains the complete draft"
+      ],
+      "rawReport": "artifacts/pdf-excerpts-integration510-r1/report.json",
+      "rawReportSha256": "025d4b2eef8c0b19c569ee1099f4b24617b9ce3a9a076431ebd92b9cf48bd45b",
+      "unverified": [
+        "Native file picker save/reopen not executed: Windows desktop input unavailable",
+        "Physical multi-monitor DPI",
+        "Full installed production app/upgrade"
+      ]
+    },
+    "zotero": {
+      "result": "PASS",
+      "mode": "actual current native app, real Zotero10.0.6 previously isolated profile at32132; read-only HTTP, no write grant or database/PDF modification",
+      "checks": [
+        "current app reads real isolated Zotero source and confirms library0/item9NVC56GE/attachmentPDPNDY9P using official local API",
+        "real existing standard note/highlight/ink load into current native viewer, including the original settled highlight, without duplicate creation",
+        "original Zotero PDF SHA-256 remains unchanged; no Zotero SQLite access and no write authorization requested"
+      ],
+      "rawReport": "artifacts/zotero-live-read-integration510-r1/report.json",
+      "rawReportSha256": "58a49eb798428738569b377570992934f885e5f7ea536b5d43b4eeb175242f5f"
+    },
+    "clipperHost": {
+      "result": "PASS",
+      "mode": "actual Windows Native Messaging Host stdin/stdout -> authenticated local IPC -> actual Tauri/WebView2/SQLite/files; no browser activeTab claim",
+      "checks": [
+        "real independent host handles desktop-not-running and rejects a different extension origin with binary UTF-8 framing",
+        "desktop connection is opt-in, actual host ping succeeds, and forged local IPC token is rejected",
+        "actual extracted article persists in chosen project; duplicate request returns same document and changed payload under same ID is rejected",
+        "saved article opens in existing Markdown split with source/code intact, local HTML inert, and explicit missing-asset source status",
+        "real PNG bytes are validated and copied to managed relative assets; standard UTF-8 Markdown and independent disk reads match with original PNG hash unchanged",
+        "multi-tab clipping keeps the original unsaved draft, close Cancel preserves it, explicit discard closes only that session, and image notes save through the original Markdown service",
+        "stop releases endpoint; actual process restart retains clips/project grouping/edited Markdown and requires explicit re-enable"
+      ],
+      "rawReport": "artifacts/clipper-native-integration510-r4/report.json",
+      "rawReportSha256": "0f84aa825b50ea3a1d01feec66d7eab64cd09b4f98d362ffb8d67d4968831db0"
+    },
+    "guide": {
+      "result": "PASS",
+      "mode": "local isolated headless Edge renderer; no native capture, user database, credential or clipboard claims",
+      "checks": [
+        "38 chapters and nested subsections mount; absent Markdown document has no split",
+        "rendered guide introduction describes current5.1.0 and the actually published Connector, without obsolete unreleased text",
+        "third-level step navigation scrolls and keyboard-focuses the actual matching H4, active location follows",
+        "collapse all removes children and active step falls back to visible parent",
+        "nested search retains ancestors, reports no results and clear restores navigation",
+        "287 examples across all 38 chapters, example-only search, actual heading jump and directory mode restoration",
+        "all 79 whitelisted offline guide images actually decode",
+        "whitelisted local guide image opens with Enter and closes with Escape",
+        "dark: guide and directory contained at seven widths 480–1440",
+        "light: guide and directory contained at seven widths 480–1440",
+        "guide navigation/unmount and remount preserves independent Markdown draft; cancel/discard closes split correctly",
+        "600px-high window keeps bottom help reachable and sidebar scroll reaches settings",
+        "both themes: selected base fonts 12/16/20 genuinely resize guide text; 480/760/1440 widths at 600px height retain contained directory/content",
+        "CSS content-scale simulation 75/100/125/150/200 percent remains contained at 1440px; this is not physical Windows DPI or OS magnifier verification",
+        "three dock panes remain inside viewport at CSS scales75–200%, pointer split drag works at125%, and independent Markdown undo survives scaling"
+      ],
+      "rawReport": "artifacts/guide-reader-integration510-r3/report.json",
+      "rawReportSha256": "3f20f8345f898e2f47e50aa11971de4c3c9cbcdfc2ce5b2b6dd273bfe66acd4e"
+    },
+    "naturalProfiles": {
+      "result": "PASS",
+      "mode": "actual optimized Windows release, dedicated owned QA identifier, natural separate WebView environments, main CDP only; native visual observation is separate",
+      "checks": [
+        "native optimized release completes Bing navigation with actual title and no load error, using natural independent profiles",
+        "natural main EBWebView and separate remote browser data directories exist",
+        "actual release restart persists settings and opens saved homepage only on explicit browser entry"
+      ],
+      "rawReport": "artifacts/browser-production-profile-manual-r4/report.json",
+      "rawReportSha256": "082c75192488de931dd1a44bb7a8e1576ec3e3b1af96823528f1c3945c1448b1",
+      "visualObservation": {
+        "result": "PASS",
+        "mode": "user actual Windows screen confirmation",
+        "observation": "User confirmed Bing page and search box visible in the explicitly selected optimized QA window",
+        "questionItemId": "call_12d2b7e5b7ac49e99531bec307743af9"
+      }
+    }
+  }
+}

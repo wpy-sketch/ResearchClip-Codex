@@ -1,0 +1,3 @@
+import {describe,it,expect} from 'vitest';
+import {configurationSection} from './configuration';
+describe('component configuration destinations',()=>{it('opens the actual module, including unknown fallback',()=>{for(const [id,target] of [['model.semantic','semantic-settings-title'],['plugin.browser-clipper','clipper-title'],['model.latex','math-ocr-settings-title'],['runtime.python','math-ocr-settings-title'],['plugin.zotero-connector','zotero-setup-title'],['model.qwen','ai-settings-title'],['capture.region','shortcut-title'],['unknown','feature-packages-title']])expect(configurationSection(id)).toBe(target);});});

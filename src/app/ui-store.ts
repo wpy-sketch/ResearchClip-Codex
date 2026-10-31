@@ -6,6 +6,8 @@ export type ViewMode = 'grid' | 'list';
 
 /** UI only. No persistence middleware, localStorage, file writes or database calls. */
 interface UiState {
+  settingsTarget:string|null;
+  openSettings:(target:string)=>void;
   activeView: NavigationView;
   navigationSerial:number;
   browserReturnView:NavigationView;
@@ -33,7 +35,7 @@ interface UiState {
 }
 
 export const useUiStore = create<UiState>((set) => ({
-  guideChapter:null,navigationSerial:0,browserReturnView:'screenshots',closeBrowser:()=>set(state=>({activeView:state.browserReturnView==='browser'?'screenshots':state.browserReturnView,navigationSerial:state.navigationSerial+1})),activeView: 'screenshots', theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, showWelcome: true,
+  settingsTarget:null,openSettings:(target)=>set(state=>({settingsTarget:target,activeView:'settings',overlay:null,navigationSerial:state.navigationSerial+1})),guideChapter:null,navigationSerial:0,browserReturnView:'screenshots',closeBrowser:()=>set(state=>({activeView:state.browserReturnView==='browser'?'screenshots':state.browserReturnView,navigationSerial:state.navigationSerial+1})),activeView: 'screenshots', theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, showWelcome: true,
   overlay: null, searchQuery: '', windowThemeError: null,
   navigate: (activeView) => set(state=>({ activeView, browserReturnView:activeView==='browser'&&state.activeView!=='browser'?state.activeView:state.browserReturnView,overlay: null,navigationSerial:state.navigationSerial+1 })),
   setTheme: (theme) => set({ theme }),

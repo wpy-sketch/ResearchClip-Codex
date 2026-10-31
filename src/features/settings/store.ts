@@ -18,7 +18,7 @@ interface SettingsState {
 }
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   snapshot: { preferences: defaults, registeredShortcut: null, shortcutError: null, registeredFullscreenShortcut: null, fullscreenShortcutError: null, storageError: null,directoryError:null }, phase: 'idle', initialized: false, error: null,
-  refresh:async()=>{if(!isTauri()||get().phase!=='idle')return;set({phase:'loading'});try{const snapshot=await getPreferences();apply(snapshot);set({snapshot,phase:'idle'});}catch(error){set({phase:'idle',error:errorMessage(error,'设置状态读取失败。')});}},
+  refresh:async()=>{if(!isTauri()||get().phase!=='idle')return;set({phase:'loading'});try{const snapshot=await getPreferences();apply(snapshot);set({snapshot,phase:'idle',error:null});}catch(error){set({phase:'idle',error:errorMessage(error,'设置状态读取失败。')});}},
   initialize: async () => {
     if (get().initialized || get().phase !== 'idle') return;
     if (!isTauri()) { set({ initialized: true }); return; }

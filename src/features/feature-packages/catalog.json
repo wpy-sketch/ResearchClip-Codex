@@ -445,8 +445,8 @@
       "browser-extension/manifest.json",
       "browser-extension/src/popup.ts"
     ],
-    "verificationNote": "需要手动安装和Native Messaging配置；本机桥不能检测浏览器安装状态。",
-    "version": "1.0.2",
+    "verificationNote": "MIT许可及第三方通知随1.0.3包提供，保留协议1和已验证1.0.2 Host；浏览器安装与连接需在目标软件中完成。",
+    "version": "1.0.3",
     "control": null
   },
   {
@@ -584,7 +584,7 @@
     "sourceFiles": [
       "semantic-search/models.json"
     ],
-    "verificationNote": "固定模型清单，SHA在任务时校验。",
+    "verificationNote": "固定8文件配对，MIT与Apache-2.0许可，原生CPU文本/图像实际自检成功才READY。",
     "version": "clip-b32-multilingual-int8-v1",
     "control": null
   },

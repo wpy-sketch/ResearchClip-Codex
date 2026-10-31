@@ -13,7 +13,7 @@
       "licenseUrl": "https://huggingface.co/SWHL/RapidOCR/blob/1cfba2e90fc938db55889873735088de210cc173/README.md",
       "source": "https://huggingface.co/SWHL/RapidOCR",
       "kind": "MODEL_PACKAGE",
-      "appVersion": "=5.0.2",
+      "appVersion": "=5.1.0",
       "platforms": [
         "windows-x86_64"
       ],
@@ -46,7 +46,7 @@
       "licenseUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/blob/v5.0.0/zotero-connector/LICENSE",
       "source": "https://github.com/wpy-sketch/ResearchClip-Codex",
       "kind": "EXTERNAL_PLUGIN",
-      "appVersion": "=5.0.2",
+      "appVersion": "=5.1.0",
       "platforms": [
         "windows-x86_64"
       ],
@@ -55,9 +55,110 @@
       "files": [
         {
           "path": "ResearchClip-Zotero-Connector-v1.0.1.xpi",
-          "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.2/ResearchClip-Zotero-Connector-v1.0.1.xpi",
+          "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.1.0/ResearchClip-Zotero-Connector-v1.0.1.xpi",
           "size": 10503,
           "sha256": "1f98896eeef54ead00c5405d2460578d3269d82a5a011038779c9a9e2973fdc2",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "model.semantic",
+      "name": "中英文图文语义检索",
+      "description": "固定配对的CLIP图像编码与多语言文本编码；原生ONNX CPU推理，无需Python，结果需人工核对。",
+      "version": "1.0.0",
+      "publisher": "ResearchClip / OpenAI / Xenova / Sentence Transformers",
+      "license": "MIT AND Apache-2.0",
+      "licenseUrl": "https://huggingface.co/Xenova/clip-vit-base-patch32",
+      "source": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1",
+      "kind": "MODEL_PACKAGE",
+      "appVersion": "=5.1.0",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "dependencies": [],
+      "adapter": "semantic",
+      "files": [
+        {
+          "path": "text.onnx",
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/onnx/model_quint8_avx2.onnx",
+          "size": 135377779,
+          "sha256": "fbc8fbeaa5237d96bd1bf430057c70d34de8334a463e933a5faa305f6caeed9c",
+          "entries": []
+        },
+        {
+          "path": "tokenizer.json",
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/tokenizer.json",
+          "size": 1961847,
+          "sha256": "5b4e1a8171c81dfd666ae40265b9530c6e0b3d53923fe8ac493dcc84229adf81",
+          "entries": []
+        },
+        {
+          "path": "dense.safetensors",
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/2_Dense/model.safetensors",
+          "size": 1572984,
+          "sha256": "d12568dc7300970a4d3dbb49068ad16cd89b99840b74b026f8e48071e9414f74",
+          "entries": []
+        },
+        {
+          "path": "pooling.json",
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/1_Pooling/config.json",
+          "size": 190,
+          "sha256": "a37f83ada23e7887be6b88f4998927dbeac0038af301553c7cd5461413bf1a56",
+          "entries": []
+        },
+        {
+          "path": "dense.json",
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/2_Dense/config.json",
+          "size": 115,
+          "sha256": "48f4dfaf605a6c2869cd200970e54911c6c15053781d2bdcf3e81e89e77662ed",
+          "entries": []
+        },
+        {
+          "path": "sentence.json",
+          "url": "https://huggingface.co/sentence-transformers/clip-ViT-B-32-multilingual-v1/resolve/58edf8cada9e398793dca955574a48cbb7f18be2/sentence_bert_config.json",
+          "size": 53,
+          "sha256": "70f4448f31320443fe3557cacea5abf2dcc4915dda8c80646bec9f3bb0aa5a1f",
+          "entries": []
+        },
+        {
+          "path": "vision.onnx",
+          "url": "https://huggingface.co/Xenova/clip-vit-base-patch32/resolve/d15189d7028b43f1d3e65039190477f6af591c2a/onnx/vision_model_quantized.onnx",
+          "size": 89117001,
+          "sha256": "583fd1110a514667812fee7d684952aaf82a99b959760c8d7dca7e0ab9839299",
+          "entries": []
+        },
+        {
+          "path": "preprocessor.json",
+          "url": "https://huggingface.co/Xenova/clip-vit-base-patch32/resolve/d15189d7028b43f1d3e65039190477f6af591c2a/preprocessor_config.json",
+          "size": 520,
+          "sha256": "6f638fb9401a6d6296feff533ee7efe657b787c49f954f82f5906b36ef2a1b1f",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "plugin.browser-clipper",
+      "name": "ResearchClip网页剪藏扩展与Host",
+      "description": "Chrome/Edge MV3网页剪藏包；下载后由用户按浏览器机制安装并注册固定Host。本中心不执行注册脚本。",
+      "version": "1.0.3",
+      "publisher": "ResearchClip contributors",
+      "license": "MIT; third-party notices retained",
+      "licenseUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/blob/v5.1.0/browser-extension/LICENSE",
+      "source": "https://github.com/wpy-sketch/ResearchClip-Codex",
+      "kind": "EXTERNAL_PLUGIN",
+      "appVersion": "=5.1.0",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "dependencies": [],
+      "adapter": "external",
+      "files": [
+        {
+          "path": "ResearchClip-WebClipper-v1.0.3-windows-x64.zip",
+          "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.1.0/ResearchClip-WebClipper-v1.0.3-windows-x64.zip",
+          "size": 1306631,
+          "sha256": "1aa42aa289703471f20d0d1c69d5ff8721080e01f7e5915e774b6fd2e23ee29e",
           "entries": []
         }
       ]

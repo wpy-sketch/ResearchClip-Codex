@@ -1,4 +1,4 @@
-> **当前构建v5.0.2**：最左侧Google浏览器入口、应用内网页与本地一键书签；38章指南按章节显示，提供六条常用阅读路线。无新增依赖及SQLite迁移。5.0.0草稿保留，5.0.2实际发布状态、资产与未验收项见[最终报告](docs/qa/FINAL_RELEASE_REPORT.md)。仍使用固定编译组件清单和手动升级，无需配置Catalog/Updater密钥，不开发IDE。
+> **当前构建v5.1.0**：修复浏览器地址草稿被轮询覆盖，默认必应并支持自定义首页和搜索引擎；扩展中心直达实际设置、核对本机状态，增加原生CPU图文语义模型和MIT网页剪藏组件。实际Release与下载以[最终报告](docs/qa/FINAL_RELEASE_REPORT.md)为准。唯一维护仓库为[ResearchClip-Codex](https://github.com/wpy-sketch/ResearchClip-Codex)，历史版本与附件去重迁入本仓库，完整性确认后旧ResearchClip归档。
 
 > **v4.2.7 · Zotero标准批注双向同步**：本地持久待处理、六种同步状态、条件写入、三方冲突比较与独立处理历史。自动刷新只读且默认关闭。指南33章。[本版说明](docs/RELEASE-NOTES-4.2.7.md) · [实际验收](docs/qa/RELEASE-4.2.7.md)。
 
@@ -13,9 +13,9 @@
 
 # 使用Codex进行构建
 
-面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v5.0.2 Windows；实际origin为ResearchClip-Codex，历史ResearchClip仓库的发布回执保留为历史记录。当前仓库的实际Tag、Release和下载结果以最终报告为准**。
+面向科研人员的本地桌面截图、图片标注与 Markdown 知识管理工具。**当前构建：v5.1.0 Windows；实际origin为ResearchClip-Codex，历史ResearchClip仓库的发布回执保留为历史记录。当前仓库的实际Tag、Release和下载结果以最终报告为准**。
 
-[v4.2.0正式回执](docs/qa/PUBLICATION-4.2.0.md) · [v4.2.0变更](docs/RELEASE-NOTES-4.2.0.md) · [Step11验收](docs/qa/ZOTERO_PDF_STEP11.md) · [GitHub发布版本](https://github.com/wpy-sketch/ResearchClip/releases/latest) · [v4.1.9正式回执](docs/qa/PUBLICATION-4.1.9.md) · [v4.1.8正式回执](docs/qa/PUBLICATION-4.1.8.md) · [v4.1.8发布检查](docs/qa/RELEASE-4.1.8.md) · [v4.1.7正式回执](docs/qa/PUBLICATION-4.1.7.md) · [v4.1.7发布检查](docs/qa/RELEASE-4.1.7.md) · [v4.1.7配套与历史附件](docs/RELEASE-COMPONENTS.md) · [v3.1.2发布传输状态](docs/qa/DELIVERY-3.1.2.md) · [完整图文使用指南](docs/USER_GUIDE.md) · [网页剪藏安装](browser-extension/README.md) · [v1.0.2实际验收](docs/qa/RELEASE-1.0.2.md) · [v1.0.2发布回执](docs/qa/PUBLICATION-1.0.2.md)
+[v4.2.0正式回执](docs/qa/PUBLICATION-4.2.0.md) · [v4.2.0变更](docs/RELEASE-NOTES-4.2.0.md) · [Step11验收](docs/qa/ZOTERO_PDF_STEP11.md) · [GitHub发布版本](https://github.com/wpy-sketch/ResearchClip-Codex/releases/latest) · [v4.1.9正式回执](docs/qa/PUBLICATION-4.1.9.md) · [v4.1.8正式回执](docs/qa/PUBLICATION-4.1.8.md) · [v4.1.8发布检查](docs/qa/RELEASE-4.1.8.md) · [v4.1.7正式回执](docs/qa/PUBLICATION-4.1.7.md) · [v4.1.7发布检查](docs/qa/RELEASE-4.1.7.md) · [v4.1.7配套与历史附件](docs/RELEASE-COMPONENTS.md) · [v3.1.2发布传输状态](docs/qa/DELIVERY-3.1.2.md) · [完整图文使用指南](docs/USER_GUIDE.md) · [网页剪藏安装](browser-extension/README.md) · [v1.0.2实际验收](docs/qa/RELEASE-1.0.2.md) · [v1.0.2发布回执](docs/qa/PUBLICATION-1.0.2.md)
 
 v3.1.2 新增 **本地相似图片检索**：主动生成原图特征索引，SHA完全重复组、可调整pHash/颜色距离与双图人工比较，不自动删除。可选Qwen3.5 4B随完整离线分卷包提供；轻量NSIS不含数GB模型。模型可能出错或截断，只作辅助。[算法与离线包](docs/SIMILARITY.md) · [本版变更](docs/RELEASE-NOTES-3.1.2.md) · [实际验收](docs/qa/RELEASE-3.1.2.md)。
 

@@ -31,7 +31,7 @@ class ManualReleaseTests(unittest.TestCase):
             (out/'zotero-updates.json').write_text(json.dumps(update_manifest({'version':x['version'],'pluginId':'researchclip-connector@wpy-sketch.github.io','sha256':a['sha256']},repo,tag)),encoding='utf-8')
             policy={'schemaVersion':1,'mode':gate.MANUAL_MODE,'updater':'DISABLED_MANUAL_DOWNLOAD','catalog':'EXACT_COMPILED_MANIFEST','signingKeysRequired':False}
             (out/'delivery.json').write_text(json.dumps(policy),encoding='utf-8')
-            for name in [f'ResearchClip_{v}_x64-setup.exe','catalog.json','delivery.json','compatibility.json','zotero-updates.json','COMPONENT-SOURCES.txt','OCR-LICENSE-APACHE-2.0.txt']:files[name]={'name':name,'size':1,'sha256':'unit'}
+            for name in [f'ResearchClip_{v}_x64-setup.exe','catalog.json','delivery.json','compatibility.json','zotero-updates.json','COMPONENT-SOURCES.txt','OCR-LICENSE-APACHE-2.0.txt','SEMANTIC-APACHE-2.0.txt','SEMANTIC-CLIP-MIT.txt','SEMANTIC-NOTICE.txt','CLIPPER-LICENSE-MIT.txt','HISTORY-INDEX.json','USER-GUIDE.zip','INSTALLATION_GUIDE.md','EXTENSION_GUIDE.md','RELEASE_NOTES.md']:files[name]={'name':name,'size':1,'sha256':'unit'}
             metadata={'deliveryMode':gate.MANUAL_MODE,'version':v,'tag':tag,'repository':repo,'files':list(files.values())};gate.validate_asset_links(out,metadata)
             metadata['files'].append({'name':'latest.json','size':1,'sha256':'unit'})
             with self.assertRaises(ValueError):gate.validate_asset_links(out,metadata)

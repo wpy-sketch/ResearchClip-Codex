@@ -1,0 +1,248 @@
+{
+  "result": "PASS",
+  "plan": "0d225c5dd0290b8b90c4bfbad7868327b91edb829c9dc708037429e00ca2f350",
+  "source": "wpy-sketch/ResearchClip",
+  "target": "wpy-sketch/ResearchClip-Codex",
+  "archiveUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/researchclip-history-20261030",
+  "uniqueAssets": 543,
+  "uniqueBytes": 8418324333,
+  "originalReferences": 4738,
+  "releases": [
+    {
+      "tag": "v0.1.0-rc.1",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.0-rc.1",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.1.0-rc.2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.0-rc.2",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.1.1",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.1",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.1.2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.2",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.1.3",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.3",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.1.4",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.4",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.1.5",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.5",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.1.8",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.1.8",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.2.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.2.0",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v0.2.1",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v0.2.1",
+      "sourceAssets": 3
+    },
+    {
+      "tag": "v1.0.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v1.0.0",
+      "sourceAssets": 4
+    },
+    {
+      "tag": "v1.0.1",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v1.0.1",
+      "sourceAssets": 4
+    },
+    {
+      "tag": "v1.0.2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v1.0.2",
+      "sourceAssets": 5
+    },
+    {
+      "tag": "v1.0.3",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v1.0.3",
+      "sourceAssets": 5
+    },
+    {
+      "tag": "v1.0.4",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v1.0.4",
+      "sourceAssets": 6
+    },
+    {
+      "tag": "v1.0.5",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v1.0.5",
+      "sourceAssets": 6
+    },
+    {
+      "tag": "v2.0.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v2.0.0",
+      "sourceAssets": 6
+    },
+    {
+      "tag": "v3.0.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.0.0",
+      "sourceAssets": 6
+    },
+    {
+      "tag": "v3.0.1",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.0.1",
+      "sourceAssets": 6
+    },
+    {
+      "tag": "v3.1.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.0",
+      "sourceAssets": 6
+    },
+    {
+      "tag": "v3.1.2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.2",
+      "sourceAssets": 66
+    },
+    {
+      "tag": "v3.1.3",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.3",
+      "sourceAssets": 8
+    },
+    {
+      "tag": "v3.1.4",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.4",
+      "sourceAssets": 4
+    },
+    {
+      "tag": "v3.1.5",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.5",
+      "sourceAssets": 4
+    },
+    {
+      "tag": "v3.1.6",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.6",
+      "sourceAssets": 10
+    },
+    {
+      "tag": "v3.1.7",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.7",
+      "sourceAssets": 10
+    },
+    {
+      "tag": "v3.1.8",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.8",
+      "sourceAssets": 10
+    },
+    {
+      "tag": "v3.1.9",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v3.1.9",
+      "sourceAssets": 10
+    },
+    {
+      "tag": "v4.0.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.0.0",
+      "sourceAssets": 10
+    },
+    {
+      "tag": "v4.1.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.0",
+      "sourceAssets": 5
+    },
+    {
+      "tag": "v4.1.1",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.1",
+      "sourceAssets": 5
+    },
+    {
+      "tag": "v4.1.2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.2",
+      "sourceAssets": 237
+    },
+    {
+      "tag": "v4.1.3",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.3",
+      "sourceAssets": 243
+    },
+    {
+      "tag": "v4.1.4",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.4",
+      "sourceAssets": 249
+    },
+    {
+      "tag": "v4.1.5",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.5",
+      "sourceAssets": 255
+    },
+    {
+      "tag": "v4.1.6",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.6",
+      "sourceAssets": 261
+    },
+    {
+      "tag": "v4.1.7",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.7",
+      "sourceAssets": 267
+    },
+    {
+      "tag": "v4.1.8",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.8",
+      "sourceAssets": 273
+    },
+    {
+      "tag": "v4.1.9",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.1.9",
+      "sourceAssets": 279
+    },
+    {
+      "tag": "v4.2.0",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.0",
+      "sourceAssets": 285
+    },
+    {
+      "tag": "v4.2.1",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.1",
+      "sourceAssets": 291
+    },
+    {
+      "tag": "v4.2.2",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.2",
+      "sourceAssets": 297
+    },
+    {
+      "tag": "v4.2.3",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.3",
+      "sourceAssets": 303
+    },
+    {
+      "tag": "v4.2.4",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.4",
+      "sourceAssets": 309
+    },
+    {
+      "tag": "v4.2.5",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.5",
+      "sourceAssets": 315
+    },
+    {
+      "tag": "v4.2.6",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.6",
+      "sourceAssets": 321
+    },
+    {
+      "tag": "v4.2.7",
+      "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v4.2.7",
+      "sourceAssets": 327
+    }
+  ],
+  "oldRepositoryArchived": false
+}

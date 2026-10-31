@@ -352,8 +352,11 @@ def finalize(client, plan, identity, receipts, output):
     migrated = []
     for row in plan['releases']:
         ref = client.request(API + '/commits/' + urllib.parse.quote(row['tag'], safe=''))
-        source = client.request('https://api.github.com/repos/' + SOURCE + '/commits/' + urllib.parse.quote(row['tag'], safe=''))
-        assert ref['sha'] == source['sha']
+        # Identical Git object IDs preserve the original tag and its resolved commit.
+        # Verify against the audited source reference rather than refetching mutable source API state.
+        pinned = next(r['sha'] for r in plan['sourceRefs'] if r['name'] == 'refs/tags/' + row['tag'])
+        target_ref = client.request(API + '/git/ref/tags/' + urllib.parse.quote(row['tag'], safe=''))
+        assert target_ref['object']['sha'] == pinned
         table = '\n'.join('| [' + a['name'] + '](' + base + urllib.parse.quote(indexed[a['sha256']]['targetName']) + ') | ' + (indexed[a['sha256']]['member'] or '直接下载') + ' | ' + a['sha256'] + ' |' for a in row['assets'])
         intro = '历史版本，原发布日期：' + (row['publishedAt'] or '未提供') + '。附件已迁入本仓库去重归档；ZIP卷内文件名及摘要见下表。当前安装版请使用Latest Release。\n\n原发布页：' + row['sourceUrl'] + '\n\n'
         body = intro + row['body'] + '\n\n## 本仓库历史附件目录\n\n| 原文件名 / 下载 | ZIP内文件名 | 原SHA-256 |\n| --- | --- | --- |\n' + table + '\n\nPlan-SHA256: ' + identity

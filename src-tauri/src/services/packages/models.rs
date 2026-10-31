@@ -21,7 +21,10 @@ impl ModelManager {
                 super::ocr_model::self_test(root)?;
                 Ok("READY".into())
             }
-            "semantic" => Err("视觉ONNX权重许可未核实，未开放托管安装或标记就绪。".into()),
+            "semantic" => {
+                super::semantic_model::self_test(root)?;
+                Ok("READY".into())
+            }
             "math" => Err("公式权重许可及可信原生适配尚未交付；不将下载完成标成就绪。".into()),
             _ => Err("未提供该模型的编译适配器。".into()),
         }

@@ -1,10 +1,10 @@
 import { invoke } from '@tauri-apps/api/core';
 import {parseWorkflows,type WorkflowConfig} from '../../features/commands/model';
-import {parseBookmarks,type BrowserBookmark} from '../../features/workspace/bookmarks';
-export interface Preferences { schemaVersion: 1; theme: 'dark' | 'light'|'system'; viewMode: 'grid' | 'list'; fontFamily: 'system' | 'sans' | 'serif'; fontSize: number; captureShortcut: string; fullscreenShortcut: string; saveDirectory: string | null; annotationColor:string;annotationWidth:number;closeToTray:boolean;markdownSplitPercent:number;workflows:WorkflowConfig[];browserBookmarks:BrowserBookmark[] }
+import {normalizeBookmark,parseBookmarks,type BrowserBookmark} from '../../features/workspace/bookmarks';
+export interface Preferences { schemaVersion: 1; theme: 'dark' | 'light'|'system'; viewMode: 'grid' | 'list'; fontFamily: 'system' | 'sans' | 'serif'; fontSize: number; captureShortcut: string; fullscreenShortcut: string; saveDirectory: string | null; annotationColor:string;annotationWidth:number;closeToTray:boolean;markdownSplitPercent:number;workflows:WorkflowConfig[];browserBookmarks:BrowserBookmark[];browserHomeUrl:string;browserSearchEngine:'bing'|'google' }
 export interface SettingsSnapshot { preferences: Preferences; registeredShortcut: string | null; shortcutError: string | null; registeredFullscreenShortcut: string | null; fullscreenShortcutError: string | null; storageError: string | null;directoryError:string|null }
-export type PreferencesPatch = Partial<Pick<Preferences, 'theme' | 'viewMode' | 'fontFamily' | 'fontSize' | 'captureShortcut' | 'fullscreenShortcut'|'annotationColor'|'annotationWidth'|'closeToTray'|'markdownSplitPercent'|'workflows'|'browserBookmarks'>>;
-export const defaults: Preferences = { schemaVersion: 1, theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, captureShortcut: 'Ctrl+Shift+2', fullscreenShortcut: 'Ctrl+Shift+1', saveDirectory: null,annotationColor:'#ef6262',annotationWidth:3,closeToTray:false,markdownSplitPercent:50,workflows:[],browserBookmarks:[] };
+export type PreferencesPatch = Partial<Pick<Preferences, 'theme' | 'viewMode' | 'fontFamily' | 'fontSize' | 'captureShortcut' | 'fullscreenShortcut'|'annotationColor'|'annotationWidth'|'closeToTray'|'markdownSplitPercent'|'workflows'|'browserBookmarks'|'browserHomeUrl'|'browserSearchEngine'>>;
+export const defaults: Preferences = { schemaVersion: 1, theme: 'dark', viewMode: 'grid', fontFamily: 'system', fontSize: 16, captureShortcut: 'Ctrl+Shift+2', fullscreenShortcut: 'Ctrl+Shift+1', saveDirectory: null,annotationColor:'#ef6262',annotationWidth:3,closeToTray:false,markdownSplitPercent:50,workflows:[],browserBookmarks:[],browserHomeUrl:'https://cn.bing.com/',browserSearchEngine:'bing' };
 export function parseSettings(value: unknown): SettingsSnapshot {
   if (!value || typeof value !== 'object') throw new Error('设置响应无效。');
   const s = value as Record<string, unknown>; const p = s.preferences as Record<string, unknown> | undefined;
@@ -16,6 +16,10 @@ export function parseSettings(value: unknown): SettingsSnapshot {
   if(p.markdownSplitPercent===undefined)p.markdownSplitPercent=50;
   p.workflows=parseWorkflows(p.workflows??[]);
   p.browserBookmarks=parseBookmarks(p.browserBookmarks??[]);
+  if(p.browserHomeUrl===undefined)p.browserHomeUrl=defaults.browserHomeUrl;
+  if(p.browserSearchEngine===undefined)p.browserSearchEngine=defaults.browserSearchEngine;
+  if(typeof p.browserHomeUrl!=='string'||!['bing','google'].includes(String(p.browserSearchEngine)))throw Error('浏览器主页或搜索设置无效。');
+  p.browserHomeUrl=normalizeBookmark('主页',p.browserHomeUrl).url;
   if(typeof p.markdownSplitPercent!=='number'||!Number.isInteger(p.markdownSplitPercent)||p.markdownSplitPercent<20||p.markdownSplitPercent>80)throw new Error('分栏比例无效。');
   return value as SettingsSnapshot;
 }

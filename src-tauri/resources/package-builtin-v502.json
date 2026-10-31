@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "sequence": 1,
+  "expiresAt": 0,
+  "packages": [
+    {
+      "id": "model.ocr-line",
+      "name": "中英文ONNX行识别",
+      "description": "PaddleOCR转换模型；单行选区识别，整页继续使用Windows OCR。",
+      "version": "1.0.1",
+      "publisher": "ResearchClip / SWHL RapidOCR / PaddlePaddle",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/SWHL/RapidOCR/blob/1cfba2e90fc938db55889873735088de210cc173/README.md",
+      "source": "https://huggingface.co/SWHL/RapidOCR",
+      "kind": "MODEL_PACKAGE",
+      "appVersion": "=5.0.2",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "dependencies": [],
+      "adapter": "ocr-line",
+      "files": [
+        {
+          "path": "rec.onnx",
+          "url": "https://huggingface.co/SWHL/RapidOCR/resolve/1cfba2e90fc938db55889873735088de210cc173/PP-OCRv4/ch_PP-OCRv4_rec_infer.onnx",
+          "size": 10857958,
+          "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b",
+          "entries": []
+        },
+        {
+          "path": "characters.txt",
+          "url": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/v2.7.3/ppocr/utils/ppocr_keys_v1.txt",
+          "size": 26249,
+          "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "plugin.zotero-connector",
+      "name": "ResearchClip Zotero Connector",
+      "description": "Zotero10.0.6专用；下载后按Zotero机制安装。",
+      "version": "1.0.1",
+      "publisher": "ResearchClip contributors",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/wpy-sketch/ResearchClip-Codex/blob/v5.0.0/zotero-connector/LICENSE",
+      "source": "https://github.com/wpy-sketch/ResearchClip-Codex",
+      "kind": "EXTERNAL_PLUGIN",
+      "appVersion": "=5.0.2",
+      "platforms": [
+        "windows-x86_64"
+      ],
+      "dependencies": [],
+      "adapter": "external",
+      "files": [
+        {
+          "path": "ResearchClip-Zotero-Connector-v1.0.1.xpi",
+          "url": "https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.2/ResearchClip-Zotero-Connector-v1.0.1.xpi",
+          "size": 10503,
+          "sha256": "1f98896eeef54ead00c5405d2460578d3269d82a5a011038779c9a9e2973fdc2",
+          "entries": []
+        }
+      ]
+    }
+  ]
+}

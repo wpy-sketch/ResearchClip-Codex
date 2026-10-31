@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "ResearchClip",
-  "version": "5.0.2",
+  "version": "5.1.0",
   "identifier": "io.researchclip.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -48,7 +48,12 @@
       "resources/native/LICENSE": "licenses/onnxruntime-MIT.txt",
       "resources/native/ThirdPartyNotices.txt": "licenses/onnxruntime-ThirdPartyNotices.txt",
       "../docs/licenses/step2-dependencies-NOTICES.txt": "licenses/step2-dependencies-NOTICES.txt",
-      "../docs/licenses/PaddleOCR-Apache-2.0.txt": "licenses/PaddleOCR-Apache-2.0.txt"
+      "../docs/licenses/PaddleOCR-Apache-2.0.txt": "licenses/PaddleOCR-Apache-2.0.txt",
+      "../semantic-search/licenses/APACHE-2.0.txt": "licenses/semantic-APACHE-2.0.txt",
+      "../semantic-search/licenses/CLIP-MIT.txt": "licenses/semantic-CLIP-MIT.txt",
+      "../semantic-search/licenses/NOTICE.txt": "licenses/semantic-NOTICE.txt",
+      "../browser-extension/LICENSE": "licenses/ResearchClip-clipper-MIT.txt",
+      "../docs/licenses/webview2-com-MIT.txt": "licenses/webview2-com-MIT.txt"
     },
     "targets": [
       "nsis"

@@ -111,17 +111,18 @@ def validate_manual_asset_links(assets,metadata):
     if (assets/'catalog.json').read_bytes()!=(ROOT/'src-tauri/resources/package-builtin.json').read_bytes():raise ValueError('Release catalog differs from the compiled component definition')
     catalog=json.loads((assets/'catalog.json').read_text(encoding='utf-8'));files={p['name']:p for p in metadata['files']}
     packages={p['id']:p for p in catalog['packages']}
-    if set(packages)!={'model.ocr-line','plugin.zotero-connector'}:raise ValueError('Unexpected manual components')
-    allowed={exe,'catalog.json','delivery.json','rec.onnx','characters.txt','compatibility.json','zotero-updates.json','COMPONENT-SOURCES.txt','OCR-LICENSE-APACHE-2.0.txt'}
+    if set(packages)!={'model.ocr-line','plugin.zotero-connector','model.semantic','plugin.browser-clipper'}:raise ValueError('Unexpected manual components')
+    allowed={exe,'catalog.json','delivery.json','rec.onnx','characters.txt','compatibility.json','zotero-updates.json','COMPONENT-SOURCES.txt','OCR-LICENSE-APACHE-2.0.txt','SEMANTIC-APACHE-2.0.txt','SEMANTIC-CLIP-MIT.txt','SEMANTIC-NOTICE.txt','CLIPPER-LICENSE-MIT.txt','HISTORY-INDEX.json','USER-GUIDE.zip','INSTALLATION_GUIDE.md','EXTENSION_GUIDE.md','RELEASE_NOTES.md'}
     for identity,p in packages.items():
         manifest=identity+'.manifest.json';allowed.add(manifest)
         if p['appVersion']!='='+v or json.loads((assets/manifest).read_text(encoding='utf-8'))!=p:raise ValueError('Manual component manifest/version mismatch')
         for a in p['files']:
+            allowed.add(a['path'])
             declared=files.get(a['path'])
             if not declared or declared['size']!=a['size'] or declared['sha256']!=a['sha256']:raise ValueError('Manual component hash mismatch')
-            if identity=='plugin.zotero-connector':
+            if identity in ('plugin.zotero-connector','plugin.browser-clipper'):
                 allowed.add(a['path'])
-                if a['url']!=f'https://github.com/{repo}/releases/download/{tag}/{a["path"]}':raise ValueError('Connector URL differs from verified origin/tag')
+                if a['url']!=f'https://github.com/{repo}/releases/download/{tag}/{a["path"]}':raise ValueError('External component URL differs from verified origin/tag')
     if set(files)!=allowed:raise ValueError('Missing or unauthorized manual release assets; updater signatures/latest.json must not be fabricated')
     delivery=json.loads((assets/'delivery.json').read_text(encoding='utf-8'))
     if delivery!={'schemaVersion':1,'mode':MANUAL_MODE,'updater':'DISABLED_MANUAL_DOWNLOAD','catalog':'EXACT_COMPILED_MANIFEST','signingKeysRequired':False}:raise ValueError('Manual delivery policy mismatch')

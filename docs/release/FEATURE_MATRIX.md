@@ -1,6 +1,10 @@
 # Step 1 功能与组件核查矩阵
 
-## 5.0.0本轮补充（2026-10-29）
+## 5.1.0本轮补充（2026-10-31）
+
+扩展中心接入实际本机探针并定位对应配置；固定可安装清单为OCR、原生CPU图文语义模型、Zotero Connector和MIT网页剪藏包。Bing地址草稿、默认首页、搜索设置和原生失败诊断已增量修复。旧公式Python路径与Qwen本地导入保留，完整原生公式一键链及Qwen托管安装仍未交付。无IDE、PDF导出或独立备份恢复；SQLite21不变。实际测试与发布状态见[本轮报告](../qa/FINAL_RELEASE_REPORT.md)。
+
+## 5.0.0历史补充（2026-10-29）
 
 下文Step1为历史快照。当前注册表48项，28项IMPLEMENTED、20项PARTIAL；新增Windows工作台内嵌网页，保留真正Chrome入口。真实Zotero10.0.6五类15项CRUD、Markdown原生保存重开和当前OCR推理已另行验证，不把历史“待验收”当作本轮结果。完整补充、仍缺能力及测试边界见[当前审查](../qa/BROWSER_WORKSPACE_500.md)。尚未验证的模型/扩展不进入当前可安装目录；IDE、HarmonyOS、未来Agent能力未因此自动实施。用户要求本轮先上传源码和Release草稿，独立干净Windows验收保留。
 

@@ -15,3 +15,6 @@ zotero-connector/bootstrap.js -text
 zotero-connector/connector.js -text
 zotero-connector/LICENSE -text
 zotero-connector/README.md -text
+
+# Stable proof bytes across local and CI Windows builds.
+src-tauri/resources/package-builtin.json text eol=lf

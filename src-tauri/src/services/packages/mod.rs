@@ -138,6 +138,7 @@ impl PackageManager {
         for legacy_payload in [
             include_str!("../../../resources/package-builtin-v500.json"),
             include_str!("../../../resources/package-builtin-v501.json"),
+            include_str!("../../../resources/package-builtin-v502.json"),
         ] {
             let legacy: Catalog =
                 serde_json::from_str(legacy_payload).map_err(|_| "旧版内置组件清单无效。")?;
@@ -386,11 +387,6 @@ impl PackageManager {
             .clone();
         if package.adapter == "math" {
             return Err("公式权重许可证及当前可信原生适配尚未交付，已禁用一键安装。".into());
-        }
-        if package.adapter == "semantic" {
-            return Err(
-                "锁定视觉权重的独立分发许可尚未核实，一键安装已禁用；已有手动研究方案保留。".into(),
-            );
         }
         models::ModelManager::validate_model_manifest(&package)?;
         self.compatible(&package, &s.registry)?;

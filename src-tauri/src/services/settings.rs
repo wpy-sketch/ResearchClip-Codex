@@ -35,6 +35,16 @@ pub struct Preferences {
     pub workflows: Vec<WorkflowConfig>,
     #[serde(default)]
     pub browser_bookmarks: Vec<BrowserBookmark>,
+    #[serde(default = "default_browser_home")]
+    pub browser_home_url: String,
+    #[serde(default = "default_browser_search")]
+    pub browser_search_engine: String,
+}
+fn default_browser_home() -> String {
+    "https://cn.bing.com/".into()
+}
+fn default_browser_search() -> String {
+    "bing".into()
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -143,6 +153,8 @@ impl Default for Preferences {
             markdown_split_percent: default_markdown_split_percent(),
             workflows: vec![],
             browser_bookmarks: vec![],
+            browser_home_url: default_browser_home(),
+            browser_search_engine: default_browser_search(),
         }
     }
 }
@@ -161,6 +173,8 @@ pub struct PreferencesPatch {
     pub markdown_split_percent: Option<u8>,
     pub workflows: Option<Vec<WorkflowConfig>>,
     pub browser_bookmarks: Option<Vec<BrowserBookmark>>,
+    pub browser_home_url: Option<String>,
+    pub browser_search_engine: Option<String>,
     // Paths can only be changed by the Rust folder-dialog command.
 }
 #[derive(Clone, Debug, Serialize)]
@@ -220,6 +234,12 @@ pub fn shortcut(value: &str) -> Result<Shortcut, CaptureError> {
 fn validate(value: &Preferences) -> Result<(), CaptureError> {
     validate_workflows(&value.workflows)?;
     validate_bookmarks(&value.browser_bookmarks)?;
+    if value.browser_home_url.len() > 2048
+        || super::browser_links::public_url(&value.browser_home_url).is_err()
+        || !["bing", "google"].contains(&value.browser_search_engine.as_str())
+    {
+        return Err(invalid());
+    }
     if value.schema_version != 1
         || !["dark", "light", "system"].contains(&value.theme.as_str())
         || !["grid", "list"].contains(&value.view_mode.as_str())
@@ -482,6 +502,14 @@ impl SettingsService {
             }
             validate_bookmarks(&v)?;
             next.browser_bookmarks = v;
+        }
+        if let Some(v) = patch.browser_home_url {
+            next.browser_home_url = super::browser_links::public_url(v.trim())
+                .map_err(|_| invalid())?
+                .to_string();
+        }
+        if let Some(v) = patch.browser_search_engine {
+            next.browser_search_engine = v;
         }
         if (edit_region && palette_key(&next.capture_shortcut))
             || (edit_full && palette_key(&next.fullscreen_shortcut))
@@ -1413,5 +1441,57 @@ mod tests {
             Some(ShortcutAction::Region)
         );
         assert_eq!(fs::read(path).unwrap(), b"corrupt");
+    }
+    #[test]
+    fn browser_settings_are_additive_persistent_and_reject_unsafe_urls() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.json");
+        let service = registered_service(path.clone());
+        assert_eq!(
+            service
+                .snapshot()
+                .unwrap()
+                .preferences
+                .browser_search_engine,
+            "bing"
+        );
+        service
+            .update(
+                PreferencesPatch {
+                    browser_home_url: Some("https://cn.bing.com/".into()),
+                    browser_search_engine: Some("google".into()),
+                    ..Default::default()
+                },
+                None,
+                |_, _| panic!("shortcut unchanged"),
+            )
+            .unwrap();
+        let bytes = fs::read(&path).unwrap();
+        let reloaded = SettingsService::load(path.clone()).snapshot().unwrap();
+        assert_eq!(
+            reloaded.preferences.browser_home_url,
+            "https://cn.bing.com/"
+        );
+        assert_eq!(reloaded.preferences.browser_search_engine, "google");
+        for url in [
+            "file:///C:/data",
+            "http://localhost/",
+            "https://u:p@example.com",
+            "javascript:alert(1)",
+        ] {
+            assert!(
+                service
+                    .update(
+                        PreferencesPatch {
+                            browser_home_url: Some(url.into()),
+                            ..Default::default()
+                        },
+                        None,
+                        |_, _| Ok(())
+                    )
+                    .is_err()
+            );
+            assert_eq!(fs::read(&path).unwrap(), bytes);
+        }
     }
 }

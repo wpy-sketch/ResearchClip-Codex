@@ -62,9 +62,12 @@ pub async fn package_center(
             Request::Source { id } => {
                 let url = match id.as_str() {
                     "plugin.browser-clipper" | "resource.clipper-host" => {
-                        "https://github.com/wpy-sketch/ResearchClip/releases"
+                        "https://github.com/wpy-sketch/ResearchClip-Codex/releases"
                     }
                     "plugin.zotero-connector" => "https://github.com/wpy-sketch/ResearchClip-Codex",
+                    "app.release" => {
+                        "https://github.com/wpy-sketch/ResearchClip-Codex/releases/latest"
+                    }
                     _ => return Err(fail("该组件没有已核实的外部发布入口。")),
                 };
                 app.opener()

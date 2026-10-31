@@ -65,3 +65,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\register-host.ps1 -Action 
 扩展运行时：Readability0.6.0（Apache-2.0）、DOMPurify3.4.17（MPL-2.0 OR Apache-2.0）、Turndown7.2.4（MIT）；静态离线打包，不从CDN加载。Readability本身不保证清理安全，另加DOMPurify并移除表单；预览使用文本框，桌面沿用skipHtml的安全Markdown渲染器。
 
 通信及威胁边界见[协议](PROTOCOL.md)；实际命令、失败和人工清单见[验收](../docs/qa/RELEASE-1.0.2.md)。普通文章、复杂网站、实际图标点击、同源图片下载和Chrome逐个验证，不能用Mock或直连Host冒充完整浏览器验收。
+
+## 本项目许可
+
+网页剪藏扩展、Native Messaging Host 与通信协议的本项目代码采用[MIT](LICENSE)，版权声明随安装资源一起提供。第三方依赖保持原有许可证；正式包包含`licenses/`和`THIRD-PARTY-NOTICES.txt`。下载只取得文件，仍需在Chrome或Edge按扩展机制安装及手动注册Host。应用不会静默执行注册脚本。
+
+v1.0.3为许可与说明补充包：保留已发布v1.0.2的Host（二进制SHA-256见包内BINARY-PROVENANCE.json）、协议1和剪藏脚本；浏览器Manifest包装版本更新为1.0.3，扩展ID不变。维护者运行`python scripts/build_clipper_component.py --output artifacts/新目录/ResearchClip-WebClipper-v1.0.3-windows-x64.zip`可从精确钉住的原发布文件生成确定性补充包，脚本不执行或注册Host。开发源码检查仍使用上文npm与Cargo命令。

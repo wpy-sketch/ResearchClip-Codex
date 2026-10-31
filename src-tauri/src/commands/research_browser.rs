@@ -1,14 +1,18 @@
 //! Unprivileged native child view. Remote pages never receive an application capability.
 use super::{CommandError, library::check};
 use serde::{Deserialize, Serialize};
-use std::sync::{Arc, Mutex};
+use std::sync::{
+    Arc, Mutex,
+    atomic::{AtomicU64, Ordering},
+};
 use tauri::{
     AppHandle, Manager, PhysicalPosition, PhysicalSize, Rect, WebviewUrl, WebviewWindow,
     WebviewWindowBuilder,
-    webview::{NewWindowResponse, PageLoadEvent, PermissionResponse},
+    webview::{NewWindowResponse, PermissionResponse},
 };
 const LABEL: &str = "research-browser";
-const HOME: &str = "https://www.google.com/";
+#[cfg(test)]
+const HOME: &str = "https://cn.bing.com/";
 #[cfg(target_os = "windows")]
 fn embedded_builder<'a>(
     builder: WebviewWindowBuilder<'a, tauri::Wry, AppHandle>,
@@ -31,11 +35,14 @@ pub struct Snapshot {
     loading: bool,
     notice: String,
     visible: bool,
+    failed: bool,
 }
 #[derive(Default)]
 pub struct BrowserHost {
     operation: Mutex<()>,
     snapshot: Mutex<Snapshot>,
+    navigation_id: Mutex<u64>,
+    generation: AtomicU64,
 }
 #[derive(Clone, Copy, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -90,6 +97,130 @@ fn notice(app: &AppHandle, message: &str) {
         s.notice = message.into();
     }
 }
+// Native completion reports DNS, TLS and connection failures that page-load callbacks omit.
+#[cfg(target_os = "windows")]
+fn observe_navigation(
+    view: &WebviewWindow,
+    host: Arc<BrowserHost>,
+    generation: u64,
+) -> Result<(), CommandError> {
+    use webview2_com::{NavigationCompletedEventHandler, NavigationStartingEventHandler};
+    let (tx, rx) = std::sync::mpsc::sync_channel(1);
+    view.with_webview(move |view| {
+        let result = (|| unsafe {
+            let core = view.controller().CoreWebView2()?;
+            let starting_host = host.clone();
+            let starting = NavigationStartingEventHandler::create(Box::new(move |_, args| {
+                if starting_host.generation.load(Ordering::SeqCst) != generation {
+                    return Ok(());
+                }
+                if let Some(args) = args {
+                    let mut id = 0;
+                    args.NavigationId(&mut id)?;
+                    if let (Ok(mut current), Ok(mut state)) = (
+                        starting_host.navigation_id.lock(),
+                        starting_host.snapshot.lock(),
+                    ) {
+                        *current = id;
+                        state.loading = true;
+                        state.failed = false;
+                        state.notice.clear();
+                    }
+                }
+                Ok(())
+            }));
+            let completed = NavigationCompletedEventHandler::create(Box::new(move |_, args| {
+                if host.generation.load(Ordering::SeqCst) != generation {
+                    return Ok(());
+                }
+                if let Some(args) = args {
+                    let mut id = 0;
+                    let mut success = Default::default();
+                    let mut error = Default::default();
+                    args.NavigationId(&mut id)?;
+                    args.IsSuccess(&mut success)?;
+                    args.WebErrorStatus(&mut error)?;
+                    if let (Ok(current), Ok(mut state)) =
+                        (host.navigation_id.lock(), host.snapshot.lock())
+                        && id == *current
+                    {
+                        state.loading = false;
+                        state.failed = !success.as_bool() && error.0 != 14;
+                        if state.failed {
+                            state.notice = navigation_error(error.0).into();
+                        }
+                    }
+                }
+                Ok(())
+            }));
+            let mut token = 0;
+            core.add_NavigationStarting(&starting, &mut token)?;
+            core.add_NavigationCompleted(&completed, &mut token)?;
+            Ok::<(), webview2_com::Error>(())
+        })();
+        let _ = tx.send(result.is_ok());
+    })
+    .map_err(|_| fail("无法配置网页加载诊断。"))?;
+    if rx.recv_timeout(std::time::Duration::from_secs(10)) != Ok(true) {
+        return Err(fail("网页加载诊断初始化失败，请关闭网页后重试。"));
+    }
+    Ok(())
+}
+#[cfg(not(target_os = "windows"))]
+fn observe_navigation(_: &WebviewWindow, _: Arc<BrowserHost>, _: u64) -> Result<(), CommandError> {
+    Ok(())
+}
+fn navigation_error(code: i32) -> &'static str {
+    match code {
+        1..=5 => "网页证书验证失败。请检查系统时间或联系网站，不会跳过证书检查。",
+        7 => "网页连接超时，请检查网络或代理后重试。",
+        13 => "无法解析网站域名，请检查网址、DNS或系统网络。",
+        17 | 18 => "网站或系统代理需要身份验证，请在系统或外部浏览器中配置。",
+        _ => "网页连接失败，请检查系统网络、代理或网站服务后重试。",
+    }
+}
+fn browser_data_dir(app: &AppHandle) -> Result<std::path::PathBuf, CommandError> {
+    // Separate the remote site's WebView environment from the trusted workbench.
+    let root = if cfg!(debug_assertions) {
+        std::env::var_os("RESEARCHCLIP_TEST_SETTINGS_DIR").map(std::path::PathBuf::from)
+    } else {
+        None
+    }
+    .or_else(|| app.path().app_local_data_dir().ok())
+    .ok_or_else(|| fail("网页缓存目录不可用。"))?;
+    let path = root.join("research-browser-v1");
+    crate::storage::files::directory(&path)
+        .map_err(|_| fail("网页缓存目录不可写或路径不安全；原资料未修改。"))?;
+    Ok(path)
+}
+// Keep the native browser above the trusted workbench's full-client WebView.
+// Showing a WS_CHILD alone does not preserve sibling Z order after focus changes.
+#[cfg(target_os = "windows")]
+fn raise_browser(view: &WebviewWindow) -> Result<(), CommandError> {
+    use windows::Win32::{
+        Foundation::HWND,
+        UI::WindowsAndMessaging::{
+            HWND_TOP, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SetWindowPos,
+        },
+    };
+    let hwnd = view.hwnd().map_err(|_| fail("无法取得网页窗口。"))?;
+    unsafe {
+        SetWindowPos(
+            HWND(hwnd.0),
+            Some(HWND_TOP),
+            0,
+            0,
+            0,
+            0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW,
+        )
+    }
+    .map_err(|_| fail("网页已加载，但原生显示层级更新失败；请返回工作台后重试。"))
+}
+#[cfg(not(target_os = "windows"))]
+fn raise_browser(_: &WebviewWindow) -> Result<(), CommandError> {
+    Ok(())
+}
 fn execute(
     window: WebviewWindow,
     app: AppHandle,
@@ -110,70 +241,107 @@ fn execute(
         let child = if let Some(v) = app.get_webview_window(LABEL) {
             v
         } else {
+            let generation = host.generation.fetch_add(1, Ordering::SeqCst) + 1;
             let navigation = app.clone();
+            let blank_allowed = std::sync::atomic::AtomicBool::new(true);
             let popup = app.clone();
-            let builder =
-                WebviewWindowBuilder::new(&app, LABEL, WebviewUrl::External(web_url(HOME)?))
-                    .visible(false)
-                    .decorations(false)
-                    .shadow(false)
-                    .skip_taskbar(true)
-                    .focused(false)
-                    .incognito(true)
-                    .devtools(false)
-                    .on_navigation(move |url| {
-                        let allowed = web_url(url.as_str()).is_ok();
-                        if !allowed {
-                            notice(&navigation, "已阻止本地文件、应用协议或内网跳转。");
-                        }
-                        allowed
-                    })
-                    .on_new_window(move |url, _| {
-                        if web_url(url.as_str()).is_ok() {
-                            let a = popup.clone();
-                            tauri::async_runtime::spawn_blocking(move || {
-                                if let Some(v) = a.get_webview_window(LABEL)
-                                    && v.navigate(url).is_err()
-                                {
-                                    notice(&a, "新链接未能打开，请在地址栏重试。");
-                                }
-                            });
-                        } else {
-                            notice(&popup, "已阻止不支持的新窗口地址。");
-                        }
-                        NewWindowResponse::Deny
-                    })
-                    .on_download(|v, _| {
-                        notice(
-                            v.app_handle(),
-                            "应用内浏览器不自动下载文件，请使用外部Chrome下载。",
-                        );
-                        false
-                    })
-                    .on_permission_request(|v, _| {
-                        notice(
-                            v.app_handle(),
-                            "网页设备与通知权限已拒绝；需要这些能力时请使用外部Chrome。",
-                        );
-                        PermissionResponse::Deny
-                    })
-                    .on_document_title_changed(|v, title| {
-                        if let Ok(mut s) = v.state::<Arc<BrowserHost>>().snapshot.lock() {
-                            s.title = title.chars().take(200).collect();
-                        }
-                    })
-                    .on_page_load(|v, payload| {
-                        if let Ok(mut s) = v.state::<Arc<BrowserHost>>().snapshot.lock() {
-                            s.url = payload.url().to_string();
-                            s.loading = matches!(payload.event(), PageLoadEvent::Started);
-                            if s.loading {
-                                s.notice.clear();
-                            }
+            let builder = WebviewWindowBuilder::new(
+                &app,
+                LABEL,
+                WebviewUrl::External(
+                    "about:blank"
+                        .parse()
+                        .map_err(|_| fail("网页初始化地址无效。"))?,
+                ),
+            )
+            .visible(false)
+            .decorations(false)
+            .shadow(false)
+            .skip_taskbar(true)
+            .focused(false)
+            .data_directory(browser_data_dir(&app)?)
+            .incognito(true)
+            .devtools(false)
+            .on_navigation(move |url| {
+                let allowed = web_url(url.as_str()).is_ok()
+                    || (url.as_str() == "about:blank"
+                        && blank_allowed.swap(false, std::sync::atomic::Ordering::SeqCst));
+                if !allowed {
+                    notice(&navigation, "已阻止本地文件、应用协议或内网跳转。");
+                }
+                allowed
+            })
+            .on_new_window(move |url, _| {
+                if web_url(url.as_str()).is_ok() {
+                    let a = popup.clone();
+                    tauri::async_runtime::spawn_blocking(move || {
+                        if let Some(v) = a.get_webview_window(LABEL)
+                            && v.navigate(url).is_err()
+                        {
+                            notice(&a, "新链接未能打开，请在地址栏重试。");
                         }
                     });
-            embedded_builder(builder, &window)?
+                } else {
+                    notice(&popup, "已阻止不支持的新窗口地址。");
+                }
+                NewWindowResponse::Deny
+            })
+            .on_download(|v, _| {
+                notice(
+                    v.app_handle(),
+                    "应用内浏览器不自动下载文件，请使用外部Chrome下载。",
+                );
+                false
+            })
+            .on_permission_request(|v, _| {
+                notice(
+                    v.app_handle(),
+                    "网页设备与通知权限已拒绝；需要这些能力时请使用外部Chrome。",
+                );
+                PermissionResponse::Deny
+            })
+            .on_document_title_changed(move |v, title| {
+                if v.state::<Arc<BrowserHost>>()
+                    .generation
+                    .load(Ordering::SeqCst)
+                    != generation
+                {
+                    return;
+                }
+                if let Ok(mut s) = v.state::<Arc<BrowserHost>>().snapshot.lock() {
+                    s.title = title.chars().take(200).collect();
+                }
+            })
+            .on_page_load(move |v, payload| {
+                if v.state::<Arc<BrowserHost>>()
+                    .generation
+                    .load(Ordering::SeqCst)
+                    != generation
+                {
+                    return;
+                }
+                if let Ok(mut s) = v.state::<Arc<BrowserHost>>().snapshot.lock()
+                    && web_url(payload.url().as_str()).is_ok()
+                {
+                    s.url = payload.url().to_string();
+                }
+            });
+            let view = embedded_builder(builder, &window)?
                 .build()
-                .map_err(|_| fail("无法创建应用内浏览器，请检查WebView2运行时。"))?
+                .map_err(|_| fail("无法创建应用内浏览器，请检查WebView2运行时。"))?;
+            if let Err(error) = observe_navigation(&view, host.inner().clone(), generation) {
+                let _ = view.close();
+                return Err(error);
+            }
+            let home = app
+                .state::<Arc<crate::services::settings::SettingsService>>()
+                .snapshot()
+                .map_err(|_| fail("浏览器设置读取失败。"))?
+                .preferences
+                .browser_home_url;
+            view.navigate(web_url(&home)?)
+                .map_err(|_| fail("浏览器首页未能打开。"))?;
+            view
         };
         child
             .set_position(r.position)
@@ -187,6 +355,7 @@ fn execute(
     } else if matches!(request, BrowserRequest::Hide {} | BrowserRequest::Close {}) {
         if let Some(v) = app.get_webview_window(LABEL) {
             if matches!(request, BrowserRequest::Close {}) {
+                host.generation.fetch_add(1, Ordering::SeqCst);
                 v.close()
             } else {
                 v.hide()
@@ -207,7 +376,13 @@ fn execute(
             BrowserRequest::Back {} => v.eval("history.back()"),
             BrowserRequest::Forward {} => v.eval("history.forward()"),
             BrowserRequest::Reload {} => v.reload(),
-            BrowserRequest::Stop {} => v.eval("window.stop()"),
+            BrowserRequest::Stop {} => {
+                let result = v.eval("window.stop()");
+                if let Ok(mut s) = host.snapshot.lock() {
+                    s.loading = false;
+                }
+                result
+            }
             BrowserRequest::Zoom { factor } => {
                 if !factor.is_finite() || !(0.5..=2.).contains(&factor) {
                     return Err(fail("网页缩放范围为50%–200%。"));
@@ -217,6 +392,14 @@ fn execute(
             _ => unreachable!(),
         }
         .map_err(|_| fail("网页操作失败，请重试或使用外部浏览器。"))?;
+    }
+    let visible = host
+        .snapshot
+        .lock()
+        .map_err(|_| fail("网页状态不可用。"))?
+        .visible;
+    if visible && let Some(view) = app.get_webview_window(LABEL) {
+        raise_browser(&view)?;
     }
     if let Some(view) = app.get_webview_window(LABEL)
         && let Ok(url) = view.url()
@@ -246,6 +429,13 @@ pub async fn research_browser(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn errors_explain_failure_without_weakening_certificate_validation() {
+        assert!(navigation_error(1).contains("不会跳过证书"));
+        assert!(navigation_error(13).contains("DNS"));
+        assert!(navigation_error(7).contains("超时"));
+        assert!(navigation_error(18).contains("代理"));
+    }
     #[test]
     fn web_addresses_are_bounded_and_unprivileged() {
         for s in [

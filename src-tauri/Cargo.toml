@@ -1,6 +1,6 @@
 [package]
 name = "researchclip"
-version = "5.0.2"
+version = "5.1.0"
 description = "Local research screenshot and knowledge card workspace"
 edition = "2024"
 rust-version = "1.99"
@@ -14,7 +14,7 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 researchclip-clipper-protocol = { path = "../browser-extension/protocol" }
-tauri = { version = "2", features = ["tray-icon"] }
+tauri = { version = "=2.12.3", features = ["tray-icon"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 httparse = "=1.10.1"
@@ -43,4 +43,5 @@ tokenizers = { version = "=0.22.2", default-features = false, features = ["fancy
 base64 = "=0.22.1"
 
 [target.'cfg(target_os = "windows")'.dependencies]
+webview2-com = "=0.39.1"
 windows = { version = "0.62.2", features = ["Foundation", "Globalization", "Graphics_Imaging", "Media_Ocr", "Storage_Streams", "Graphics_Capture", "Graphics_DirectX_Direct3D11", "Win32_Graphics_Direct3D", "Win32_Graphics_Direct3D11", "Win32_Graphics_Dxgi_Common", "Win32_System_WinRT_Direct3D11", "Win32_System_WinRT_Graphics_Capture", "Win32_System_WinRT", "Win32_Foundation", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_UI_Shell", "Win32_UI_HiDpi", "Win32_UI_WindowsAndMessaging", "Win32_Security", "Win32_Security_Credentials", "Win32_System_JobObjects", "Win32_System_Threading", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_DataExchange", "Win32_System_Memory"] }

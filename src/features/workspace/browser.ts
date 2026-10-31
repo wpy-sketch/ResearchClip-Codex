@@ -1,14 +1,14 @@
 import {invoke} from '@tauri-apps/api/core';
-export type BrowserSnapshot={url:string;title:string;loading:boolean;notice:string;visible:boolean};
+export type BrowserSnapshot={url:string;title:string;loading:boolean;notice:string;visible:boolean;failed?:boolean};
 export type BrowserBounds={x:number;y:number;width:number;height:number};
 export type BrowserRequest={operation:'show';bounds:BrowserBounds}|{operation:'navigate';url:string}|{operation:'zoom';factor:number}|{operation:'hide'|'back'|'forward'|'reload'|'stop'|'status'|'close'};
 // Serialize lifecycle with toolbar actions; a late show must not cover the next editor.
 let tail:Promise<unknown>=Promise.resolve();
 export function browserRequest(request:BrowserRequest):Promise<BrowserSnapshot>{const next=tail.then(()=>invoke<BrowserSnapshot>('research_browser',{request}));tail=next.catch(()=>undefined);return next;}
-export function browserAddress(input:string):string{
+export function browserAddress(input:string,engine:'bing'|'google'='google'):string{
  const value=input.trim();if(!value||value.length>4096||[...value].some(c=>c.charCodeAt(0)<32||c.charCodeAt(0)===127))throw Error('请输入不超过4096字符的网页地址或搜索词。');
  const explicit=/^[a-z][a-z\d+.-]*:/i.test(value);
- const address=explicit?value:!value.includes(' ')&&value.includes('.')?'https://'+value:'https://www.google.com/search?q='+encodeURIComponent(value);
+ const address=explicit?value:!value.includes(' ')&&value.includes('.')?'https://'+value:(engine==='bing'?'https://cn.bing.com/search?q=':'https://www.google.com/search?q=')+encodeURIComponent(value);
  const url=new URL(address);if(!['https:','http:'].includes(url.protocol)||url.username||url.password)throw Error('只支持不含账号密码的HTTP或HTTPS网页地址。');return url.href;
 }
 export function browserBounds(rect:{x:number;y:number;width:number;height:number},dpr:number,viewport?:{width:number;height:number}):BrowserBounds|null{

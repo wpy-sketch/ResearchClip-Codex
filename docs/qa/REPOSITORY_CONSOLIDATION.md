@@ -1,4 +1,4 @@
-# ResearchClip仓库整合（进行中）
+# ResearchClip仓库整合（迁移与公开下载核验完成，待归档）
 
 2026-10-30。用户明确选择：将历史附件去重归档到ResearchClip-Codex，迁移各版说明；完整核验后将原ResearchClip设为只读迁移入口，不删除。
 
@@ -11,7 +11,7 @@
 
 ## 迁移与验证
 
-固定输入为[审计计划](../release/researchclip-consolidation.json)。它目前是PLAN_NOT_YET_COPIED，不是已迁移成功声明。
+固定输入为[审计计划](../release/researchclip-consolidation.json)。它是不可变的原始输入计划；实际完成状态见[完整回执](evidence/consolidation-20261030/complete.json)，原计划状态不代表当前进度。
 
 新增工作流仅手动触发，固定源和目标仓库，使用目标仓库GITHUB_TOKEN；不需要新增Secret。按[GitHub官方说明](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)，该令牌推送历史引用不会重放旧版本工作流。
 
@@ -21,6 +21,9 @@
 
 ## 当前结果
 
-- 迁移契约单元测试6项通过：确定性ZIP、内容/成员/越界拒绝、远端不覆盖、全映射覆盖、令牌目标约束、公开归档禁止写入。
-- 实际复制、匿名下载、标签保留及各版说明迁移结果待工作流完成后补录。
+- 迁移契约单元测试7项通过：确定性ZIP、内容/成员/越界拒绝、远端不覆盖、全映射覆盖、令牌目标约束、公开归档禁止写入。
+- 八组CI匿名下载全部通过，543个原文件SHA逐一匹配；85个归档资产公开。
+- 49个Git引用对象逐字保留；47个版本说明和4,738条附件映射已迁入目标。当前Latest保持v5.0.1，未覆盖已有Tag、资产或Release。
+- Actions内置令牌在部分历史工作流对象的引用导入/Release创建受到GitHub403限制；核对历史工作流仅手动触发后，使用已有授权官方Git/CLI/API补齐，未新增Secret或放宽权限。CI本身最终任务显示失败，不能称全部CI绿色；实际本地最终回执PASS。
+- [历史归档](https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/researchclip-history-20261030)与原文件映射可公开获取。
 - 原仓库尚未归档；旧下载入口继续保留。GitHub星标、关注及社会关系不属于可合并的Git历史，保留在原仓库，不虚构已转移。

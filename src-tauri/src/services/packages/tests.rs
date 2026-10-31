@@ -128,13 +128,16 @@ fn compiled_manifest_needs_no_keys_and_never_trusts_an_edited_local_catalog_or_p
     assert_eq!(state.catalog_mode, "BUILTIN");
     assert!(!state.published);
     let catalog = state.catalog.unwrap();
-    assert_eq!(catalog.packages.len(), 2);
-    assert!(
-        catalog
-            .packages
-            .iter()
-            .all(|p| ["model.ocr-line", "plugin.zotero-connector"].contains(&p.id.as_str()))
-    );
+    assert_eq!(catalog.packages.len(), 4);
+    assert!(catalog.packages.iter().all(|p| {
+        [
+            "model.ocr-line",
+            "plugin.zotero-connector",
+            "model.semantic",
+            "plugin.browser-clipper",
+        ]
+        .contains(&p.id.as_str())
+    }));
     let package = &catalog.packages[0];
     let proof = service.builtin_proof.as_ref().unwrap();
     service.authenticate_package(package, proof).unwrap();
@@ -647,4 +650,28 @@ fn major_version_upgrade_retains_signed_v4_files_but_requires_a_compatible_packa
         download::hash(&files.join("readme.md")).unwrap(),
         package.files[0].sha256
     );
+}
+
+#[test]
+fn reviewed_semantic_manifest_requires_all_eight_original_weights() {
+    let root = tempfile::tempdir().unwrap();
+    let service = PackageManager::production(root.path().join("packages")).unwrap();
+    let package = service
+        .snapshot()
+        .unwrap()
+        .catalog
+        .unwrap()
+        .packages
+        .into_iter()
+        .find(|p| p.id == "model.semantic")
+        .unwrap();
+    assert_eq!(package.adapter, "semantic");
+    assert_eq!(package.license, "MIT AND Apache-2.0");
+    models::ModelManager::validate_model_manifest(&package).unwrap();
+    let mut missing = package.clone();
+    missing.files.pop();
+    assert!(models::ModelManager::validate_model_manifest(&missing).is_err());
+    let mut changed = package.clone();
+    changed.files[0].sha256 = "a".repeat(64);
+    assert!(models::ModelManager::validate_model_manifest(&changed).is_err());
 }

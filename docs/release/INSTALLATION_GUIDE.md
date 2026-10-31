@@ -1,11 +1,11 @@
 # Windows安装、升级与验收指南
 
-[ResearchClip5.0.1已正式公开](https://github.com/wpy-sketch/ResearchClip-Codex/releases/tag/v5.0.1)，14个资源已逐项匿名下载核对SHA。使用内置固定组件清单与手动升级，无需公私钥配置；完整验收范围见[最终报告](../qa/FINAL_RELEASE_REPORT.md)。
+v5.1.0的公开下载与SHA核对结果以[最终报告](../qa/FINAL_RELEASE_REPORT.md)为准；请从对应Release核对SHA，不把构建快照当作公开下载证明。5.0.1旧版保持可用。使用内置固定组件清单与手动升级，无需公私钥配置；完整验收范围见[最终报告](../qa/FINAL_RELEASE_REPORT.md)。
 
 ## 1. 下载安装
 
-1. 下载[ResearchClip_5.0.1_x64-setup.exe](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.0.1/ResearchClip_5.0.1_x64-setup.exe)和同页SHA256SUMS。以[报告中的实际URL及SHA](../qa/FINAL_RELEASE_REPORT.md)核对，不把Draft视作匿名下载入口。
-2. 在PowerShell运行`Get-FileHash -LiteralPath '.\ResearchClip_5.0.1_x64-setup.exe' -Algorithm SHA256`，与同一Release校验清单核对。哈希只能核对文件一致性，不能代替发布者身份签名。
+1. 下载[ResearchClip_5.1.0_x64-setup.exe](https://github.com/wpy-sketch/ResearchClip-Codex/releases/download/v5.1.0/ResearchClip_5.1.0_x64-setup.exe)和同页SHA256SUMS。以[报告中的实际URL及SHA](../qa/FINAL_RELEASE_REPORT.md)核对，不把Draft视作匿名下载入口。
+2. 在PowerShell运行`Get-FileHash -LiteralPath '.\ResearchClip_5.1.0_x64-setup.exe' -Algorithm SHA256`，与同一Release校验清单核对。哈希只能核对文件一致性，不能代替发布者身份签名。
 3. 运行NSIS安装程序，选择当前用户安装目录。用户资料、截图、Markdown和模型保存在独立数据位置，不随程序安装目录移动。
 4. 从开始菜单或安装目录启动。用户不需要Rust、Node.js或Python开发环境；主程序携带可信原生OCR运行时，模型权重按需安装。WebView2按安装程序依赖机制处理。
 5. PDF文件关联提供“打开方式”，不擅自替换现有默认阅读器。也可在Zotero设置中选择ResearchClip程序作为外部PDF阅读器。

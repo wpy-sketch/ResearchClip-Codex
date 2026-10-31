@@ -8,6 +8,13 @@ vi.mock('../../shared/api/settings', async (original) => ({ ...await original<ty
 const initial = { preferences: defaults, registeredShortcut: 'Ctrl+Shift+2', shortcutError: null, registeredFullscreenShortcut: 'Ctrl+Shift+1', fullscreenShortcutError: null, storageError: null,directoryError:null };
 beforeEach(() => { vi.resetAllMocks(); vi.mocked(isTauri).mockReturnValue(true); useUiStore.setState(useUiStore.getInitialState(), true); useSettingsStore.setState(useSettingsStore.getInitialState(), true); });
 describe('persisted settings boundary', () => {
+  it('validates additive browser preferences and clears a stale error after refresh',async()=>{
+    const legacy={...defaults};delete (legacy as Partial<typeof defaults>).browserHomeUrl;delete (legacy as Partial<typeof defaults>).browserSearchEngine;
+    expect(parseSettings({...initial,preferences:legacy}).preferences).toMatchObject({browserHomeUrl:'https://cn.bing.com/',browserSearchEngine:'bing'});
+    for(const browserHomeUrl of ['file:///C:/data','http://127.0.0.1/','javascript:x'])expect(()=>parseSettings({...initial,preferences:{...defaults,browserHomeUrl}})).toThrow();
+    expect(()=>parseSettings({...initial,preferences:{...defaults,browserSearchEngine:'unsafe'}})).toThrow();
+    useSettingsStore.setState({error:'previous failure'});vi.mocked(getPreferences).mockResolvedValue(initial);await useSettingsStore.getState().refresh();expect(useSettingsStore.getState().error).toBeNull();
+  });
   it('validates system theme, annotation defaults, close behavior and directory warnings',()=>{expect(parseSettings({...initial,preferences:{...defaults,theme:'system',annotationColor:'#00aa88',annotationWidth:7,closeToTray:true},directoryError:'目录不可用'}).directoryError).toBe('目录不可用');for(const patch of [{annotationColor:'red'},{annotationWidth:0},{annotationWidth:33},{annotationWidth:1.5},{closeToTray:'yes'}])expect(()=>parseSettings({...initial,preferences:{...defaults,...patch}})).toThrow();});
   it('loads once and applies persisted appearance', async () => {
     const snapshot = { ...initial, preferences: { ...defaults, theme: 'light' as const, fontFamily: 'serif' as const, fontSize: 18 } };
