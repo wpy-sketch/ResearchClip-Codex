@@ -31,7 +31,10 @@ def main():
         r=subprocess.run(['gh',*args],capture_output=True,text=True,encoding='utf8')
         if r.returncode:raise ValueError('Official GitHub operation failed; no asset overwritten')
         return r.stdout
-    def release():return json.loads(gh('release','view',tag,'--repo',repo,'--json','isDraft,targetCommitish,assets'))
+    def release():
+        identity=json.loads(gh('release','view',tag,'--repo',repo,'--json','databaseId'))
+        value=json.loads(gh('api','repos/'+repo+'/releases/'+str(identity['databaseId'])))
+        return {'isDraft':value['draft'],'targetCommitish':value['target_commitish'],'assets':value['assets']}
     r=release()
     if not r['isDraft'] or r['targetCommitish']!=commit:raise ValueError('Only the exact existing draft is eligible')
     with tempfile.TemporaryDirectory(prefix='researchclip-reviewed-models-') as temp:
