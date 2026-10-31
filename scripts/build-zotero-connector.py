@@ -10,7 +10,8 @@ files=['manifest.json','bootstrap.js','connector.js','LICENSE','README.md'];stre
 with zipfile.ZipFile(stream,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for name in files:
   info=zipfile.ZipInfo(name,date_time=(2026,10,27,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16;z.writestr(info,(source/name).read_bytes())
-body=stream.getvalue();digest=hashlib.sha256(body).hexdigest();out=root/'artifacts/zotero-connector-build'/digest;out.mkdir(parents=True,exist_ok=True);path=out/f'ResearchClip-Zotero-Connector-v{version}.xpi'
+from zotero_xpi_bytes import stable_xpi_bytes
+body=stable_xpi_bytes(stream.getvalue(),{name:(source/name).read_bytes() for name in files},version);digest=hashlib.sha256(body).hexdigest();out=root/'artifacts/zotero-connector-build'/digest;out.mkdir(parents=True,exist_ok=True);path=out/f'ResearchClip-Zotero-Connector-v{version}.xpi'
 if path.exists():assert path.read_bytes()==body
 else:
  with path.open('xb') as f:f.write(body)

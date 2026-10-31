@@ -57,7 +57,7 @@ jobs:
       - name: Test release gate failures
         env:
           PYTHONPATH: scripts
-        run: python -m unittest test_release_gate test_manual_release test_verified_publication
+        run: python -m unittest test_release_gate test_manual_release test_verified_publication test_zotero_xpi_bytes
   build:
     needs: validate
     if: github.event_name != 'workflow_dispatch' || inputs.mode == 'build'
