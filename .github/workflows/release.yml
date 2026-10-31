@@ -7,7 +7,7 @@ on:
       mode:
         description: Build manual-install assets, or publish an already tested build
         type: choice
-        options: [build, publish]
+        options: [build, publish, transfer-models]
         default: build
       build_run_id:
         description: Required for publish; run that produced windows-manual-assets
@@ -23,6 +23,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   validate:
+    if: github.event_name != 'workflow_dispatch' || inputs.mode != 'transfer-models'
     runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +58,7 @@ jobs:
       - name: Test release gate failures
         env:
           PYTHONPATH: scripts
-        run: python -m unittest test_release_gate test_manual_release test_verified_publication test_zotero_xpi_bytes
+        run: python -m unittest test_release_gate test_manual_release test_verified_publication test_zotero_xpi_bytes test_transfer_release_models
   build:
     needs: validate
     if: github.event_name != 'workflow_dispatch' || inputs.mode == 'build'
@@ -121,3 +122,19 @@ jobs:
           if ($env:RECEIPT_PATH -notmatch '^docs/qa/evidence/[a-zA-Z0-9_.-]+\.json$') { throw 'Receipt must be a committed QA evidence file' }
           python scripts/publish_verified_release.py --assets artifacts/manual-release --receipt $env:RECEIPT_PATH
           if ($LASTEXITCODE -ne 0) { throw 'Stable release was not verified' }
+  transfer-models:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'transfer-models'
+    runs-on: windows-2025
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.6'
+      - name: Transfer only exact reviewed large assets into the existing draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/transfer_release_models.py
