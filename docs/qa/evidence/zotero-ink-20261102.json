@@ -1,0 +1,67 @@
+{
+  "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+  "checks": [
+    "source confirmation and navigation in the same JS turn refresh the PDF owner after source-pane unmount; no bridge mocking, manual reload or PDF restart",
+    "native HTTP/SQLite preserves multi-stroke ink and single dot; sidebar SVG and page canvas contain real graphics, list click locates original PDF bounds",
+    "actual WebView2 canvas red pixels match known PDF coordinates at0/90/180/270 degrees and after PDF zoom changes; blank control point remains transparent",
+    "overlay visibility and type filters remove/repaint ink correctly while sidebar previews remain independent of overlay visibility",
+    "clicking page ink focuses the original Zotero key; HTTP403 and local-cache reload preserve graphical preview and page drawing",
+    "ink preview remains inside the native workbench at480/760/1440 CSS pixels; physical mixed-monitor DPI and real Zotero UI remain manual"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/ATTACH01/file/view/url"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/PARENT01"
+    },
+    {
+      "method": "GET",
+      "path": "/api/"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/ATTACH01"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/PARENT01"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/ATTACH01/file/view/url"
+    },
+    {
+      "method": "GET",
+      "path": "/api/"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/ATTACH01"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/ATTACH01/file/view/url"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/0/items/ATTACH01/children"
+    },
+    {
+      "method": "GET",
+      "path": "/api/"
+    }
+  ],
+  "errors": [],
+  "result": "PASS"
+}

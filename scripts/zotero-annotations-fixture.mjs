@@ -16,6 +16,7 @@ export function annotationFixture(library,start,mode,limit=20){
  ];
  const cross=JSON.parse(list[5].data.annotationPosition);cross.nextPageRects=[[30,770,200,790]];list[5].data.annotationPosition=JSON.stringify(cross);
  list[6].data.annotationPosition=JSON.stringify({pageIndex:0,paths:[[10,20,30,40]],width:1});
+ if(mode==='inkPreview')list[6].data.annotationPosition=JSON.stringify({pageIndex:0,paths:[[100,550,200,650,300,550],[120,570,280,570],[200,600]],width:4});
  list[7].data.annotationPosition='{broken';
  const newer=structuredClone(list[0]);newer.version=2;newer.data.annotationText+=' · v2';list.push(newer,item('EX000001','note',1,[[40,50,70,80]],'#5fb236','第二页响应'));
  if(mode==='annotationVersionShift')for(let n=0;n<100;n++)list.push(item('V'+String(n).padStart(7,'0'),'highlight',0,[[20,40,40,60]],'#ffd400','分页版本变化练习'));

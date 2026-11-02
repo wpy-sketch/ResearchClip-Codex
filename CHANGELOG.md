@@ -1,5 +1,9 @@
 # ResearchClip 版本记录
 
+## 5.1.1 — 2026-11-02
+
+Zotero ink 列表加入等比图形预览，保留多笔画、单点和颜色；PDF 页面补充坐标/线宽校验和逐条绘制错误恢复。现有来源身份、SQLite21、依赖和权限保持兼容。见[功能验收](docs/qa/ZOTERO-INK-2026-11-02.md)及[发布说明](docs/release/RELEASE_NOTES.md)。
+
 ## 4.2.7 — 2026-10-27
 
 Zotero标准批注持久待处理、六状态、版本条件双向同步、三方冲突比较与独立处理修订；只读自动刷新默认关闭。schema20事务迁移保留旧截图/Markdown/cache，无新增依赖。界面与四色图标调整，指南33章253练习68图。见[说明](docs/RELEASE-NOTES-4.2.7.md)与[实际验收](docs/qa/RELEASE-4.2.7.md)。

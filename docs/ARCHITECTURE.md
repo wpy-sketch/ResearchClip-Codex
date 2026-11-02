@@ -1,3 +1,5 @@
+2026-11-02 ink 显示增量：沿用 Zotero 标准路径和现有 PDF.js/Canvas 投影，列表添加受校验数字生成的 SVG 预览，页面绘制逐条报告失败并继续显示其余批注；不改变来源身份、schema21、IPC 或依赖。见[实现与验收](qa/ZOTERO-INK-2026-11-02.md)。
+
 v4.4.0开发验收：当前PDF30,000条Zotero标准批注、schema21缓存扩容、批量原子比较和有界DOM/密集绘制；[规模决策](architecture/ZOTERO_ANNOTATION_SCALE_440.md)。用户明确停止IDE开发，前序研究不接入主应用。
 
 v4.2.7 Step16：沿用模块化单体与现有Zotero适配，schema20增量保存标准批注待处理意图、处理修订和来源刷新设置；详见[同步决策](architecture/ZOTERO_ANNOTATION_SYNC_STEP16.md)与[实际验收](qa/RELEASE-4.2.7.md)。
