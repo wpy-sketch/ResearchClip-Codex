@@ -137,4 +137,4 @@ jobs:
       - name: Transfer only exact reviewed large assets into the existing draft
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python scripts/transfer_release_models.py
+        run: python release-transfer-v511/transfer.py

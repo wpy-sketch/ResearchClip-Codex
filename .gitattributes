@@ -18,3 +18,8 @@ zotero-connector/README.md -text
 
 # Stable proof bytes across local and CI Windows builds.
 src-tauri/resources/package-builtin.json text eol=lf
+
+# Preserve the exact locally accepted release transport bytes.
+release-transfer-v511/assets/* binary
+
+release-transfer-v511/parts/* binary

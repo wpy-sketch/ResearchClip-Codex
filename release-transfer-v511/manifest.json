@@ -1,0 +1,827 @@
+{
+  "repository": "wpy-sketch/ResearchClip-Codex",
+  "releaseId": 431008505,
+  "tag": "v5.1.1",
+  "sourceCommit": "9c31486df8f99193f95fe309cae8a8b37af07c7a",
+  "expected": [
+    {
+      "name": "catalog.json",
+      "size": 7119,
+      "sha256": "e048ea8af1d9767898e69cd584fdae8f3e9f87365c2a78fabd57a36d85562317"
+    },
+    {
+      "name": "characters.txt",
+      "size": 26249,
+      "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7"
+    },
+    {
+      "name": "CLIPPER-LICENSE-MIT.txt",
+      "size": 1118,
+      "sha256": "bbaf43ecc449ebe99986421e31b1aceed9f4f7539c45aa6fcb5a6435b317919c"
+    },
+    {
+      "name": "compatibility.json",
+      "size": 502,
+      "sha256": "f60a047b5bcd576172833d8512993787f5c9b0ae97112f2adb4c4eaa1ebb6289"
+    },
+    {
+      "name": "COMPONENT-SOURCES.txt",
+      "size": 846,
+      "sha256": "dcbac0deb80b538553caa49e171ec77b4cbd86b9fcd49a19d36fdd3145542753"
+    },
+    {
+      "name": "delivery.json",
+      "size": 181,
+      "sha256": "6aeead83e61f4aefbf9eeba40156331b7ab5ecac8f9d4d836ca3ea79ab823727"
+    },
+    {
+      "name": "dense.json",
+      "size": 115,
+      "sha256": "48f4dfaf605a6c2869cd200970e54911c6c15053781d2bdcf3e81e89e77662ed"
+    },
+    {
+      "name": "dense.safetensors",
+      "size": 1572984,
+      "sha256": "d12568dc7300970a4d3dbb49068ad16cd89b99840b74b026f8e48071e9414f74"
+    },
+    {
+      "name": "EXTENSION_GUIDE.md",
+      "size": 6950,
+      "sha256": "0a63399c38a26139ed812663511d1d6a483e6a210d5ec0eed94c9541178434f3"
+    },
+    {
+      "name": "HISTORY-INDEX.json",
+      "size": 1617305,
+      "sha256": "38b8cac5bc8e0fe615ac067739c8ed602077aabde244a52790ade8425e1625b2"
+    },
+    {
+      "name": "INSTALLATION_GUIDE.md",
+      "size": 3681,
+      "sha256": "a19e983e84a7c4d091558f8f217adeee63ae2841a4974fcf41e67404b5d7f564"
+    },
+    {
+      "name": "model.ocr-line.manifest.json",
+      "size": 1216,
+      "sha256": "322c61b940eddc60c99922366be183c1da436b0b86970882b8de68a24df21a8c"
+    },
+    {
+      "name": "model.semantic.manifest.json",
+      "size": 3359,
+      "sha256": "95c2d1910b9fa8b6add03ac6950148af7e56e71427c876e805eddb8a992b5f43"
+    },
+    {
+      "name": "OCR-LICENSE-APACHE-2.0.txt",
+      "size": 11438,
+      "sha256": "ff6311c56c1b22c9209c96cc8afc16da91c24ee55a15e14ebc46fe1960dbd856"
+    },
+    {
+      "name": "plugin.browser-clipper.manifest.json",
+      "size": 1054,
+      "sha256": "111c5e843554f352d127bea5faabc8f2f3f3c1e8e6026dc707ac36d3364dd6f8"
+    },
+    {
+      "name": "plugin.zotero-connector.manifest.json",
+      "size": 926,
+      "sha256": "db4b8bb9db29e445048ec989903f03ffe5c4e9db8a27fa54c92d17f65757af4c"
+    },
+    {
+      "name": "pooling.json",
+      "size": 190,
+      "sha256": "a37f83ada23e7887be6b88f4998927dbeac0038af301553c7cd5461413bf1a56"
+    },
+    {
+      "name": "preprocessor.json",
+      "size": 520,
+      "sha256": "6f638fb9401a6d6296feff533ee7efe657b787c49f954f82f5906b36ef2a1b1f"
+    },
+    {
+      "name": "rec.onnx",
+      "size": 10857958,
+      "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b"
+    },
+    {
+      "name": "RELEASE_NOTES.md",
+      "size": 2097,
+      "sha256": "a939deddd8d165035bc3c4cd6e1257155b00825b254fcf9af76b959d0990905a"
+    },
+    {
+      "name": "ResearchClip-WebClipper-v1.0.3-windows-x64.zip",
+      "size": 1306631,
+      "sha256": "1aa42aa289703471f20d0d1c69d5ff8721080e01f7e5915e774b6fd2e23ee29e"
+    },
+    {
+      "name": "ResearchClip-Zotero-Connector-v1.0.1.xpi",
+      "size": 10503,
+      "sha256": "1f98896eeef54ead00c5405d2460578d3269d82a5a011038779c9a9e2973fdc2"
+    },
+    {
+      "name": "ResearchClip_5.1.1_x64-setup.exe",
+      "size": 23490708,
+      "sha256": "af39eeaf503f34d5be350fadb94ab3bbc07a0bb3ad434cb1d74b6256f6c6a80f"
+    },
+    {
+      "name": "SEMANTIC-APACHE-2.0.txt",
+      "size": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "name": "SEMANTIC-CLIP-MIT.txt",
+      "size": 1064,
+      "sha256": "987e63b32f6c89ff5160e429458a872ff048e6860b590a3912e938f9da8f14db"
+    },
+    {
+      "name": "SEMANTIC-NOTICE.txt",
+      "size": 813,
+      "sha256": "d6dd871b96cba8d9c7c0eacba98c07fd3f199758558a4ee723d9b717c59ddb3b"
+    },
+    {
+      "name": "sentence.json",
+      "size": 53,
+      "sha256": "70f4448f31320443fe3557cacea5abf2dcc4915dda8c80646bec9f3bb0aa5a1f"
+    },
+    {
+      "name": "text.onnx",
+      "size": 135377779,
+      "sha256": "fbc8fbeaa5237d96bd1bf430057c70d34de8334a463e933a5faa305f6caeed9c"
+    },
+    {
+      "name": "tokenizer.json",
+      "size": 1961847,
+      "sha256": "5b4e1a8171c81dfd666ae40265b9530c6e0b3d53923fe8ac493dcc84229adf81"
+    },
+    {
+      "name": "USER-GUIDE.zip",
+      "size": 10137557,
+      "sha256": "7651d9c5d67b39ac9b03670aa4aeeb602fedb58b9253ec9fa8987fd3a683bd79"
+    },
+    {
+      "name": "vision.onnx",
+      "size": 89117001,
+      "sha256": "583fd1110a514667812fee7d684952aaf82a99b959760c8d7dca7e0ab9839299"
+    },
+    {
+      "name": "zotero-updates.json",
+      "size": 589,
+      "sha256": "72ddd99c87583c0756a203ced0819da180e0d83bd41d54bf754e83c54c87ddcd"
+    },
+    {
+      "name": "release-build.json",
+      "size": 5700,
+      "sha256": "510cadf911acea43d6db391467f6f5ff48e9cf547069f3c86b5622edfe25b6e8"
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 2830,
+      "sha256": "b7d50fe628369d0a87de00a0fb113c89c2b47cfb437658eccdd9c3fedcec3b56"
+    }
+  ],
+  "payload": [
+    "RELEASE_NOTES.md",
+    "ResearchClip-WebClipper-v1.0.3-windows-x64.zip",
+    "ResearchClip-Zotero-Connector-v1.0.1.xpi",
+    "ResearchClip_5.1.1_x64-setup.exe",
+    "SEMANTIC-APACHE-2.0.txt",
+    "SEMANTIC-CLIP-MIT.txt",
+    "SEMANTIC-NOTICE.txt",
+    "SHA256SUMS",
+    "USER-GUIDE.zip",
+    "rec.onnx",
+    "sentence.json",
+    "tokenizer.json",
+    "zotero-updates.json"
+  ],
+  "parts": {
+    "RELEASE_NOTES.md": [
+      {
+        "file": "00-0000.bin",
+        "size": 2097,
+        "sha256": "a939deddd8d165035bc3c4cd6e1257155b00825b254fcf9af76b959d0990905a",
+        "blobSha": "4116c53f09ff1e091a7325e31cadd774f895d113"
+      }
+    ],
+    "ResearchClip-WebClipper-v1.0.3-windows-x64.zip": [
+      {
+        "file": "01-0000.bin",
+        "size": 524288,
+        "sha256": "d91a6a49f725e38b9ef764964f45c1fffffa7863c7903553ec0f31b9bb2e933a",
+        "blobSha": "09c01703f56c9a55e02d0bb625ff1040083bf153"
+      },
+      {
+        "file": "01-0001.bin",
+        "size": 524288,
+        "sha256": "5b4ad7000fa78396000d9233d8d09e430b5aac660468c598689b03dfa23e8390",
+        "blobSha": "57bed8f0f639774743f95747c8531509c1879fb0"
+      },
+      {
+        "file": "01-0002.bin",
+        "size": 258055,
+        "sha256": "81e40942d8dd46f22da7360d75a56ee9d924632b98fc2ebddd43c28bfaa26365",
+        "blobSha": "efcf9c667e2dc44c66f28fcce75a8cf8b6c6bca8"
+      }
+    ],
+    "ResearchClip-Zotero-Connector-v1.0.1.xpi": [
+      {
+        "file": "02-0000.bin",
+        "size": 10503,
+        "sha256": "1f98896eeef54ead00c5405d2460578d3269d82a5a011038779c9a9e2973fdc2",
+        "blobSha": "f9093308a9db5ca9d6dbcbb60561c9a301eb0942"
+      }
+    ],
+    "ResearchClip_5.1.1_x64-setup.exe": [
+      {
+        "file": "03-0000.bin",
+        "size": 524288,
+        "sha256": "b426732a3fb586919b1dc099c8f8f42b646e92aeaa7c82cd8374cdda589b0d43",
+        "blobSha": "e4ee9e202be83d169cfd36d29f58e1e88fe9c736"
+      },
+      {
+        "file": "03-0001.bin",
+        "size": 524288,
+        "sha256": "9a01ca6ca71966e7edb69272fecd3464810b308063f378abfc2ec4a7608e71d4",
+        "blobSha": "2048d0606af1216bdf0c4f6258c4fa3b8fda741a"
+      },
+      {
+        "file": "03-0002.bin",
+        "size": 524288,
+        "sha256": "50c0c6b5487dddad2d5884eb31baa02c21303a75447970cd2207db7da965603a",
+        "blobSha": "41c5582aac74df79de81fb4823032b7800cc77aa"
+      },
+      {
+        "file": "03-0003.bin",
+        "size": 524288,
+        "sha256": "5d1de0e17059c634574f5838b3b0100ba028274c107dfbf47bcb9eef207d9095",
+        "blobSha": "d1cc67fc06d64a5ce6ac03cbb8aab7133e3cee8f"
+      },
+      {
+        "file": "03-0004.bin",
+        "size": 524288,
+        "sha256": "8e15e43ff8ebb531d9c16b72b5e49c850286aeb3e0cb2566a8e7940a9021d812",
+        "blobSha": "78872e726138bcc79b60a312781f15e15d7517a1"
+      },
+      {
+        "file": "03-0005.bin",
+        "size": 524288,
+        "sha256": "85bd52b6f386a7d7caad2e0ed2e621e19943c6c37b89780c00559072bbc81aec",
+        "blobSha": "5edc996daec62d026dac35ce7058cdbfd8aeb139"
+      },
+      {
+        "file": "03-0006.bin",
+        "size": 524288,
+        "sha256": "f37de41da1b471a4382e6d8af0c66c57df5a1bdcdab7fe2c011d886b8ea19684",
+        "blobSha": "f7f9abeb4a3e9ec57da61d925f95072ee17c2a10"
+      },
+      {
+        "file": "03-0007.bin",
+        "size": 524288,
+        "sha256": "7a2f0fc20a056794ce50e364eb0da3a819bf89064b9a294037e375c70110ca6e",
+        "blobSha": "8a4ccf266d8a441e406bbd8598bad0eacc3af9a2"
+      },
+      {
+        "file": "03-0008.bin",
+        "size": 524288,
+        "sha256": "9905f017cc38d06937cbadbd0f3d64bde95af146b73ec82e0a96fc4ffdca4c8d",
+        "blobSha": "f67ab4554ba9fe276ccf97c3c8dba63739a7a459"
+      },
+      {
+        "file": "03-0009.bin",
+        "size": 524288,
+        "sha256": "c810c3b0b8d5d4ddae505ad2ac3c7c647dc7a2d92de3a442cb65869baebe9dda",
+        "blobSha": "64ef242137419e33d8421edde8e7ac6e733fcb1b"
+      },
+      {
+        "file": "03-0010.bin",
+        "size": 524288,
+        "sha256": "1eb28c3fa79c8bfe1b6068a963f7ac3c68227fb4f5dc8a6c907ec960edc7ad52",
+        "blobSha": "4618be4a27d52f537a06b5dd9584a0b0c8e95f85"
+      },
+      {
+        "file": "03-0011.bin",
+        "size": 524288,
+        "sha256": "89f46d483a6d30fe53157fe3a1307bb5859777a1e510bf077dbaa91ea0d0d865",
+        "blobSha": "9a1aa37a2b2474e38b3758712285c5ea7861aa0e"
+      },
+      {
+        "file": "03-0012.bin",
+        "size": 524288,
+        "sha256": "17437e500275488c8348df8e973bd4ec787421595c4559f58beb06c89d732198",
+        "blobSha": "77ea411861a7237549f108ca5bfd985a7f96c4c4"
+      },
+      {
+        "file": "03-0013.bin",
+        "size": 524288,
+        "sha256": "230954b7dc021df7b00e92c23f4bf7b159c963753a073fe6f3fceb785da8b12a",
+        "blobSha": "557b311ce54c28228d0541c8d8c51394c47e3d0d"
+      },
+      {
+        "file": "03-0014.bin",
+        "size": 524288,
+        "sha256": "276de5c73efcb749c2a297498829ca950bcd0be1d2f6a48ce5fdf2de0c07c718",
+        "blobSha": "42a4519a230b4b6ee2751865955031b6d2e76bb9"
+      },
+      {
+        "file": "03-0015.bin",
+        "size": 524288,
+        "sha256": "24e12e6c8be4eba15b206d5bfcf1c270fb65d4c2e68be6f811813f73138de23e",
+        "blobSha": "b933f2f2b2b84fd9de4608e61af54cd999fb9685"
+      },
+      {
+        "file": "03-0016.bin",
+        "size": 524288,
+        "sha256": "b223dcc071cebe607ebba7c83a7680d997f2c5a03c8c3931acf931527721af20",
+        "blobSha": "52fc6cf007b54312149aefdb912f4310f50b38ef"
+      },
+      {
+        "file": "03-0017.bin",
+        "size": 524288,
+        "sha256": "e3a8b2f6ff94a126ac618265e5666ec149b94d02febbdebd885ec6089d455406",
+        "blobSha": "745ebed850786a9569a6aad30d6260e8aeeb7c25"
+      },
+      {
+        "file": "03-0018.bin",
+        "size": 524288,
+        "sha256": "673c40f41f3428ca52fd88108191fa6e22c1810ef883e54a348b528ffcbf7a3a",
+        "blobSha": "072ff628baa87e06a432efac1c6498e29bd85ef6"
+      },
+      {
+        "file": "03-0019.bin",
+        "size": 524288,
+        "sha256": "c3ce09dc10abd014ae88a0615427098d01b5d022f241bd01219ff2f6e7d3537e",
+        "blobSha": "e6d9d00e4e962deee323e74e171badb1df300100"
+      },
+      {
+        "file": "03-0020.bin",
+        "size": 524288,
+        "sha256": "22fd08fb3a054d78d713e6469ff9175f024764ab804352443bb56368b0f7946e",
+        "blobSha": "067e526bdd9dde2e5f95535427b14df8ab37a379"
+      },
+      {
+        "file": "03-0021.bin",
+        "size": 524288,
+        "sha256": "2fee6cb40fe586ffd3bf53f8c3d4c503c7b51768f2bcb55283e7415c28fa36df",
+        "blobSha": "9b17b4aad817af60e6fa0c088e655423d5ea20cf"
+      },
+      {
+        "file": "03-0022.bin",
+        "size": 524288,
+        "sha256": "8c4d330903966cbcd063a9fce593868bdbf234e7e1c4c4d317d3c9ca34add775",
+        "blobSha": "ae0be853d6e893699ae883eecfce0f61de34b11a"
+      },
+      {
+        "file": "03-0023.bin",
+        "size": 524288,
+        "sha256": "03fff8a54e9489f7932e680d0aa1cb2940d91e380f6242e3b9aaf37609c019dd",
+        "blobSha": "bb19d69f6f9f6817435e16ffa8002066a0e59337"
+      },
+      {
+        "file": "03-0024.bin",
+        "size": 524288,
+        "sha256": "8aabfe068a1a197b58dd6325a23ba5826a20d01d1a92e90c1c5c22c8edaeb37d",
+        "blobSha": "add4b9acb99f917d707d61b02ef16d48e9d5ec93"
+      },
+      {
+        "file": "03-0025.bin",
+        "size": 524288,
+        "sha256": "c6375c8044d2998d0a0eaa2dcf1349fa1affd653fa3e55139bf773e760b8a8de",
+        "blobSha": "51325839a2bbaabd6a69540edd9ae989e400ab7a"
+      },
+      {
+        "file": "03-0026.bin",
+        "size": 524288,
+        "sha256": "a94e477893b6861fdf1cb7440dc455c929c58c72b142123366c0605e89fc7373",
+        "blobSha": "aa38142e8bdda8a09472464c49ab560b1aceacf1"
+      },
+      {
+        "file": "03-0027.bin",
+        "size": 524288,
+        "sha256": "0084e0f2277b149b3c519cec3dc4196741c90485104acaf52a60d60eb244085c",
+        "blobSha": "b4334d5939b9076fc712c3bd27b7fadb6be7c91e"
+      },
+      {
+        "file": "03-0028.bin",
+        "size": 524288,
+        "sha256": "bfa801daff6343cfe8fb6dbc6f796b0e58e11ffc1259535cefbad98054946571",
+        "blobSha": "39c42bad15f259e7d940f112d3b52eee7bdd26eb"
+      },
+      {
+        "file": "03-0029.bin",
+        "size": 524288,
+        "sha256": "86bb7dd0953719311775e9e899bd77b7bff4b84518a541fd24a9ddf5daa2cc0c",
+        "blobSha": "c47686bda07726e0a626c891934ac019a7c97343"
+      },
+      {
+        "file": "03-0030.bin",
+        "size": 524288,
+        "sha256": "374e7c9eafc36b0fb39cb620414fbdd1dd422efea80a8bc5cecf6e5eb419dacf",
+        "blobSha": "4ef779739c9ef60e14e2e062ad9394dfb40dc09a"
+      },
+      {
+        "file": "03-0031.bin",
+        "size": 524288,
+        "sha256": "74e40a805c88a5dbb19937688c295dcdaaa5ba832db28469108e33ea282f76f5",
+        "blobSha": "23aec22360fe4ab4ab46fbc3cd3d436be956fb30"
+      },
+      {
+        "file": "03-0032.bin",
+        "size": 524288,
+        "sha256": "7167e4df02233aaa4f40f0c2c1988228e8684dc5a0669d598e620d7a49f5bff1",
+        "blobSha": "d4dc119ca4729ffb6560eec630ffc2e383e4e79c"
+      },
+      {
+        "file": "03-0033.bin",
+        "size": 524288,
+        "sha256": "4d662905bc4a677f868e50fe34d34b206580f5cb7273b4f1408efd75492b3467",
+        "blobSha": "71896343e4b7525234662976e53e77017184ce57"
+      },
+      {
+        "file": "03-0034.bin",
+        "size": 524288,
+        "sha256": "ea7038f3c11b9b35aac1ea1037dd586683ae1bed8229a363a5a7b6e1ffd462b7",
+        "blobSha": "da184690dbecd2bf6cb847d10983fe71239080b8"
+      },
+      {
+        "file": "03-0035.bin",
+        "size": 524288,
+        "sha256": "f7381499a9325ecfb96eb92a7cd75a65633f98ce6e23f018278ece2f7b78f20f",
+        "blobSha": "64938fa13d4b4ebc66aa5f51bd596218339cc7f3"
+      },
+      {
+        "file": "03-0036.bin",
+        "size": 524288,
+        "sha256": "6ef8cba25a0fc95d32775787b7acddfda9f2460b8d560c97b9c1fb912fa6b967",
+        "blobSha": "3876271a8e0093abc3f51328c11d56f2f20c4cad"
+      },
+      {
+        "file": "03-0037.bin",
+        "size": 524288,
+        "sha256": "a3ec923766635c577864fd27af4597fd0da2d3ebecd2236bafb4431c7a0af748",
+        "blobSha": "622bb73d5fcdae2c4ec2d069bd29c7f66eb1ed09"
+      },
+      {
+        "file": "03-0038.bin",
+        "size": 524288,
+        "sha256": "92d34ec56ed48495cc7a6bece5dc5d2e024e7e099b54f6b12b7980eba55e4cd2",
+        "blobSha": "7b30b8e9649340a94c7825c2df3b0dd6d3d8ed80"
+      },
+      {
+        "file": "03-0039.bin",
+        "size": 524288,
+        "sha256": "92369105b89617270cc1cc0a181668882457d6e356fb61f1c06642d4e83410f8",
+        "blobSha": "06fe0ad060e35172d552204f5919f09cea751800"
+      },
+      {
+        "file": "03-0040.bin",
+        "size": 524288,
+        "sha256": "3ae61bb3c743c4977b2d1350977708e728ac466d24cf62a7e8c6dc888ba405b7",
+        "blobSha": "14c98dbc0e184639cd6978f1d2f95e8dd0d185d9"
+      },
+      {
+        "file": "03-0041.bin",
+        "size": 524288,
+        "sha256": "fd6028a0678c3c5eaa788f1065202f68282f9dada4f9fc116c3c224cc1618705",
+        "blobSha": "4493d5e5bc553775a3dd726f205d396595a4d9c5"
+      },
+      {
+        "file": "03-0042.bin",
+        "size": 524288,
+        "sha256": "53b76804f8ce3c271300d0553985508d8975acbb580a039734b18f15455fe1f2",
+        "blobSha": "284cd3cd3cdca76252cc6c1356cff8120b9d220b"
+      },
+      {
+        "file": "03-0043.bin",
+        "size": 524288,
+        "sha256": "752e9bf855a95f4645fed02ebf9d90e4584864d0e00ffc3b8fd1b85feeab71e8",
+        "blobSha": "57a21976b82b91dc59670cd77a44632e909b99d2"
+      },
+      {
+        "file": "03-0044.bin",
+        "size": 422036,
+        "sha256": "ec7d6ca014ac3b04d2f4df3c41ce2aa9b8a2a8b1544ff71c05eca12b3e546f78",
+        "blobSha": "3122d70c863b7e029c22597a677490355f44d358"
+      }
+    ],
+    "SEMANTIC-APACHE-2.0.txt": [
+      {
+        "file": "04-0000.bin",
+        "size": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "blobSha": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+      }
+    ],
+    "SEMANTIC-CLIP-MIT.txt": [
+      {
+        "file": "05-0000.bin",
+        "size": 1064,
+        "sha256": "987e63b32f6c89ff5160e429458a872ff048e6860b590a3912e938f9da8f14db",
+        "blobSha": "4e97f0b45803b7c04ae89548934af4f257a97501"
+      }
+    ],
+    "SEMANTIC-NOTICE.txt": [
+      {
+        "file": "06-0000.bin",
+        "size": 813,
+        "sha256": "d6dd871b96cba8d9c7c0eacba98c07fd3f199758558a4ee723d9b717c59ddb3b",
+        "blobSha": "8d5d4e6b20b11411faece56ebe8ab40da1898e55"
+      }
+    ],
+    "SHA256SUMS": [
+      {
+        "file": "07-0000.bin",
+        "size": 2830,
+        "sha256": "b7d50fe628369d0a87de00a0fb113c89c2b47cfb437658eccdd9c3fedcec3b56",
+        "blobSha": "6bdeb6928a4de22cf545d2f60001107c71a6ed10"
+      }
+    ],
+    "USER-GUIDE.zip": [
+      {
+        "file": "08-0000.bin",
+        "size": 524288,
+        "sha256": "3e17768d21522ac1e2a5b7d045cf1974acef218f4cb565bd5863248637d057cf",
+        "blobSha": "57f58e7b38f62232b92eace863397de53511e001"
+      },
+      {
+        "file": "08-0001.bin",
+        "size": 524288,
+        "sha256": "6edcdfcd510acaebe8561cfd4567b9a8411a68db2db391b5472556f62c13847d",
+        "blobSha": "d6415f05bd5a2ac6c5dcb006dc64f7341f140085"
+      },
+      {
+        "file": "08-0002.bin",
+        "size": 524288,
+        "sha256": "a615b051d347e18c52215022d0af64526525f34b3b1d401eb917a80c4ea2f32d",
+        "blobSha": "8bfa8dfd4717a5b704c480a1c91da3faa7a6c767"
+      },
+      {
+        "file": "08-0003.bin",
+        "size": 524288,
+        "sha256": "72a6e4f8954c57227ba29fc6ba5d3d9919b564968a36412bd71961624589d641",
+        "blobSha": "4a6e791626f0b1b862fb79371c2e2658442fac2f"
+      },
+      {
+        "file": "08-0004.bin",
+        "size": 524288,
+        "sha256": "6e9ca797c3f6c69f93811eec74c05a07831213fd88406caa8668541e94c450b7",
+        "blobSha": "6b71a1afb28af67492fa7726c52f2d51b6332b56"
+      },
+      {
+        "file": "08-0005.bin",
+        "size": 524288,
+        "sha256": "49349d012fc30b70102dcf55e3a8f1126d74d023c47745a03f3b1cf3e249b82a",
+        "blobSha": "e694b5f643551e8c7106ccda42d08603bf7a2d63"
+      },
+      {
+        "file": "08-0006.bin",
+        "size": 524288,
+        "sha256": "ca83f7aabe5005b492a2645d07b08d107b68db0693ca536263a10ff9bfb6bd22",
+        "blobSha": "9956300a8d14a5ee9ab922e47dcaa65545805572"
+      },
+      {
+        "file": "08-0007.bin",
+        "size": 524288,
+        "sha256": "947d766c46ed26f0be1564b69deffea89ebc1e5eff3fc8723938daf0916d62cd",
+        "blobSha": "cb456e1700ddf7f1b081d00be5ee208f484d7e53"
+      },
+      {
+        "file": "08-0008.bin",
+        "size": 524288,
+        "sha256": "e2b270d6cc7287c154e0a366bd89d7bdb381c69e50b7fc2aab1299fb5a844cd9",
+        "blobSha": "6d9d8e19d840b8cf8dcf680028091e2066d2b6e5"
+      },
+      {
+        "file": "08-0009.bin",
+        "size": 524288,
+        "sha256": "25bc5ef931b9b9d4891783d34bc71a558571d3204799f739a3966ba445237844",
+        "blobSha": "d8d0324f4831f8bbc941cc392ed66772e0759af5"
+      },
+      {
+        "file": "08-0010.bin",
+        "size": 524288,
+        "sha256": "1791ca599b5f49fc0cd5acf1dd4443155806f442737ee93e54fb7ae56daaf162",
+        "blobSha": "56c4056a3bfdbd3ab81522c073320b56e3607a25"
+      },
+      {
+        "file": "08-0011.bin",
+        "size": 524288,
+        "sha256": "dbcc2f44d704e6c336a9d11cd77e9b0bdc24876a0e7f1e9f94e784c5baee3810",
+        "blobSha": "412ef5e8d834fac32a98fb66191ee4297b803681"
+      },
+      {
+        "file": "08-0012.bin",
+        "size": 524288,
+        "sha256": "b93a0f3887bda78150cb5e93cc06d2c3a25f49f86c90c1e6c4bc63d50e99724a",
+        "blobSha": "8c49000757fa07257961fc053933c6162efc7809"
+      },
+      {
+        "file": "08-0013.bin",
+        "size": 524288,
+        "sha256": "9bc6c08eb918e4711f7da1f0cd8a67f720ebee0a33ac0163bbbbc1320dfa5a99",
+        "blobSha": "25bae33f2352da71bd5d287c6a20fe9c494e25c5"
+      },
+      {
+        "file": "08-0014.bin",
+        "size": 524288,
+        "sha256": "4ca7e3823513fc3eb2e972cb1ee3a3e4acf18bc94d773144d4ce7f1c93d8e196",
+        "blobSha": "83a726f01c0f7de507234d9b689160829091259f"
+      },
+      {
+        "file": "08-0015.bin",
+        "size": 524288,
+        "sha256": "828eb4d2a2613ccb0dac9be2ac6f3fa27b604d80041c6fc4a9f5ce49e1b62e86",
+        "blobSha": "265c4b4f9d1c9025e7771cf67176a8e6fed457d3"
+      },
+      {
+        "file": "08-0016.bin",
+        "size": 524288,
+        "sha256": "9aa00a24d33f743a3b68203aa9fad665d8636f528600fbb82c561cdcd0dac46b",
+        "blobSha": "59ba1731037733839448c7ebb8eff4dab101e355"
+      },
+      {
+        "file": "08-0017.bin",
+        "size": 524288,
+        "sha256": "1fb60ef211b7fd799ac9372fc07fd7d83004543988a47ca93a6dd9af2fcceb9f",
+        "blobSha": "e7798149e26b4fbf7ce7dc24e96592a73dbbd828"
+      },
+      {
+        "file": "08-0018.bin",
+        "size": 524288,
+        "sha256": "e1d395443a266e7ad1485494daac7137933b94ce723e8e990445f7f99988dcd4",
+        "blobSha": "faf3bf2ad9cfc58ec94cb9c7a8c5d44c5ab1fe42"
+      },
+      {
+        "file": "08-0019.bin",
+        "size": 176085,
+        "sha256": "19edd70b597e0bd4722222b8b41abff1835bbf91ef39e51a196304834327b226",
+        "blobSha": "9625549299a93a9e7da447886f7345ede97551b6"
+      }
+    ],
+    "rec.onnx": [
+      {
+        "file": "09-0000.bin",
+        "size": 524288,
+        "sha256": "cfa51ce6dca1c813ec9f7756e5572c81b290f3aaa4be2619cb14a4cdb0ba5fed",
+        "blobSha": "024f65ee5e3b19763182a217abec32df3378c920"
+      },
+      {
+        "file": "09-0001.bin",
+        "size": 524288,
+        "sha256": "6d5ea6d8b072023b467fa838bd404e49dda31055594c20bdff94a64602fe03a7",
+        "blobSha": "c81693053856743e74290cee9f326ec88a847fd7"
+      },
+      {
+        "file": "09-0002.bin",
+        "size": 524288,
+        "sha256": "2e82bd551f4e369cae8db2de5dda48e21ae49379364b302e3f6e069ce5a9baff",
+        "blobSha": "6b0bceb9b03141b2b12a5e546b35fc1cff295fe5"
+      },
+      {
+        "file": "09-0003.bin",
+        "size": 524288,
+        "sha256": "6455c5930c7f1d5d68ab9c3f452639ae54f660c8075d2420417eac3a1d33087c",
+        "blobSha": "647f3bf4394743218567c1ab4da28c681539cfed"
+      },
+      {
+        "file": "09-0004.bin",
+        "size": 524288,
+        "sha256": "519dff7e72270a95a76e027e9d3f504fed73cec1e74bb8ca60dd80457bceaa40",
+        "blobSha": "c20a02bbb6c718c57de6babf78d60c4fb22c4938"
+      },
+      {
+        "file": "09-0005.bin",
+        "size": 524288,
+        "sha256": "eecb261a382066a8103c248eed83c88fd097deb09dbbfa23f987a48c7dd9533f",
+        "blobSha": "d1941fd2b4b247874b64586411274620b00a9eb0"
+      },
+      {
+        "file": "09-0006.bin",
+        "size": 524288,
+        "sha256": "c0d2ff88ca42cd316981960cfe160e25b061d2f9c897c21f0cc6c3701fa411dd",
+        "blobSha": "78e4b6196843482b1172e11ebdbb3f242048664b"
+      },
+      {
+        "file": "09-0007.bin",
+        "size": 524288,
+        "sha256": "b7ec7257bcc1b1b7948b283a472354966ef956a608382c9e00f7e18ac077c367",
+        "blobSha": "b4541f687090a4965d7d2077eed28de2e99923a2"
+      },
+      {
+        "file": "09-0008.bin",
+        "size": 524288,
+        "sha256": "1f7bcb64ef880d2e7e6719e8f621f4a888870665e25983a6437713348e4b9383",
+        "blobSha": "5bcc31dbd8d05ad8170bd1708d3268495cfbfff5"
+      },
+      {
+        "file": "09-0009.bin",
+        "size": 524288,
+        "sha256": "cc3a8731bf3b1affb12b0050ea60ee3441bb29c1d6a2ee559a81e5a7771af16b",
+        "blobSha": "76b7699d6197f5b549acb7f31dbd6bc86115b8f9"
+      },
+      {
+        "file": "09-0010.bin",
+        "size": 524288,
+        "sha256": "36ea2bcca89b2beb1c6a783604d76e85f403c07e5a061ee1bbd5338c165bb1e2",
+        "blobSha": "bec7d4e21a6d929361c8fe7210bd1e841019442e"
+      },
+      {
+        "file": "09-0011.bin",
+        "size": 524288,
+        "sha256": "e8892cc0407b1887a408eb6a5855a44804f44098f42e268473396ddfde0b1d94",
+        "blobSha": "b3248139733f908e567f0b93cda6d6f24067eaed"
+      },
+      {
+        "file": "09-0012.bin",
+        "size": 524288,
+        "sha256": "9f97c413301876a3f014e4a470b0c6775127f94a02c25040bbf7f6a782cf1a23",
+        "blobSha": "c2690995a0be6b9f8b39b82b63314611450f5ff0"
+      },
+      {
+        "file": "09-0013.bin",
+        "size": 524288,
+        "sha256": "8103281a1d9c9cc7f2a945eed2ddc849c5e9e4c0069d36ea558a9907859dc9f4",
+        "blobSha": "3d476e61d045f9e38e97038ce59855d2215cd649"
+      },
+      {
+        "file": "09-0014.bin",
+        "size": 524288,
+        "sha256": "0f2b0842b3e803af992f8651e3032bd00b94e308f2beb10b05591d41a5bc67ac",
+        "blobSha": "06dfd3c3880397d922dbc84f2d00f98a59099fe9"
+      },
+      {
+        "file": "09-0015.bin",
+        "size": 524288,
+        "sha256": "5d3d56aec7cc80139a1bc51ba5a1881ad74d84350acc68441666ba70cc8a1214",
+        "blobSha": "fc2f9b17d5e943d267afca8bdb12227c5ee87c91"
+      },
+      {
+        "file": "09-0016.bin",
+        "size": 524288,
+        "sha256": "7e57ea6664656c11ea3dc8b55489c5089cef84cfbd4759ac0e2c63741f098af1",
+        "blobSha": "2ebea22605772f5c979d4abcabbc92068f416c04"
+      },
+      {
+        "file": "09-0017.bin",
+        "size": 524288,
+        "sha256": "974a3491ca9bfb8fdc144428bcb71e2230542ff6746a3dfbf44e2b5d4ee94925",
+        "blobSha": "6fc8b04452c89918120a8400187dde7ff4b7011b"
+      },
+      {
+        "file": "09-0018.bin",
+        "size": 524288,
+        "sha256": "620c8debc45b76f6e6a3ff73f1e226a8f81304c35ecd8dee62cc65701bd2d738",
+        "blobSha": "dcb6f85b9872831de7e6e445d04d53492af6ad46"
+      },
+      {
+        "file": "09-0019.bin",
+        "size": 524288,
+        "sha256": "fa77a20b50550290249b28afd9daf27ddb250221c318040422ceba1b8d118922",
+        "blobSha": "511ba13b7ad253dd582b3d44964f29b3bdb298d9"
+      },
+      {
+        "file": "09-0020.bin",
+        "size": 372198,
+        "sha256": "6a6644177364e16e355500f993ba41a3950fe0c7ec6a6ce82de22e397a3ae47f",
+        "blobSha": "b41a52363013b3257dc7434d12184fc3a9785255"
+      }
+    ],
+    "sentence.json": [
+      {
+        "file": "10-0000.bin",
+        "size": 53,
+        "sha256": "70f4448f31320443fe3557cacea5abf2dcc4915dda8c80646bec9f3bb0aa5a1f",
+        "blobSha": "5fd10429389515d3e5cccdeda08cae5fea1ae82e"
+      }
+    ],
+    "tokenizer.json": [
+      {
+        "file": "11-0000.bin",
+        "size": 524288,
+        "sha256": "786ea6d7deef8f2fae9fbbb59650efc53692aeb332d255475e53a7f22c52adad",
+        "blobSha": "51802348d53caef4ecd825d772ded9f684fbb5d2"
+      },
+      {
+        "file": "11-0001.bin",
+        "size": 524288,
+        "sha256": "d2b6d3dc4c44eea3c71f7f9b2dc99a57f4eb6838dfc18d8a12553f54eac9a73e",
+        "blobSha": "e9d7bdad940fcba1a62e43f13a882df9a788093b"
+      },
+      {
+        "file": "11-0002.bin",
+        "size": 524288,
+        "sha256": "9936e81c56de74efe5fea775598ce412be46ef8028953d8a010bfa0fcf52296f",
+        "blobSha": "20ca3a042791c4bd363cf9507acb6eb28735c39d"
+      },
+      {
+        "file": "11-0003.bin",
+        "size": 388983,
+        "sha256": "1f4b39845861276d07e5fe57edca7b7c25db981be0f509e0b124e7478fda5b4d",
+        "blobSha": "d9072a09cd5f1dceb6e104b80fcd5e0e97770201"
+      }
+    ],
+    "zotero-updates.json": [
+      {
+        "file": "12-0000.bin",
+        "size": 589,
+        "sha256": "72ddd99c87583c0756a203ced0819da180e0d83bd41d54bf754e83c54c87ddcd",
+        "blobSha": "0607ae86db72902daf6540c5c7c13c32b9b3efbb"
+      }
+    ]
+  }
+}
