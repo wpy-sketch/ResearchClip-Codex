@@ -12,7 +12,18 @@
 
 ## 本轮检查
 
-环境：Windows x64 10.0.26300，Node22.22.2/npm10.9.7，项目既有 Rust/Tauri 工具链。具体执行结果在本轮结束后据实补齐；前轮836项测试及原生 ink 验证不冒充本轮结果。
+环境：Windows x64 10.0.26300，Node22.22.2/npm10.9.7、Rust1.99.0、Tauri2.12.3。本轮重新执行以下检查，退出码均为0；与前轮记录分开。
+
+- `npm ci` 干净安装327个包；`npm run check`：108个文件、836项测试，类型检查、ESLint、生产前端构建通过。
+- `npm run format:rust`、`npm run test:rust`、`npm run check:rust`：370项通过、12项专用用例按原配置忽略；包括数据库迁移、回滚与数据保持。
+- 发布门禁、手动发布、公开校验、XPI字节重现及模型传输的23项Python测试通过；`npm run check:docs`通过，文档检查不等同运行验收。
+- `tauri build --debug --no-bundle` 和 `build_manual_release.py` 均实际成功；生产优化NSIS安装器22.40 MiB，32份内容文件加2份元数据，全部本地大小/SHA通过。
+- 当前版本8套本机原生检查通过，详情见[原生事实摘要](evidence/v511-native-summary.json)：ink6组、六类批注/30,000条fixture8组、Markdown7组、PDF摘录11组、离线OCR5组、真实隔离Zotero10.0.6只读3组、既有已发布剪藏Host7组、安装器6组。模式、原始报告路径和SHA分别保留。
+- 实际安装/卸载只使用受管中文/空格路径，验证安装载荷、忙碌拒绝、许可证/运行时、PDF默认程序保持及既有AppData哈希；未向用户真实资料启动主程序。
+
+源码构建提交为 `9c31486df8f99193f95fe309cae8a8b37af07c7a`；安装器 SHA-256 为 `af39eeaf503f34d5be350fadb94ab3bbc07a0bb3ad434cb1d74b6256f6c6a80f`。完整构建与接受范围见[精确发布回执](evidence/v511-release-ready.json)。
+
+失败和修复保留：干净安装首轮因沙盒npm缓存EPERM失败，授权后成功；Rust链接多次因历史生成PDB写入LNK1201失败，保留原调试文件后重新生成，完整测试与Clippy成功。没有移除测试、降低安全断言或删除用户资料。前轮沙盒WebView2页面空列表的失败亦保留。
 
 ## 人工验收与已知限制
 

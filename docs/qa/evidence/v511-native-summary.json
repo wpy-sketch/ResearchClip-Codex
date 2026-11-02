@@ -1,0 +1,127 @@
+{
+  "result": "PASS",
+  "scope": "actual local isolated Windows5.1.1; fixture and real Zotero are explicitly distinguished; not independent-machine or physical-DPI acceptance",
+  "suites": {
+    "ink": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+      "checks": [
+        "source confirmation and navigation in the same JS turn refresh the PDF owner after source-pane unmount; no bridge mocking, manual reload or PDF restart",
+        "native HTTP/SQLite preserves multi-stroke ink and single dot; sidebar SVG and page canvas contain real graphics, list click locates original PDF bounds",
+        "actual WebView2 canvas red pixels match known PDF coordinates at0/90/180/270 degrees and after PDF zoom changes; blank control point remains transparent",
+        "overlay visibility and type filters remove/repaint ink correctly while sidebar previews remain independent of overlay visibility",
+        "clicking page ink focuses the original Zotero key; HTTP403 and local-cache reload preserve graphical preview and page drawing",
+        "ink preview remains inside the native workbench at480/760/1440 CSS pixels; physical mixed-monitor DPI and real Zotero UI remain manual"
+      ],
+      "rawReport": "artifacts/zotero-ink-native-v511-final/report.json",
+      "rawReportSha256": "baf88e8d279331e614ee8834816d949706e2daf5bfd93262dcd8e3b35aff9fb6"
+    },
+    "zoteroAllTypes": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2 and executable argv forwarding; isolated HTTP mock of documented Zotero API, fictional metadata, not Zotero UI acceptance",
+      "checks": [
+        "source confirmation and navigation in the same JS turn refresh the PDF owner after source-pane unmount; no bridge mocking, manual reload or PDF restart",
+        "actual native Rust read/cache and WebView2 six-type filtering, ink paths projected to a native canvas; stable Zotero identities retained, invalid position remains diagnostic",
+        "right PDF navigation resizes with keyboard limits; full Chinese PDF name remains present and wraps",
+        "clicking PDF highlight navigates to the corresponding annotation row without changing document content",
+        "native PDF text selection displays floating five-type toolbar and configurable shortcuts while retaining selected text; external translation/clipboard need desktop acceptance",
+        "rightmost embedded Google browser keeps PDF sessions; return restores the workbench; account/bookmark sync not claimed",
+        "30,000 real fixture records cross native HTTP/SQLite/UI with301 children requests including overflow probe; last record reachable and list mounts only50 rows",
+        "native responsive panels contained at480/760/1440px and CSS75–200%; physical high-DPI and multiple monitors still require manual validation"
+      ],
+      "rawReport": "artifacts/zotero-alltypes-native-v511-final/report.json",
+      "rawReportSha256": "a31fa9a504579b3723429bb9a8bcaf0aae8bc6247c317009cb0b67adf6f67757"
+    },
+    "markdown": {
+      "result": "PASS",
+      "mode": "actual Windows WebView2; new isolated v11 database; generated PNG, not physical screenshot; no Zotero/Agent access",
+      "checks": [
+        "native table editor changes one cell/alignment and saves exact surrounding CRLF mixed document; undo/save restores original byte-for-byte",
+        "native Ctrl+Shift+T grid insertion, cell Tab and escaped pipe save as ordinary GFM with original document prefix unchanged",
+        "native image alt/title and whole-group copy/move/delete keep relative URL and both captions; scoped undo restores each operation",
+        "native language selection changes only fence info; real highlighted code, view-only line numbers/folding and actual system clipboard hash match source without executing HTML",
+        "controlled WebView File drop reaches actual Rust decode/SQLite/import/render/save and creates a persistent relative PNG plus editable annotation area; switching the active owned tab during import keeps the second document unchanged and releases the first; OS OLE drop is a separate locked-desktop blocker",
+        "legacy alt and visible title preserve private version1; copied image/caption has a unique managed name, same screenshot association, exact PNG bytes and existing undo/redo",
+        "actual process restart restores source/table/code and legacy image data; source PNG hashes and dynamic no-document layout remain intact"
+      ],
+      "rawReport": "artifacts/markdown-content-native-v511-final/report.json",
+      "rawReportSha256": "8e485e365642600f5fe8514bfca414803f30a680e31eefb4c5e20bcaf61b4894"
+    },
+    "pdfExcerpt": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2 PDF.js rendering and native SQLite/files, generated calibration PDF; CDP DPR/CSS are simulations, not physical DPI or screen-capture acceptance; render-only scope excludes native file picker and persisted Markdown reopening",
+      "checks": [
+        "local generated PDF opens in the real native viewer with no empty Markdown panel and unchanged source hash",
+        "actual PDF with nonzeroCropBox, UserUnit2 and intrinsic90-degree rotation produces the same physical-point rectangle and independently correct oriented pixels",
+        "actual local CitationChooser selects a stable literature ID; screenshot provenance and existing reference association persist without inventing DOI or verified metadata",
+        "actual PDF.js crops across multiple pages, zoom50/100/150/200%, rotations0/90/180/270, DPI144/216/288, CSS80/125% and emulatedDPR1/2 map canonical rectangles and match four independent source colors without capturing UI",
+        "malformed raw capture IPC is rejected without adding a native screenshot/provenance record",
+        "a real valid native PDF grant reads successfully, refuses a different attachment, and after close cannot save a correctly formed excerpt; no new image or pending intent appears",
+        "implemented PDF commands prepare only the persisted stable location and source notes contain a stable local-literature link",
+        "without an open Markdown, insertion asks explicitly before creating a source draft with image above editable note and stable PDF-location backlink",
+        "existing native image annotation tool edits and saves vectors on the excerpt while original cropped PNG bytes and PDF provenance remain immutable",
+        "two saved crops insert at the retained active Markdown caret in capture order; surrounding text stays intact and relative-image paragraphs include editable source notes",
+        "actual native pointer drag moves the entire image/note/backlink group; one-step undo and redo restore exact Markdown",
+        "closing an unsaved excerpt Markdown asks for confirmation and cancellation retains the complete draft"
+      ],
+      "rawReport": "artifacts/pdf-excerpts-v511-final/report.json",
+      "rawReportSha256": "136940f3600eabd1d80adebf875dd7917262a89e241e4c94d68469f80e3e2ec9"
+    },
+    "ocr": {
+      "result": "PASS",
+      "mode": "actual Windows Tauri/WebView2/Rust with compiled production manifest, real CPU OCR and isolated research data; no keys",
+      "checks": [
+        "production compiled manifest exposes reviewed OCR/semantic/clipper/Connector, requires no key files, disables auto-updater and rejects arbitrary IPC download URLs",
+        "explicit SHA-verified cache installs fixed OCR weights/dictionary through UI confirmation and native CPU inference; no signed catalog or key required",
+        "restart revalidates the exact compiled manifest and file hashes; installed OCR remains ready under a deliberately failing HTTP proxy",
+        "real OCR still runs offline, persists through existing SQLite/FTS and inserts recognized text into Markdown",
+        "enable/disable/uninstall preserve screenshots, OCR records and research database"
+      ],
+      "rawReport": "artifacts/builtin-packages-native-v511-final/report.json",
+      "rawReportSha256": "d8917a58d2e70bedb3dc45ccd2d2369dbe85c644e9b51b909f145ff6ada8250a"
+    },
+    "zotero": {
+      "result": "PASS",
+      "mode": "actual current native app, real Zotero10.0.6 previously isolated profile at32132; read-only HTTP, no write grant or database/PDF modification",
+      "checks": [
+        "current app reads real isolated Zotero source and confirms library0/item9NVC56GE/attachmentPDPNDY9P using official local API",
+        "real existing standard note/highlight/ink load into current native viewer, including the original settled highlight, without duplicate creation",
+        "original Zotero PDF SHA-256 remains unchanged; no Zotero SQLite access and no write authorization requested"
+      ],
+      "rawReport": "artifacts/zotero-live-read-v511-final/report.json",
+      "rawReportSha256": "58a49eb798428738569b377570992934f885e5f7ea536b5d43b4eeb175242f5f"
+    },
+    "clipperHost": {
+      "result": "PASS",
+      "mode": "actual Windows Native Messaging Host stdin/stdout -> authenticated local IPC -> actual Tauri/WebView2/SQLite/files; no browser activeTab claim",
+      "checks": [
+        "real independent host handles desktop-not-running and rejects a different extension origin with binary UTF-8 framing",
+        "desktop connection is opt-in, actual host ping succeeds, and forged local IPC token is rejected",
+        "actual extracted article persists in chosen project; duplicate request returns same document and changed payload under same ID is rejected",
+        "saved article opens in existing Markdown split with source/code intact, local HTML inert, and explicit missing-asset source status",
+        "real PNG bytes are validated and copied to managed relative assets; standard UTF-8 Markdown and independent disk reads match with original PNG hash unchanged",
+        "multi-tab clipping keeps the original unsaved draft, close Cancel preserves it, explicit discard closes only that session, and image notes save through the original Markdown service",
+        "stop releases endpoint; actual process restart retains clips/project grouping/edited Markdown and requires explicit re-enable"
+      ],
+      "rawReport": "artifacts/clipper-native-v511-final/report.json",
+      "rawReportSha256": "0f84aa825b50ea3a1d01feec66d7eab64cd09b4f98d362ffb8d67d4968831db0"
+    },
+    "installer": {
+      "result": "PASS",
+      "mode": "actual NSIS, isolated install path, read-only user-data hashes, process fixture for busy guard",
+      "checks": [
+        "Installed CPU runtime matches exact reviewed size/SHA and valid Microsoft Authenticode; ONNX Runtime and OCR notices match original licensed files.",
+        "Actual per-user silent installation at a Unicode/space path; full payload SHA-256 matches with only the verified Tauri UNK-to-NSS marker, plus version, publisher, icon and uninstall registration.",
+        "Actual installer and uninstaller refuse a running image at the installed executable path; process fixture remains alive and files/registration remain intact.",
+        "Actual PDF OpenWith candidate, quoted Unicode executable command and SupportedTypes registered; existing default/UserChoice preserved before and after ownership-scoped uninstall.",
+        "Actual default silent uninstall removes application files/registration, preserves an unrelated install-folder file and all pre-existing AppData file hashes. No production app was launched against user data.",
+        "Only newly created, verified test installer metadata was cleaned up; user data and evidence retained."
+      ],
+      "rawReport": "artifacts/installer-v511-final/report.json",
+      "rawReportSha256": "f8feb9c2c50b0b9e6c2c14a14f811a5fe3a40e3885ba9c5a5e797166802e0e07",
+      "installerSha256": "af39eeaf503f34d5be350fadb94ab3bbc07a0bb3ad434cb1d74b6256f6c6a80f",
+      "userDataFilesHashed": 181,
+      "signatureStatus": "NotSigned"
+    }
+  }
+}
