@@ -137,4 +137,11 @@ jobs:
       - name: Transfer only exact reviewed large assets into the existing draft
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python release-transfer-v511/transfer.py
+        run: python release-transfer-v511/finalize.py
+      - name: Preserve complete anonymous hash verification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: v511-publication-receipt
+          path: release-transfer-v511/publication-verified.json
+          if-no-files-found: error
+          retention-days: 14
