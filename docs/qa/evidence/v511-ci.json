@@ -1,0 +1,34 @@
+{
+  "result": "PASS",
+  "runId": 41377478128,
+  "url": "https://github.com/wpy-sketch/ResearchClip-Codex/actions/runs/41377478128",
+  "sourceCommit": "9c31486df8f99193f95fe309cae8a8b37af07c7a",
+  "jobs": [
+    {
+      "name": "validate",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "transfer-models",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "build",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "publish",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "publishedInstallerScope": "Exact locally accepted NSIS is preserved; separately rebuilt CI installer is not substituted.",
+  "modelTransferRun": "https://github.com/wpy-sketch/ResearchClip-Codex/actions/runs/41378144061",
+  "exactBytesTransferRun": "https://github.com/wpy-sketch/ResearchClip-Codex/actions/runs/41382078512",
+  "transportCommit": "a475d90fead4d2f4ddb7dd7734145b4e1025ce0f",
+  "transportSourceDifference": "Only isolated workflow/gitattributes/release transport paths; no application source difference from accepted main.",
+  "finalizationRun": "https://github.com/wpy-sketch/ResearchClip-Codex/actions/runs/41383227952"
+}

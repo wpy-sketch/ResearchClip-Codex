@@ -2,6 +2,8 @@
 
 日期：2026-11-02。范围仅为 ResearchClip 中已有 Zotero ink 的列表预览与 PDF 页面显示；不新增编辑、上传、导出或同步功能。
 
+本页保留功能实现当轮结果；后续5.1.1安装包、正式发布和公开下载核验见[发布验收](FINAL_RELEASE_REPORT.md)，不将后续结果回填为本页当轮执行。
+
 ## 实现与文件
 
 - `src/features/pdf/zotero-annotations/InkPreview.tsx`：以现有 `position.paths/width` 生成只读 SVG，保留颜色、多笔画和单点，按 PDF 纵轴翻转并等比居中；包含线帽余量。仅插入受校验数字，不执行外部 SVG/HTML。
